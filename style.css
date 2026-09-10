@@ -271,20 +271,224 @@ body{
 .error-message{text-align:center;padding:36px;color:var(--neon-pink)}
 
 /* ===================== RESPONSIVE ===================== */
-@media(max-width:1200px){.content-section{padding:20px 28px}.hero-content{padding:0 28px 70px}.detail-body{padding:0 28px 36px}.detail-hero-content{padding:0 28px 36px}}
-@media(max-width:768px){
-    .nav-center{display:none}.nav-links a span{display:none}
-    .hero-content{padding:0 18px 50px}.content-section{padding:16px 14px}
-    .movie-card{flex:0 0 135px}
-    .modal-body{flex-direction:column;padding:0 18px 18px}
-    .modal-poster{flex:none;display:flex;justify-content:center}.modal-poster img{max-width:140px}
-    .hero-buttons{flex-direction:column}
-    .footer{padding:22px 14px 14px}
-    .provider-grid{grid-template-columns:repeat(3,1fr)}
-    .detail-hero-content{flex-direction:column;align-items:center;padding:0 18px 28px}
-    .detail-poster{flex:none}.detail-poster img{max-width:150px}
-    .detail-info{text-align:center}.detail-badges{justify-content:center}.detail-actions{justify-content:center}
-    .detail-body{padding:0 14px 28px}.detail-episodes-grid{grid-template-columns:1fr}
-    .detail-ep-thumb{flex:0 0 100px}
+
+/* Large laptops 1024-1200px */
+@media(max-width:1200px){
+    .content-section{padding:18px 24px}
+    .hero-content{padding:0 24px 60px}
+    .detail-body{padding:0 24px 32px}
+    .detail-hero-content{padding:0 24px 32px}
+    .nav-container{padding:0 24px}
+    .footer{padding:28px 24px 12px}
 }
-@media(max-width:480px){.movie-card{flex:0 0 115px}.hero-title{font-size:24px}.modal-title{font-size:18px}.provider-grid{grid-template-columns:repeat(2,1fr)}.detail-title{font-size:20px}}
+
+/* Tablets landscape 768-1024px */
+@media(max-width:1024px){
+    .nav-center{max-width:350px;margin:0 16px}
+    .search-box input{font-size:12px;padding:8px 12px 8px 32px}
+    .hero{height:75vh;min-height:480px}
+    .hero-title{font-size:clamp(28px,4vw,44px)}
+    .hero-desc{font-size:12px;max-height:65px}
+    .hero-content{padding:0 20px 50px}
+    .content-section{padding:16px 20px}
+    .section-title{font-size:13px}
+    .movie-card{flex:0 0 155px}
+    .detail-hero{height:65vh;min-height:420px}
+    .detail-hero-content{padding:0 20px 28px}
+    .detail-poster{flex:0 0 170px}
+    .detail-body{padding:0 20px 28px}
+    .detail-episodes-grid{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+    .footer{padding:24px 20px 12px}
+}
+
+/* Tablets portrait 600-768px */
+@media(max-width:768px){
+    .nav-center{display:none}
+    .nav-links a span{display:none}
+    .nav-links a{padding:8px 10px}
+    .nav-links a i{font-size:16px}
+    .nav-container{padding:0 16px}
+    .hero{height:65vh;min-height:400px}
+    .hero-content{padding:0 16px 40px}
+    .hero-title{font-size:clamp(24px,5vw,36px)}
+    .hero-meta{gap:10px}
+    .meta-item{font-size:11px}
+    .hero-desc{font-size:12px;max-height:60px}
+    .hero-buttons{gap:8px}
+    .btn-primary,.btn-secondary{padding:10px 20px;font-size:12px}
+    .content-section{padding:14px 14px}
+    .section-title{font-size:12px;letter-spacing:1px}
+    .section-header{margin-bottom:10px}
+    .movie-card{flex:0 0 130px}
+    .card-info{padding:6px 2px 0}
+    .card-title{font-size:11px}
+    .card-year{font-size:9px}
+    .detail-hero{height:55vh;min-height:360px}
+    .detail-hero-content{flex-direction:column;align-items:center;text-align:center;padding:0 14px 24px;gap:16px}
+    .detail-poster{flex:none}
+    .detail-poster img{max-width:140px;border-radius:6px}
+    .poster-placeholder{max-width:140px}
+    .detail-info{width:100%}
+    .detail-badges{justify-content:center}
+    .detail-meta{justify-content:center}
+    .detail-overview{font-size:12px;text-align:center}
+    .detail-actions{justify-content:center}
+    .detail-body{padding:0 14px 24px}
+    .detail-section-title{font-size:13px}
+    .detail-episodes-grid{grid-template-columns:1fr}
+    .detail-episode-card{padding:8px}
+    .detail-ep-thumb{flex:0 0 110px;height:65px}
+    .detail-ep-name{font-size:11px}
+    .detail-ep-desc{font-size:10px}
+    .season-tab{min-width:68px;padding:10px 16px}
+    .season-num{font-size:11px}
+    .modal-body{flex-direction:column;padding:0 16px 16px;gap:16px}
+    .modal-poster{flex:none;display:flex;justify-content:center}
+    .modal-poster img{max-width:130px}
+    .modal-title{font-size:20px}
+    .modal-desc{font-size:11px}
+    .modal-buttons{flex-direction:column}
+    .modal-buttons .btn-primary,.modal-buttons .btn-secondary{width:100%;justify-content:center}
+    .provider-grid{grid-template-columns:repeat(3,1fr)}
+    .player-header{padding:12px 16px}
+    .player-title{font-size:13px}
+    .footer{padding:20px 14px 10px}
+    .footer-content{flex-direction:column;text-align:center;gap:10px}
+}
+
+/* Mobile large 480-600px */
+@media(max-width:600px){
+    .nav-links a{padding:6px 8px}
+    .nav-links a i{font-size:15px}
+    .user-profile{width:28px;height:28px;font-size:14px}
+    .hero{height:55vh;min-height:350px}
+    .hero-content{padding:0 14px 35px}
+    .hero-title{font-size:clamp(22px,6vw,32px);letter-spacing:1px}
+    .hero-badge{font-size:9px;padding:5px 10px;letter-spacing:2px}
+    .hero-desc{font-size:11px;max-height:50px}
+    .hero-meta{gap:8px}
+    .meta-item{font-size:10px;gap:3px}
+    .hero-buttons{flex-direction:column;width:100%}
+    .btn-primary,.btn-secondary{width:100%;justify-content:center;padding:11px 18px;font-size:11px}
+    .content-section{padding:12px 10px}
+    .section-title{font-size:11px;letter-spacing:0.5px}
+    .movie-card{flex:0 0 118px}
+    .card-rating{font-size:9px;padding:2px 5px}
+    .card-fav{width:24px;height:24px;font-size:10px}
+    .card-play{width:38px;height:38px;font-size:14px}
+    .detail-hero{height:50vh;min-height:320px}
+    .detail-back{top:10px;left:10px;padding:7px 12px;font-size:11px}
+    .detail-hero-content{padding:0 12px 20px;gap:12px}
+    .detail-poster img{max-width:120px}
+    .detail-title{font-size:clamp(18px,5vw,28px)}
+    .detail-badge{font-size:10px;padding:3px 8px}
+    .detail-overview{font-size:11px;max-height:60px}
+    .detail-btn-play,.detail-btn-fav{padding:10px 20px;font-size:12px}
+    .detail-body{padding:0 10px 20px}
+    .detail-episodes-grid{grid-template-columns:1fr}
+    .detail-episode-card{gap:8px;padding:6px}
+    .detail-ep-thumb{flex:0 0 95px;height:56px;border-radius:4px}
+    .detail-ep-number{font-size:7px}
+    .detail-ep-name{font-size:10px}
+    .detail-ep-runtime{font-size:9px}
+    .detail-ep-date{font-size:9px}
+    .detail-ep-desc{font-size:9px;-webkit-line-clamp:1}
+    .season-tabs{gap:5px}
+    .season-tab{min-width:60px;padding:8px 12px}
+    .season-num{font-size:10px}
+    .season-eps{font-size:8px}
+    .modal-content{max-height:92vh;border-radius:6px}
+    .modal-hero{height:200px}
+    .modal-close{top:10px;right:10px;width:30px;height:30px;font-size:13px}
+    .modal-title{font-size:18px}
+    .modal-meta{gap:6px}
+    .meta-badge{font-size:10px;padding:3px 8px}
+    .provider-grid{grid-template-columns:repeat(2,1fr)}
+    .provider-btn{padding:5px 7px;font-size:8px}
+    .footer{padding:16px 10px 8px}
+    .footer-logo .logo-text{font-size:14px}
+    .footer-logo p{font-size:10px}
+    .footer-bottom{font-size:10px}
+}
+
+/* Mobile small 320-480px */
+@media(max-width:480px){
+    .nav-links a{padding:5px 6px}
+    .nav-links a i{font-size:14px}
+    .user-profile{width:26px;height:26px;font-size:13px}
+    .logo-icon{width:28px;height:28px;font-size:11px;border-radius:6px}
+    .logo-text{font-size:15px}
+    .hero{height:50vh;min-height:300px}
+    .hero-content{padding:0 12px 30px}
+    .hero-title{font-size:clamp(18px,7vw,26px)}
+    .hero-badge{font-size:8px;padding:4px 8px}
+    .hero-desc{font-size:10px;max-height:42px;-webkit-line-clamp:2}
+    .meta-item{font-size:9px}
+    .btn-primary,.btn-secondary{padding:10px 16px;font-size:10px}
+    .content-section{padding:10px 8px}
+    .section-title{font-size:10px}
+    .movie-card{flex:0 0 105px}
+    .card-title{font-size:10px}
+    .card-year{font-size:8px}
+    .detail-hero{height:45vh;min-height:280px}
+    .detail-hero-content{padding:0 10px 16px;gap:10px}
+    .detail-poster img{max-width:100px}
+    .detail-title{font-size:16px}
+    .detail-badge{font-size:9px;padding:2px 6px}
+    .detail-overview{font-size:10px;max-height:50px}
+    .detail-btn-play,.detail-btn-fav{padding:8px 16px;font-size:11px;gap:5px}
+    .detail-body{padding:0 8px 16px}
+    .detail-section-title{font-size:11px}
+    .detail-ep-thumb{flex:0 0 85px;height:50px}
+    .detail-ep-name{font-size:9px}
+    .detail-episode-card{padding:5px}
+    .season-tab{min-width:54px;padding:7px 10px}
+    .season-num{font-size:9px}
+    .modal-hero{height:160px}
+    .modal-body{padding:0 12px 12px}
+    .modal-poster img{max-width:100px}
+    .modal-title{font-size:16px}
+    .modal-desc{font-size:10px}
+    .player-wrapper{padding:8px}
+    .video-iframe{border-radius:4px}
+}
+
+/* Very small screens 320px and below */
+@media(max-width:360px){
+    .nav-links a{padding:4px 5px}
+    .logo-text{font-size:13px;letter-spacing:0}
+    .hero-title{font-size:18px}
+    .hero-content{padding:0 10px 25px}
+    .movie-card{flex:0 0 95px}
+    .detail-poster img{max-width:90px}
+    .detail-title{font-size:14px}
+    .detail-btn-play,.detail-btn-fav{padding:7px 14px;font-size:10px}
+    .season-tab{min-width:48px;padding:6px 8px}
+    .season-num{font-size:8px}
+    .detail-ep-thumb{flex:0 0 75px;height:44px}
+}
+
+/* Landscape phones */
+@media(max-height:500px) and (orientation:landscape){
+    .hero{height:80vh;min-height:250px}
+    .hero-content{padding:0 16px 20px}
+    .hero-title{font-size:22px}
+    .hero-desc{display:none}
+    .hero-buttons{flex-direction:row}
+    .detail-hero{height:70vh;min-height:200px}
+}
+
+/* Touch devices - larger tap targets */
+@media(hover:none) and (pointer:coarse){
+    .movie-card{min-height:200px}
+    .card-fav{opacity:1;width:30px;height:30px}
+    .season-tab{min-width:72px;padding:12px 18px}
+    .detail-episode-card{min-height:80px}
+    .filter-btn{padding:6px 14px;font-size:11px}
+    .nav-links a{padding:10px 12px}
+}
+
+/* High DPI screens */
+@media(-webkit-min-device-pixel-ratio:2),(min-resolution:192dpi){
+    .card-poster img,.detail-ep-thumb img{image-rendering:-webkit-optimize-contrast}
+}
