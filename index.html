@@ -4,14 +4,40 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CineVerse - Streaming</title>
-    <link rel="stylesheet" href="style.css">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <link rel="stylesheet" href="style.css?v=2">
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <style>
+        #boot-screen {
+            position: fixed; inset: 0; z-index: 99999;
+            background: #0a0a0f;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 20px; transition: opacity 0.5s ease;
+        }
+        #boot-screen.fade-out { opacity: 0; pointer-events: none; }
+        #boot-screen .logo-big { font-family: 'Orbitron', monospace; font-size: 48px; font-weight: 900; }
+        #boot-screen .logo-big .accent { color: #00d4ff; text-shadow: 0 0 30px rgba(0,212,255,0.8); }
+        #boot-screen .loader { width: 200px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
+        #boot-screen .loader-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #00d4ff, #7b2fff); border-radius: 3px; animation: bootLoad 2s ease forwards; }
+        #boot-screen .boot-text { color: #6b6b8d; font-size: 14px; font-family: 'Rajdhani', sans-serif; }
+        @keyframes bootLoad { 0% { width: 0%; } 50% { width: 70%; } 100% { width: 100%; } }
+        #boot-error { display: none; color: #ff2d95; margin-top: 10px; font-size: 13px; max-width: 400px; text-align: center; }
+    </style>
 </head>
 <body>
+    <div id="boot-screen">
+        <div class="logo-big">CINE<span class="accent">VERSE</span></div>
+        <div class="loader"><div class="loader-bar"></div></div>
+        <div class="boot-text">Carregando plataforma...</div>
+        <div id="boot-error"></div>
+    </div>
     
-    <nav class="navbar">
+    <nav class="navbar" style="display:none" id="mainNav">
         <div class="nav-container">
             <a href="#" class="logo" onclick="goHome()">
                 <div class="logo-icon"><i class="fas fa-play"></i></div>
@@ -45,57 +71,7 @@
         </div>
     </nav>
 
-    <main class="main-content">
-        <section class="hero" id="hero">
-            <div class="hero-bg" id="heroBg"></div>
-            <div class="hero-particles" id="particles"></div>
-            <div class="hero-content">
-                <div class="hero-badge"><i class="fas fa-bolt"></i><span>EM ALTA</span></div>
-                <h1 class="hero-title" id="heroTitle"></h1>
-                <div class="hero-meta" id="heroMeta"></div>
-                <p class="hero-desc" id="heroDesc"></p>
-                <div class="hero-buttons">
-                    <button class="btn-primary glow" id="heroPlay"><i class="fas fa-play"></i><span>ASSISTIR AGORA</span></button>
-                    <button class="btn-secondary" id="heroInfo"><i class="fas fa-info-circle"></i><span>MAIS INFORMACOES</span></button>
-                </div>
-            </div>
-            <div class="hero-gradient"></div>
-        </section>
-
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-fire"></i></span>Em Alta</h2>
-            </div>
-            <div class="movies-row" id="popular"></div>
-        </section>
-
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-film"></i></span>Filmes Populares</h2>
-            </div>
-            <div class="movies-row" id="filmesRow"></div>
-        </section>
-
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-tv"></i></span>Series Populares</h2>
-            </div>
-            <div class="movies-row" id="seriesRow"></div>
-        </section>
-
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-dragon"></i></span>Anime</h2>
-            </div>
-            <div class="movies-row" id="animeRow"></div>
-        </section>
-
-        <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-broadcast-tower"></i></span>TV Ao Vivo</h2>
-            </div>
-            <div class="movies-row" id="tvRow"></div>
-        </section>
+    <main class="main-content" id="mainContent" style="display:none">
     </main>
 
     <div class="modal" id="movieModal">
@@ -139,7 +115,7 @@
         </div>
     </div>
 
-    <footer class="footer">
+    <footer class="footer" id="mainFooter" style="display:none">
         <div class="footer-content">
             <div class="footer-logo">
                 <span class="logo-text">CINE<span class="accent">VERSE</span></span>
@@ -151,9 +127,30 @@
         </div>
     </footer>
 
-    <script src="config.js"></script>
-    <script src="tmdb.js"></script>
-    <script src="player.js"></script>
-    <script src="app.js"></script>
+    <script src="config.js?v=2"></script>
+    <script src="tmdb.js?v=2"></script>
+    <script src="player.js?v=2"></script>
+    <script src="app.js?v=2"></script>
+    <script>
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                var boot = document.getElementById('boot-screen');
+                if (boot) {
+                    boot.classList.add('fade-out');
+                    setTimeout(function() { boot.remove(); }, 600);
+                }
+                document.getElementById('mainNav').style.display = '';
+                document.getElementById('mainContent').style.display = '';
+                document.getElementById('mainFooter').style.display = '';
+            }, 2200);
+        });
+        window.addEventListener('error', function(e) {
+            var errEl = document.getElementById('boot-error');
+            if (errEl) {
+                errEl.style.display = 'block';
+                errEl.textContent = 'Erro: ' + e.message + ' (' + (e.filename || '').split('/').pop() + ':' + e.lineno + ')';
+            }
+        }, true);
+    </script>
 </body>
 </html>

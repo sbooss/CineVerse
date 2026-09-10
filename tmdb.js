@@ -5,11 +5,6 @@ class TMDBAPI {
         this.imgURL = 'https://image.tmdb.org/t/p/';
         this.cache = new Map();
         this.cacheTimeout = 15 * 60 * 1000;
-        this.corsProxies = [
-            '',
-            'https://api.allorigins.win/raw?url=',
-            'https://corsproxy.io/?'
-        ];
         this.fallbackData = this.generateFallback();
     }
 
@@ -57,24 +52,19 @@ class TMDBAPI {
         url.searchParams.set('language', 'pt-BR');
         Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
 
-        for (const proxy of this.corsProxies) {
-            try {
-                const fetchUrl = proxy ? proxy + encodeURIComponent(url.toString()) : url.toString();
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 10000);
-                const response = await fetch(fetchUrl, { signal: controller.signal });
-                clearTimeout(timeout);
-                if (!response.ok) continue;
-                const data = await response.json();
-                this.cache.set(cacheKey, { data, time: Date.now() });
-                return data;
-            } catch (error) {
-                continue;
-            }
+        try {
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 15000);
+            const response = await fetch(url.toString(), { signal: controller.signal });
+            clearTimeout(timeout);
+            if (!response.ok) throw new Error(`TMDB ${response.status}`);
+            const data = await response.json();
+            this.cache.set(cacheKey, { data, time: Date.now() });
+            return data;
+        } catch (error) {
+            console.warn('TMDB fetch failed:', endpoint, error.message);
+            return null;
         }
-
-        console.warn('TMDB fetch failed for:', endpoint);
-        return null;
     }
 
     getPoster(path) {
