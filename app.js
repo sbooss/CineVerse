@@ -80,7 +80,7 @@ async function loadContent(category) {
     } else if (category === 'favorites') {
         loadFavorites();
     } else {
-        const main = document.querySelector('.main-content');
+        const main = document.getElementById('mainContent');
         main.innerHTML = '';
         const sections = getCategorySections(category);
         for (const section of sections) {
@@ -100,7 +100,6 @@ function getCategorySections(category) {
             { id: 'fil-upcoming', title: 'Lancamentos', icon: 'fa-calendar', category: 'upcoming', mediaType: 'movie' },
             { id: 'fil-top', title: 'Melhores Avaliados', icon: 'fa-trophy', category: 'top_rated', mediaType: 'movie' },
             { id: 'fil-action', title: 'Acao', icon: 'fa-fist-raised', category: 'action', mediaType: 'movie' },
-            { id: 'fil-adventure', title: 'Aventura', icon: 'fa-compass', category: 'adventure', mediaType: 'movie' },
             { id: 'fil-comedy', title: 'Comedia', icon: 'fa-laugh', category: 'comedy', mediaType: 'movie' },
             { id: 'fil-horror', title: 'Terror', icon: 'fa-ghost', category: 'horror', mediaType: 'movie' },
             { id: 'fil-scifi', title: 'Ficcao Cientifica', icon: 'fa-rocket', category: 'scifi', mediaType: 'movie' },
@@ -110,11 +109,7 @@ function getCategorySections(category) {
             { id: 'fil-animation', title: 'Animacao', icon: 'fa-hat-wizard', category: 'animation', mediaType: 'movie' },
             { id: 'fil-crime', title: 'Crime', icon: 'fa-bomb', category: 'crime', mediaType: 'movie' },
             { id: 'fil-family', title: 'Familia', icon: 'fa-people-roof', category: 'family', mediaType: 'movie' },
-            { id: 'fil-fantasy', title: 'Fantasia', icon: 'fa-wand-sparkles', category: 'fantasy', mediaType: 'movie' },
-            { id: 'fil-history', title: 'Historia', icon: 'fa-landmark', category: 'history', mediaType: 'movie' },
-            { id: 'fil-music', title: 'Musica', icon: 'fa-music', category: 'music', mediaType: 'movie' },
-            { id: 'fil-war', title: 'Guerra', icon: 'fa-shield-halved', category: 'war', mediaType: 'movie' },
-            { id: 'fil-western', title: 'Faroeste', icon: 'fa-hat-cowboy', category: 'western', mediaType: 'movie' }
+            { id: 'fil-fantasy', title: 'Fantasia', icon: 'fa-wand-sparkles', category: 'fantasy', mediaType: 'movie' }
         ],
         'tv': [
             { id: 'tv-popular', title: 'Series Populares', icon: 'fa-fire', category: 'popular', mediaType: 'tv' },
@@ -123,11 +118,8 @@ function getCategorySections(category) {
             { id: 'tv-onair', title: 'Em Exibicao', icon: 'fa-play-circle', category: 'on_the_air', mediaType: 'tv' },
             { id: 'tv-drama', title: 'Drama', icon: 'fa-masks-theater', category: 'drama', mediaType: 'tv' },
             { id: 'tv-comedy', title: 'Comedia', icon: 'fa-laugh', category: 'comedy', mediaType: 'tv' },
-            { id: 'tv-animation', title: 'Animacao', icon: 'fa-hat-wizard', category: 'animation', mediaType: 'tv' },
             { id: 'tv-scifi', title: 'Sci-Fi & Fantasia', icon: 'fa-rocket', category: 'scifi', mediaType: 'tv' },
-            { id: 'tv-documentary', title: 'Documentarios', icon: 'fa-book', category: 'documentary', mediaType: 'tv' },
-            { id: 'tv-crime', title: 'Crime', icon: 'fa-bomb', category: 'crime', mediaType: 'tv' },
-            { id: 'tv-reality', title: 'Reality Show', icon: 'fa-star', category: 'reality', mediaType: 'tv' }
+            { id: 'tv-crime', title: 'Crime', icon: 'fa-bomb', category: 'crime', mediaType: 'tv' }
         ],
         'anime': [
             { id: 'an-popular', title: 'Animes Populares', icon: 'fa-fire', category: 'popular', mediaType: 'anime' },
@@ -165,9 +157,7 @@ async function loadSection(sectionId, category, mediaType, isLive) {
             container.innerHTML = items.map(item => createLiveCard(item)).join('');
             items.forEach((channel, i) => {
                 const card = container.querySelector(`.movie-card:nth-child(${i + 1})`);
-                if (card) {
-                    card.addEventListener('click', () => player.openLiveTV(channel));
-                }
+                if (card) card.addEventListener('click', () => player.openLiveTV(channel));
             });
             return;
         } else if (mediaType === 'anime') {
@@ -197,7 +187,7 @@ async function loadSection(sectionId, category, mediaType, isLive) {
 }
 
 async function loadHomePage() {
-    const main = document.querySelector('.main-content');
+    const main = document.getElementById('mainContent');
     main.innerHTML = `
         <section class="hero" id="hero">
             <div class="hero-bg" id="heroBg"></div>
@@ -215,81 +205,55 @@ async function loadHomePage() {
             <div class="hero-gradient"></div>
         </section>
         <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-fire"></i></span>Em Alta</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-fire"></i></span>Em Alta</h2></div>
             <div class="movies-row" id="popular"></div>
         </section>
         <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-film"></i></span>Filmes Populares</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-film"></i></span>Filmes Populares</h2></div>
             <div class="movies-row" id="filmesRow"></div>
         </section>
         <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-ticket-alt"></i></span>Em Cartaz</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-ticket-alt"></i></span>Em Cartaz</h2></div>
             <div class="movies-row" id="nowPlaying"></div>
         </section>
         <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-calendar"></i></span>Lancamentos</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-calendar"></i></span>Lancamentos</h2></div>
             <div class="movies-row" id="upcoming"></div>
         </section>
         <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-trophy"></i></span>Melhores Avaliados</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-trophy"></i></span>Melhores Avaliados</h2></div>
             <div class="movies-row" id="topRated"></div>
         </section>
         <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-tv"></i></span>Series Populares</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-tv"></i></span>Series Populares</h2></div>
             <div class="movies-row" id="seriesRow"></div>
         </section>
         <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-play-circle"></i></span>Series Em Exibicao</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-play-circle"></i></span>Em Exibicao</h2></div>
             <div class="movies-row" id="onTheAir"></div>
         </section>
         <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-dragon"></i></span>Anime</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-dragon"></i></span>Anime</h2></div>
             <div class="movies-row" id="animeRow"></div>
         </section>
         <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-fist-raised"></i></span>Acao</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-fist-raised"></i></span>Acao</h2></div>
             <div class="movies-row" id="actionRow"></div>
         </section>
         <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-rocket"></i></span>Ficcao Cientifica</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-rocket"></i></span>Ficcao Cientifica</h2></div>
             <div class="movies-row" id="scifiRow"></div>
         </section>
         <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-ghost"></i></span>Terror</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-ghost"></i></span>Terror</h2></div>
             <div class="movies-row" id="horrorRow"></div>
         </section>
         <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-laugh"></i></span>Comedia</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-laugh"></i></span>Comedia</h2></div>
             <div class="movies-row" id="comedyRow"></div>
         </section>
         <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-broadcast-tower"></i></span>TV Ao Vivo</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-broadcast-tower"></i></span>TV Ao Vivo</h2></div>
             <div class="movies-row" id="tvRow"></div>
         </section>`;
 
@@ -312,7 +276,7 @@ async function loadHomePage() {
     if (hero) {
         if (hero.backdrop) document.getElementById('heroBg').style.backgroundImage = `url(${hero.backdrop})`;
         document.getElementById('heroTitle').textContent = hero.title;
-        document.getElementById('heroDesc').textContent = hero.overview?.substring(0, 250) + (hero.overview?.length > 250 ? '...' : '') || 'Sinopse nao disponivel.';
+        document.getElementById('heroDesc').textContent = hero.overview?.substring(0, 250) + (hero.overview?.length > 250 ? '...' : '') || '';
         document.getElementById('heroMeta').innerHTML = `
             <span class="meta-item"><i class="fas fa-star"></i> ${hero.rating?.toFixed(1) || 'N/A'}</span>
             <span class="meta-item"><i class="fas fa-calendar"></i> ${hero.releaseDate?.split('-')[0] || 'N/A'}</span>
@@ -337,20 +301,16 @@ async function loadHomePage() {
     ]);
 
     try {
-        const tvChannels = loadLiveChannels('br').slice(0, 15);
+        const tvChannels = loadLiveChannels('br').slice(0, 12);
         const tvRow = document.getElementById('tvRow');
         if (tvRow) {
             tvRow.innerHTML = tvChannels.map(item => createLiveCard(item)).join('');
             tvChannels.forEach((channel, i) => {
                 const card = tvRow.querySelector(`.movie-card:nth-child(${i + 1})`);
-                if (card) {
-                    card.addEventListener('click', () => player.openLiveTV(channel));
-                }
+                if (card) card.addEventListener('click', () => player.openLiveTV(channel));
             });
         }
-    } catch (e) {
-        console.warn('TV channels load failed:', e);
-    }
+    } catch (e) {}
 }
 
 function setupCardClicks(containerId, items) {
@@ -368,13 +328,9 @@ function createCard(item) {
     return `
         <div class="movie-card" data-id="${item.id}">
             <div class="card-poster">
-                ${posterUrl
-                    ? `<img src="${posterUrl}" alt="${item.title}" loading="lazy" onerror="this.style.display='none'">`
-                    : ''}
+                ${posterUrl ? `<img src="${posterUrl}" alt="${item.title}" loading="lazy" onerror="this.style.display='none'">` : ''}
                 <div class="card-placeholder" style="${posterUrl ? 'display:none' : ''}"><i class="fas fa-film"></i></div>
-                <div class="card-overlay">
-                    <div class="card-play"><i class="fas fa-play"></i></div>
-                </div>
+                <div class="card-overlay"><div class="card-play"><i class="fas fa-play"></i></div></div>
                 <div class="card-rating"><i class="fas fa-star"></i> ${item.rating?.toFixed(1) || 'N/A'}</div>
                 <div class="card-fav ${isFav ? 'active' : ''}" onclick="event.stopPropagation(); toggleFavorite(this.closest('.movie-card').dataset.id)"><i class="fas fa-heart"></i></div>
             </div>
@@ -393,43 +349,30 @@ function createLiveCard(item) {
                     <i class="fas fa-broadcast-tower"></i>
                     <span>${item.title}</span>
                 </div>
-                <div class="card-overlay">
-                    <div class="card-play"><i class="fas fa-play"></i></div>
-                </div>
+                <div class="card-overlay"><div class="card-play"><i class="fas fa-play"></i></div></div>
                 <div class="live-badge"><i class="fas fa-circle"></i> AO VIVO</div>
             </div>
-            <div class="card-info">
-                <h3 class="card-title">${item.title}</h3>
-            </div>
+            <div class="card-info"><h3 class="card-title">${item.title}</h3></div>
         </div>`;
 }
 
 function loadLiveChannels(category) {
     let channels;
-    if (category === 'br') {
-        channels = CONFIG.IPTV.BRAZIL;
-    } else if (category === 'int') {
-        channels = CONFIG.IPTV.INTERNATIONAL;
-    } else {
-        channels = [...CONFIG.IPTV.BRAZIL, ...CONFIG.IPTV.INTERNATIONAL];
-    }
+    if (category === 'br') channels = CONFIG.IPTV.BRAZIL;
+    else if (category === 'int') channels = CONFIG.IPTV.INTERNATIONAL;
+    else channels = [...CONFIG.IPTV.BRAZIL, ...CONFIG.IPTV.INTERNATIONAL];
     return channels.map(ch => ({
         id: ch.name.replace(/\s+/g, '-').toLowerCase(),
         title: ch.name,
-        poster: ch.logo || '',
-        logo: ch.logo || '',
         streamUrl: ch.stream,
-        mediaType: 'live',
-        rating: null,
-        releaseDate: null,
-        overview: `Canal ${ch.name} - TV Ao Vivo`
+        mediaType: 'live'
     }));
 }
 
 async function openModal(item) {
     const modal = document.getElementById('movieModal');
-    document.getElementById('modalTitle').textContent = item.title || 'Sem titulo';
-    document.getElementById('modalDesc').textContent = item.overview || 'Sinopse nao disponivel.';
+    document.getElementById('modalTitle').textContent = item.title || '';
+    document.getElementById('modalDesc').textContent = item.overview || '';
     document.getElementById('modalRating').textContent = item.rating?.toFixed(1) || 'N/A';
     document.getElementById('modalYear').textContent = item.releaseDate?.split('-')[0] || 'N/A';
     document.getElementById('modalDuration').textContent = item.runtime ? `${item.runtime} min` : (item.seasons > 0 ? `${item.seasons} Temp.` : 'N/A');
@@ -471,48 +414,83 @@ async function loadSeasons(item) {
 
     try {
         const seasonCount = Math.min(item.seasons || 1, 30);
-        container.innerHTML = '';
+        let allSeasonsData = [];
 
         for (let s = 1; s <= seasonCount; s++) {
-            const seasonEl = document.createElement('div');
-            seasonEl.className = 'season-item';
-            seasonEl.innerHTML = `
-                <div class="season-header" onclick="this.parentElement.classList.toggle('expanded')">
-                    <span>Temporada ${s}</span>
-                    <i class="fas fa-chevron-down"></i>
-                </div>
-                <div class="episodes-list"></div>`;
-            container.appendChild(seasonEl);
-
             try {
                 const seasonData = await tmdb.getSeasonDetails(item.id, s);
-                if (seasonData?.episodes) {
-                    const episodesList = seasonEl.querySelector('.episodes-list');
-                    seasonData.episodes.forEach(ep => {
-                        const epEl = document.createElement('div');
-                        epEl.className = 'episode-item';
-                        epEl.innerHTML = `
-                            <span class="ep-number">E${ep.episode_number}</span>
-                            <div class="ep-info">
-                                <span class="ep-title">${ep.name || 'Episodio ' + ep.episode_number}</span>
-                                <span class="ep-desc">${(ep.overview || 'Sem descricao').substring(0, 120)}${(ep.overview || '').length > 120 ? '...' : ''}</span>
-                            </div>`;
-                        epEl.onclick = (e) => {
-                            e.stopPropagation();
-                            currentSeason = s;
-                            currentEpisode = ep.episode_number;
-                            player.open(item, s, ep.episode_number);
-                            document.getElementById('movieModal').classList.remove('active');
-                        };
-                        episodesList.appendChild(epEl);
-                    });
-                }
-            } catch (error) {
-                console.error(`Error loading season ${s}:`, error);
+                allSeasonsData.push({ season: s, data: seasonData });
+            } catch (e) {
+                allSeasonsData.push({ season: s, data: null });
             }
         }
+
+        let html = '<div class="season-selector">';
+        html += '<div class="season-tabs">';
+        allSeasonsData.forEach((sd, i) => {
+            const epCount = sd.data?.episodes?.length || 0;
+            html += `<button class="season-tab ${i === 0 ? 'active' : ''}" onclick="switchSeason(${i}, ${item.id})" data-season="${sd.season}">
+                <span class="season-num">T${String(sd.season).padStart(2, '0')}</span>
+                <span class="season-eps">${epCount} eps</span>
+            </button>`;
+        });
+        html += '</div>';
+        html += '<div class="episodes-container" id="episodesContainer">';
+        html += renderEpisodes(allSeasonsData[0]?.data, 1);
+        html += '</div></div>';
+
+        container.innerHTML = html;
+        window._seasonsData = allSeasonsData;
+        window._currentItem = item;
     } catch (error) {
         container.innerHTML = '<p style="color:var(--text-muted)">Erro ao carregar temporadas</p>';
+    }
+}
+
+function renderEpisodes(seasonData, seasonNum) {
+    if (!seasonData?.episodes || seasonData.episodes.length === 0) {
+        return '<div class="empty-eps"><i class="fas fa-film"></i><p>Nenhum episodio encontrado</p></div>';
+    }
+
+    let html = '<div class="episodes-grid">';
+    seasonData.episodes.forEach(ep => {
+        const epNum = String(ep.episode_number).padStart(2, '0');
+        const seasonNumStr = String(seasonNum).padStart(2, '0');
+        const stillUrl = ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '';
+        html += `
+            <div class="episode-card" onclick="playEpisode(${seasonNum}, ${ep.episode_number})">
+                <div class="episode-thumb">
+                    ${stillUrl ? `<img src="${stillUrl}" alt="E${epNum}" loading="lazy" onerror="this.style.display='none'">` : ''}
+                    <div class="episode-play"><i class="fas fa-play"></i></div>
+                    <div class="episode-number">S${seasonNumStr}E${epNum}</div>
+                </div>
+                <div class="episode-info">
+                    <div class="episode-title-row">
+                        <span class="episode-name">${ep.name || 'Episodio ' + ep.episode_number}</span>
+                    </div>
+                    <p class="episode-desc">${(ep.overview || '').substring(0, 100)}${(ep.overview || '').length > 100 ? '...' : ''}</p>
+                </div>
+            </div>`;
+    });
+    html += '</div>';
+    return html;
+}
+
+function switchSeason(index, itemId) {
+    document.querySelectorAll('.season-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.season-tab')[index].classList.add('active');
+    const sd = window._seasonsData[index];
+    document.getElementById('episodesContainer').innerHTML = renderEpisodes(sd.data, sd.season);
+    currentSeason = sd.season;
+    currentEpisode = 1;
+}
+
+function playEpisode(season, episode) {
+    currentSeason = season;
+    currentEpisode = episode;
+    if (window._currentItem) {
+        document.getElementById('movieModal').classList.remove('active');
+        player.open(window._currentItem, season, episode);
     }
 }
 
@@ -532,17 +510,9 @@ function toggleFavorite(itemIdOrItem) {
         favorites.splice(index, 1);
     } else {
         favorites.push({
-            id: item.id,
-            title: item.title,
-            poster: item.poster,
-            backdrop: item.backdrop,
-            overview: item.overview,
-            rating: item.rating,
-            releaseDate: item.releaseDate,
-            mediaType: item.mediaType,
-            genreIds: item.genreIds,
-            seasons: item.seasons,
-            episodes: item.episodes
+            id: item.id, title: item.title, poster: item.poster, backdrop: item.backdrop,
+            overview: item.overview, rating: item.rating, releaseDate: item.releaseDate,
+            mediaType: item.mediaType, genreIds: item.genreIds, seasons: item.seasons, episodes: item.episodes
         });
     }
     localStorage.setItem('cineverse_favorites', JSON.stringify(favorites));
@@ -558,12 +528,10 @@ function toggleFavorite(itemIdOrItem) {
 }
 
 function loadFavorites() {
-    const main = document.querySelector('.main-content');
+    const main = document.getElementById('mainContent');
     main.innerHTML = `
         <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-heart"></i></span>Meus Favoritos</h2>
-            </div>
+            <div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-heart"></i></span>Meus Favoritos</h2></div>
             <div class="movies-row" id="favoritesRow"></div>
         </section>`;
     const container = document.getElementById('favoritesRow');
@@ -576,17 +544,12 @@ function loadFavorites() {
 }
 
 async function performSearch(query) {
-    const main = document.querySelector('.main-content');
+    const main = document.getElementById('mainContent');
     main.innerHTML = `
         <section class="content-section">
-            <div class="section-header">
-                <h2 class="section-title"><span class="title-icon"><i class="fas fa-search"></i></span>Resultados para "${query}"</h2>
-            </div>
-            <div class="movies-row" id="searchResults">
-                <div class="loading"><div class="loading-spinner"></div></div>
-            </div>
+            <div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-search"></i></span>Resultados para "${query}"</h2></div>
+            <div class="movies-row" id="searchResults"><div class="loading"><div class="loading-spinner"></div></div></div>
         </section>`;
-
     try {
         let results = await tmdb.searchMulti(query);
         if (currentFilter !== 'all') {
@@ -596,7 +559,6 @@ async function performSearch(query) {
                 return item.mediaType === currentFilter;
             });
         }
-
         const container = document.getElementById('searchResults');
         if (results.length === 0) {
             container.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>Nenhum resultado encontrado</p></div>';
@@ -605,7 +567,6 @@ async function performSearch(query) {
             setupCardClicks('searchResults', results);
         }
     } catch (error) {
-        console.error('Search error:', error);
         document.getElementById('searchResults').innerHTML = '<div class="error-message">Erro na busca</div>';
     }
 }
@@ -619,14 +580,12 @@ function goHome() {
 
 function getGenreName(id) {
     const genres = {
-        28: 'Acao', 12: 'Aventura', 16: 'Animacao', 35: 'Comedia', 80: 'Crime',
-        99: 'Documentario', 18: 'Drama', 10751: 'Familia', 14: 'Fantasia',
-        36: 'Historia', 27: 'Terror', 10402: 'Musica', 9648: 'Misterio',
-        10749: 'Romance', 878: 'Ficcao Cientifica', 10770: 'Filme TV',
-        53: 'Suspense', 10752: 'Guerra', 37: 'Faroeste',
-        10759: 'Acao & Aventura', 10762: 'Infantil', 10763: 'Noticias',
-        10764: 'Reality', 10765: 'Sci-Fi & Fantasia', 10766: 'Soap',
-        10767: 'Talk', 10768: 'Guerra & Politica'
+        28:'Acao',12:'Aventura',16:'Animacao',35:'Comedia',80:'Crime',
+        99:'Documentario',18:'Drama',10751:'Familia',14:'Fantasia',
+        36:'Historia',27:'Terror',10402:'Musica',9648:'Misterio',
+        10749:'Romance',878:'Ficcao Cientifica',53:'Suspense',
+        10752:'Guerra',37:'Faroeste',10759:'Acao & Aventura',
+        10762:'Infantil',10765:'Sci-Fi & Fantasia'
     };
     return genres[id] || 'Genero';
 }
@@ -634,11 +593,9 @@ function getGenreName(id) {
 document.getElementById('modalClose')?.addEventListener('click', () => {
     document.getElementById('movieModal').classList.remove('active');
 });
-
 document.querySelector('.modal-backdrop')?.addEventListener('click', () => {
     document.getElementById('movieModal').classList.remove('active');
 });
-
 document.querySelector('.player-bg')?.addEventListener('click', () => {
     player.close();
 });

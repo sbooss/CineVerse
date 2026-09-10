@@ -13,19 +13,51 @@ class VideoPlayer {
 
     _setupPopupBlocker() {
         window.open = function() { return null; };
+        window.addEventListener('beforeunload', (e) => {
+            if (this.isOpen()) {
+                e.preventDefault();
+                e.returnValue = '';
+            }
+        });
         document.addEventListener('click', (e) => {
             if (!this.isOpen()) return;
             const link = e.target.closest('a');
             if (link) {
                 const href = link.getAttribute('href') || '';
                 const target = link.getAttribute('target') || '';
-                if (target === '_blank' || target === '_top' || href.startsWith('javascript:')) {
+                if (target === '_blank' || target === '_top' || href.startsWith('javascript:') || href === '#') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    return false;
+                }
+            }
+            if (e.target.closest('[onclick]')) {
+                const onclick = e.target.closest('[onclick]').getAttribute('onclick') || '';
+                if (onclick.includes('window.open') || onclick.includes('_blank')) {
                     e.preventDefault();
                     e.stopPropagation();
                     return false;
                 }
             }
         }, true);
+        const observer = new MutationObserver((mutations) => {
+            if (!this.isOpen()) return;
+            mutations.forEach((mutation) => {
+                mutation.addedNodes.forEach((node) => {
+                    if (node.nodeType === 1) {
+                        if (node.tagName === 'A' && (node.target === '_blank' || node.target === '_top')) {
+                            node.removeAttribute('target');
+                            node.href = 'javascript:void(0)';
+                        }
+                        node.querySelectorAll && node.querySelectorAll('a[target="_blank"], a[target="_top"]').forEach(a => {
+                            a.removeAttribute('target');
+                            a.href = 'javascript:void(0)';
+                        });
+                    }
+                });
+            });
+        });
+        observer.observe(document.body, { childList: true, subtree: true });
     }
 
     isOpen() {
@@ -157,7 +189,7 @@ class VideoPlayer {
                         this.wrapper.innerHTML = `
                             <div class="player-error">
                                 <i class="fas fa-tv"></i>
-                                <p>Stream indisponivel - tentando proximo...</p>
+                                <p>Stream indisponivel</p>
                             </div>`;
                     }
                 });
