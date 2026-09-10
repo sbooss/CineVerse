@@ -3,28 +3,16 @@ let currentFilter = 'all';
 let favorites = JSON.parse(localStorage.getItem('cineverse_favorites') || '[]');
 let currentSeason = 1;
 let currentEpisode = 1;
+let detailPageItem = null;
+let detailPageSeasonsData = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    initParticles();
     initNavigation();
     initSearch();
     initFilters();
+    initDetailPage();
     loadHomePage();
 });
-
-function initParticles() {
-    const container = document.getElementById('particles');
-    if (!container) return;
-    container.innerHTML = '';
-    for (let i = 0; i < 40; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.animationDelay = Math.random() * 20 + 's';
-        particle.style.opacity = Math.random() * 0.4 + 0.1;
-        container.appendChild(particle);
-    }
-}
 
 function initNavigation() {
     document.querySelectorAll('.nav-links a').forEach(link => {
@@ -67,28 +55,26 @@ function initFilters() {
             btn.classList.add('active');
             currentFilter = btn.dataset.filter;
             const searchVal = document.getElementById('searchInput').value;
-            if (searchVal.length > 2) {
-                performSearch(searchVal);
-            }
+            if (searchVal.length > 2) performSearch(searchVal);
         });
     });
 }
 
+function initDetailPage() {
+    document.getElementById('detailBack').addEventListener('click', closeDetailPage);
+}
+
 async function loadContent(category) {
-    if (category === 'home') {
-        await loadHomePage();
-    } else if (category === 'favorites') {
-        loadFavorites();
-    } else {
-        const main = document.getElementById('mainContent');
-        main.innerHTML = '';
-        const sections = getCategorySections(category);
-        for (const section of sections) {
-            main.innerHTML += createSectionHTML(section.id, section.title, section.icon);
-        }
-        for (const section of sections) {
-            await loadSection(section.id, section.category, section.mediaType, section.isLive);
-        }
+    if (category === 'home') { await loadHomePage(); return; }
+    if (category === 'favorites') { loadFavorites(); return; }
+    const main = document.getElementById('mainContent');
+    main.innerHTML = '';
+    const sections = getCategorySections(category);
+    for (const section of sections) {
+        main.innerHTML += createSectionHTML(section.id, section.title, section.icon);
+    }
+    for (const section of sections) {
+        await loadSection(section.id, section.category, section.mediaType, section.isLive);
     }
 }
 
@@ -149,7 +135,6 @@ function createSectionHTML(id, title, icon) {
 async function loadSection(sectionId, category, mediaType, isLive) {
     const container = document.getElementById(sectionId);
     if (!container) return;
-
     try {
         let items;
         if (isLive || mediaType === 'live') {
@@ -169,15 +154,13 @@ async function loadSection(sectionId, category, mediaType, isLive) {
         } else {
             items = await tmdb.getMoviesByCategory(category);
         }
-
         if (!items || items.length === 0) {
             container.innerHTML = '<div class="empty-state"><i class="fas fa-film"></i><p>Nenhum conteudo encontrado</p></div>';
             return;
         }
-
         container.innerHTML = items.map(item => createCard(item)).join('');
         container.querySelectorAll('.movie-card').forEach((card, index) => {
-            card.addEventListener('click', () => openModal(items[index]));
+            card.addEventListener('click', () => handleCardClick(items[index]));
             setTimeout(() => card.classList.add('visible'), index * 50);
         });
     } catch (error) {
@@ -191,14 +174,13 @@ async function loadHomePage() {
     main.innerHTML = `
         <section class="hero" id="hero">
             <div class="hero-bg" id="heroBg"></div>
-            <div class="hero-particles" id="particles"></div>
             <div class="hero-content">
                 <div class="hero-badge"><i class="fas fa-bolt"></i><span>EM ALTA</span></div>
                 <h1 class="hero-title" id="heroTitle"></h1>
                 <div class="hero-meta" id="heroMeta"></div>
                 <p class="hero-desc" id="heroDesc"></p>
                 <div class="hero-buttons">
-                    <button class="btn-primary glow" id="heroPlay"><i class="fas fa-play"></i><span>ASSISTIR AGORA</span></button>
+                    <button class="btn-primary" id="heroPlay"><i class="fas fa-play"></i><span>ASSISTIR AGORA</span></button>
                     <button class="btn-secondary" id="heroInfo"><i class="fas fa-info-circle"></i><span>MAIS INFORMACOES</span></button>
                 </div>
             </div>
@@ -257,21 +239,6 @@ async function loadHomePage() {
             <div class="movies-row" id="tvRow"></div>
         </section>`;
 
-    initParticles();
-
-    const loadRow = async (id, fn) => {
-        try {
-            const items = await fn();
-            if (items) {
-                const el = document.getElementById(id);
-                if (el) {
-                    el.innerHTML = items.slice(0, 20).map(item => createCard(item)).join('');
-                    setupCardClicks(id, items.slice(0, 20));
-                }
-            }
-        } catch (e) { console.warn(id + ' failed:', e); }
-    };
-
     const hero = await tmdb.getHeroContent();
     if (hero) {
         if (hero.backdrop) document.getElementById('heroBg').style.backgroundImage = `url(${hero.backdrop})`;
@@ -282,8 +249,24 @@ async function loadHomePage() {
             <span class="meta-item"><i class="fas fa-calendar"></i> ${hero.releaseDate?.split('-')[0] || 'N/A'}</span>
             <span class="meta-item"><i class="fas fa-clock"></i> ${hero.runtime || 'N/A'} min</span>`;
         document.getElementById('heroPlay').onclick = () => player.open(hero);
-        document.getElementById('heroInfo').onclick = () => openModal(hero);
+        document.getElementById('heroInfo').onclick = () => handleCardClick(hero);
     }
+
+    const loadRow = async (id, fn) => {
+        try {
+            const items = await fn();
+            if (items) {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.innerHTML = items.slice(0, 20).map(item => createCard(item)).join('');
+                    el.querySelectorAll('.movie-card').forEach((card, index) => {
+                        card.addEventListener('click', () => handleCardClick(items[index]));
+                        setTimeout(() => card.classList.add('visible'), index * 50);
+                    });
+                }
+            }
+        } catch (e) { console.warn(id + ' failed:', e); }
+    };
 
     await Promise.all([
         loadRow('popular', () => tmdb.getTrending('all', 'week')),
@@ -311,15 +294,6 @@ async function loadHomePage() {
             });
         }
     } catch (e) {}
-}
-
-function setupCardClicks(containerId, items) {
-    const container = document.getElementById(containerId);
-    if (!container) return;
-    container.querySelectorAll('.movie-card').forEach((card, index) => {
-        card.addEventListener('click', () => openModal(items[index]));
-        setTimeout(() => card.classList.add('visible'), index * 50);
-    });
 }
 
 function createCard(item) {
@@ -369,13 +343,195 @@ function loadLiveChannels(category) {
     }));
 }
 
-async function openModal(item) {
+function handleCardClick(item) {
+    const isTV = item.mediaType === 'tv' || item.mediaType === 'anime';
+    if (isTV && item.seasons > 0) {
+        openDetailPage(item);
+    } else {
+        openMovieModal(item);
+    }
+}
+
+/* ===================== DETAIL PAGE (TV SERIES) ===================== */
+async function openDetailPage(item) {
+    detailPageItem = item;
+    detailPageSeasonsData = [];
+    currentSeason = 1;
+    currentEpisode = 1;
+
+    const page = document.getElementById('detailPage');
+    document.getElementById('mainContent').style.display = 'none';
+    document.getElementById('mainFooter').style.display = 'none';
+    document.querySelector('.hero')?.style && (document.querySelector('.hero').style.display = 'none');
+    page.style.display = 'block';
+
+    if (item.backdrop) {
+        document.getElementById('detailHeroBg').style.backgroundImage = `url(${item.backdrop})`;
+    }
+
+    const posterEl = document.getElementById('detailPoster');
+    posterEl.innerHTML = item.poster
+        ? `<img src="${item.poster}" alt="${item.title}">`
+        : '<div class="poster-placeholder"><i class="fas fa-film"></i></div>';
+
+    const badges = [];
+    if (item.rating) badges.push(`<span class="detail-badge badge-rating"><i class="fas fa-star"></i> ${item.rating.toFixed(1)}</span>`);
+    if (item.releaseDate) badges.push(`<span class="detail-badge"><i class="fas fa-calendar"></i> ${item.releaseDate.split('-')[0]}</span>`);
+    if (item.seasons) badges.push(`<span class="detail-badge"><i class="fas fa-layer-group"></i> ${item.seasons} Temp.</span>`);
+    if (item.episodes) badges.push(`<span class="detail-badge"><i class="fas fa-list-ol"></i> ${item.episodes} Eps</span>`);
+    document.getElementById('detailBadges').innerHTML = badges.join('');
+
+    document.getElementById('detailTitle').textContent = item.title || '';
+
+    const meta = [];
+    if (item.genreIds?.length) {
+        item.genreIds.slice(0, 3).forEach(gid => {
+            const name = getGenreName(gid);
+            if (name) meta.push(`<span class="detail-meta-item">${name}</span>`);
+        });
+    }
+    document.getElementById('detailMeta').innerHTML = meta.map((m, i) =>
+        `<span class="detail-meta-item">${m}</span>${i < meta.length - 1 ? '<span class="detail-meta-dot"></span>' : ''}`
+    ).join('');
+
+    document.getElementById('detailOverview').textContent = item.overview || 'Sinopse nao disponivel.';
+
+    const isFav = favorites.some(f => f.id === item.id);
+    document.getElementById('detailBtnFav').innerHTML = `<i class="fas fa-heart"></i> ${isFav ? 'Favoritado' : 'Favoritar'}`;
+    document.getElementById('detailBtnFav').onclick = () => {
+        toggleFavorite(item);
+        const nowFav = favorites.some(f => f.id === item.id);
+        document.getElementById('detailBtnFav').innerHTML = `<i class="fas fa-heart"></i> ${nowFav ? 'Favoritado' : 'Favoritar'}`;
+    };
+
+    document.getElementById('detailBtnPlay').onclick = () => {
+        player.open(item, currentSeason, currentEpisode);
+    };
+
+    document.getElementById('detailSeasonsSection').style.display = 'none';
+    document.getElementById('detailEpisodesContainer').innerHTML = '<div class="loading"><div class="loading-spinner"></div></div>';
+    document.getElementById('detailSimilar').innerHTML = '';
+
+    window.scrollTo(0, 0);
+
+    await loadDetailSeasons(item);
+
+    try {
+        const similar = await tmdb.getSimilar(item.id, item.mediaType === 'movie' ? 'movie' : 'tv');
+        if (similar && similar.length > 0) {
+            const container = document.getElementById('detailSimilar');
+            container.innerHTML = similar.slice(0, 15).map(i => createCard(i)).join('');
+            container.querySelectorAll('.movie-card').forEach((card, idx) => {
+                card.addEventListener('click', () => handleCardClick(similar[idx]));
+                setTimeout(() => card.classList.add('visible'), idx * 50);
+            });
+        }
+    } catch (e) {}
+}
+
+async function loadDetailSeasons(item) {
+    const selectorEl = document.getElementById('seasonSelector');
+    const episodesEl = document.getElementById('detailEpisodesContainer');
+    const seasonsSection = document.getElementById('detailSeasonsSection');
+
+    const seasonCount = Math.min(item.seasons || 1, 30);
+    let allSeasonsData = [];
+
+    for (let s = 1; s <= seasonCount; s++) {
+        try {
+            const seasonData = await tmdb.getSeasonDetails(item.id, s);
+            allSeasonsData.push({ season: s, data: seasonData });
+        } catch (e) {
+            allSeasonsData.push({ season: s, data: null });
+        }
+    }
+
+    detailPageSeasonsData = allSeasonsData;
+
+    let tabsHtml = '<div class="season-tabs">';
+    allSeasonsData.forEach((sd, i) => {
+        const epCount = sd.data?.episodes?.length || 0;
+        tabsHtml += `
+            <button class="season-tab ${i === 0 ? 'active' : ''}" onclick="switchDetailSeason(${i})">
+                <span class="season-num">T${String(sd.season).padStart(2, '0')}</span>
+                <span class="season-eps">${epCount} ep${epCount !== 1 ? 's' : ''}</span>
+            </button>`;
+    });
+    tabsHtml += '</div>';
+
+    selectorEl.innerHTML = tabsHtml;
+    seasonsSection.style.display = 'block';
+
+    renderDetailEpisodes(allSeasonsData[0]?.data, allSeasonsData[0]?.season || 1);
+}
+
+function renderDetailEpisodes(seasonData, seasonNum) {
+    const container = document.getElementById('detailEpisodesContainer');
+    if (!seasonData?.episodes || seasonData.episodes.length === 0) {
+        container.innerHTML = '<div class="empty-eps"><i class="fas fa-film"></i><p>Nenhum episodio encontrado para esta temporada</p></div>';
+        return;
+    }
+
+    let html = '<div class="detail-episodes-grid">';
+    seasonData.episodes.forEach(ep => {
+        const epNum = String(ep.episode_number).padStart(2, '0');
+        const seasonNumStr = String(seasonNum).padStart(2, '0');
+        const stillUrl = ep.still_path ? `https://image.tmdb.org/t/p/w500${ep.still_path}` : '';
+        const airDate = ep.air_date ? formatDate(ep.air_date) : '';
+        html += `
+            <div class="detail-episode-card" onclick="playDetailEpisode(${seasonNum}, ${ep.episode_number})">
+                <div class="detail-ep-thumb">
+                    ${stillUrl ? `<img src="${stillUrl}" alt="S${seasonNumStr}E${epNum}" loading="lazy" onerror="this.style.display='none'">` : '<div class="detail-ep-noimg"><i class="fas fa-film"></i></div>'}
+                    <div class="detail-ep-play"><i class="fas fa-play"></i></div>
+                    <div class="detail-ep-number">S${seasonNumStr}E${epNum}</div>
+                </div>
+                <div class="detail-ep-info">
+                    <div class="detail-ep-top">
+                        <span class="detail-ep-name">${ep.name || 'Episodio ' + ep.episode_number}</span>
+                        ${ep.runtime ? `<span class="detail-ep-runtime">${ep.runtime}min</span>` : ''}
+                    </div>
+                    ${airDate ? `<span class="detail-ep-date">${airDate}</span>` : ''}
+                    <p class="detail-ep-desc">${(ep.overview || 'Sinopse nao disponivel.').substring(0, 150)}${(ep.overview || '').length > 150 ? '...' : ''}</p>
+                </div>
+            </div>`;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function switchDetailSeason(index) {
+    document.querySelectorAll('.detail-page .season-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.detail-page .season-tab')[index].classList.add('active');
+    const sd = detailPageSeasonsData[index];
+    currentSeason = sd.season;
+    currentEpisode = 1;
+    renderDetailEpisodes(sd.data, sd.season);
+}
+
+function playDetailEpisode(season, episode) {
+    currentSeason = season;
+    currentEpisode = episode;
+    if (detailPageItem) {
+        player.open(detailPageItem, season, episode);
+    }
+}
+
+function closeDetailPage() {
+    document.getElementById('detailPage').style.display = 'none';
+    document.getElementById('mainContent').style.display = '';
+    document.getElementById('mainFooter').style.display = '';
+    detailPageItem = null;
+    detailPageSeasonsData = [];
+}
+
+/* ===================== MOVIE MODAL ===================== */
+function openMovieModal(item) {
     const modal = document.getElementById('movieModal');
     document.getElementById('modalTitle').textContent = item.title || '';
     document.getElementById('modalDesc').textContent = item.overview || '';
     document.getElementById('modalRating').textContent = item.rating?.toFixed(1) || 'N/A';
     document.getElementById('modalYear').textContent = item.releaseDate?.split('-')[0] || 'N/A';
-    document.getElementById('modalDuration').textContent = item.runtime ? `${item.runtime} min` : (item.seasons > 0 ? `${item.seasons} Temp.` : 'N/A');
+    document.getElementById('modalDuration').textContent = item.runtime ? `${item.runtime} min` : 'N/A';
     document.getElementById('modalGenre').textContent = getGenreName(item.genreIds?.[0]);
     if (item.backdrop) document.getElementById('modalHero').style.backgroundImage = `url(${item.backdrop})`;
 
@@ -388,110 +544,18 @@ async function openModal(item) {
 
     const isFav = favorites.some(f => f.id === item.id);
     document.getElementById('modalFav').innerHTML = `<i class="fas fa-heart"></i> ${isFav ? 'DESFAVORITAR' : 'FAVORITAR'}`;
-    document.getElementById('modalFav').onclick = () => toggleFavorite(item);
-
-    currentSeason = 1;
-    currentEpisode = 1;
-
-    if ((item.mediaType === 'tv' || item.mediaType === 'anime') && item.seasons > 0) {
-        document.getElementById('modalSeasons').style.display = 'block';
-        await loadSeasons(item);
-    } else {
-        document.getElementById('modalSeasons').style.display = 'none';
-    }
+    document.getElementById('modalFav').onclick = () => {
+        toggleFavorite(item);
+        const nowFav = favorites.some(f => f.id === item.id);
+        document.getElementById('modalFav').innerHTML = `<i class="fas fa-heart"></i> ${nowFav ? 'DESFAVORITAR' : 'FAVORITAR'}`;
+    };
 
     document.getElementById('modalPlay').onclick = () => {
-        player.open(item, currentSeason, currentEpisode);
+        player.open(item);
         modal.classList.remove('active');
     };
 
     modal.classList.add('active');
-}
-
-async function loadSeasons(item) {
-    const container = document.getElementById('seasonsList');
-    container.innerHTML = '<div class="loading"><div class="loading-spinner"></div></div>';
-
-    try {
-        const seasonCount = Math.min(item.seasons || 1, 30);
-        let allSeasonsData = [];
-
-        for (let s = 1; s <= seasonCount; s++) {
-            try {
-                const seasonData = await tmdb.getSeasonDetails(item.id, s);
-                allSeasonsData.push({ season: s, data: seasonData });
-            } catch (e) {
-                allSeasonsData.push({ season: s, data: null });
-            }
-        }
-
-        let html = '<div class="season-selector">';
-        html += '<div class="season-tabs">';
-        allSeasonsData.forEach((sd, i) => {
-            const epCount = sd.data?.episodes?.length || 0;
-            html += `<button class="season-tab ${i === 0 ? 'active' : ''}" onclick="switchSeason(${i}, ${item.id})" data-season="${sd.season}">
-                <span class="season-num">T${String(sd.season).padStart(2, '0')}</span>
-                <span class="season-eps">${epCount} eps</span>
-            </button>`;
-        });
-        html += '</div>';
-        html += '<div class="episodes-container" id="episodesContainer">';
-        html += renderEpisodes(allSeasonsData[0]?.data, 1);
-        html += '</div></div>';
-
-        container.innerHTML = html;
-        window._seasonsData = allSeasonsData;
-        window._currentItem = item;
-    } catch (error) {
-        container.innerHTML = '<p style="color:var(--text-muted)">Erro ao carregar temporadas</p>';
-    }
-}
-
-function renderEpisodes(seasonData, seasonNum) {
-    if (!seasonData?.episodes || seasonData.episodes.length === 0) {
-        return '<div class="empty-eps"><i class="fas fa-film"></i><p>Nenhum episodio encontrado</p></div>';
-    }
-
-    let html = '<div class="episodes-grid">';
-    seasonData.episodes.forEach(ep => {
-        const epNum = String(ep.episode_number).padStart(2, '0');
-        const seasonNumStr = String(seasonNum).padStart(2, '0');
-        const stillUrl = ep.still_path ? `https://image.tmdb.org/t/p/w300${ep.still_path}` : '';
-        html += `
-            <div class="episode-card" onclick="playEpisode(${seasonNum}, ${ep.episode_number})">
-                <div class="episode-thumb">
-                    ${stillUrl ? `<img src="${stillUrl}" alt="E${epNum}" loading="lazy" onerror="this.style.display='none'">` : ''}
-                    <div class="episode-play"><i class="fas fa-play"></i></div>
-                    <div class="episode-number">S${seasonNumStr}E${epNum}</div>
-                </div>
-                <div class="episode-info">
-                    <div class="episode-title-row">
-                        <span class="episode-name">${ep.name || 'Episodio ' + ep.episode_number}</span>
-                    </div>
-                    <p class="episode-desc">${(ep.overview || '').substring(0, 100)}${(ep.overview || '').length > 100 ? '...' : ''}</p>
-                </div>
-            </div>`;
-    });
-    html += '</div>';
-    return html;
-}
-
-function switchSeason(index, itemId) {
-    document.querySelectorAll('.season-tab').forEach(t => t.classList.remove('active'));
-    document.querySelectorAll('.season-tab')[index].classList.add('active');
-    const sd = window._seasonsData[index];
-    document.getElementById('episodesContainer').innerHTML = renderEpisodes(sd.data, sd.season);
-    currentSeason = sd.season;
-    currentEpisode = 1;
-}
-
-function playEpisode(season, episode) {
-    currentSeason = season;
-    currentEpisode = episode;
-    if (window._currentItem) {
-        document.getElementById('movieModal').classList.remove('active');
-        player.open(window._currentItem, season, episode);
-    }
 }
 
 function toggleFavorite(itemIdOrItem) {
@@ -520,11 +584,6 @@ function toggleFavorite(itemIdOrItem) {
         const fav = card.querySelector('.card-fav');
         if (fav) fav.classList.toggle('active');
     });
-    const modalFav = document.getElementById('modalFav');
-    if (modalFav) {
-        const isFav = favorites.some(f => f.id === item.id);
-        modalFav.innerHTML = `<i class="fas fa-heart"></i> ${isFav ? 'DESFAVORITAR' : 'FAVORITAR'}`;
-    }
 }
 
 function loadFavorites() {
@@ -539,7 +598,10 @@ function loadFavorites() {
         container.innerHTML = '<div class="empty-state"><i class="fas fa-heart-broken"></i><p>Nenhum favorito ainda</p></div>';
     } else {
         container.innerHTML = favorites.map(item => createCard(item)).join('');
-        setupCardClicks('favoritesRow', favorites);
+        container.querySelectorAll('.movie-card').forEach((card, index) => {
+            card.addEventListener('click', () => handleCardClick(favorites[index]));
+            setTimeout(() => card.classList.add('visible'), index * 50);
+        });
     }
 }
 
@@ -564,7 +626,10 @@ async function performSearch(query) {
             container.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>Nenhum resultado encontrado</p></div>';
         } else {
             container.innerHTML = results.map(item => createCard(item)).join('');
-            setupCardClicks('searchResults', results);
+            container.querySelectorAll('.movie-card').forEach((card, index) => {
+                card.addEventListener('click', () => handleCardClick(results[index]));
+                setTimeout(() => card.classList.add('visible'), index * 50);
+            });
         }
     } catch (error) {
         document.getElementById('searchResults').innerHTML = '<div class="error-message">Erro na busca</div>';
@@ -572,6 +637,7 @@ async function performSearch(query) {
 }
 
 function goHome() {
+    closeDetailPage();
     currentCategory = 'home';
     document.querySelectorAll('.nav-links a').forEach(l => l.classList.remove('active'));
     document.querySelector('.nav-links a[data-category="home"]').classList.add('active');
@@ -588,6 +654,14 @@ function getGenreName(id) {
         10762:'Infantil',10765:'Sci-Fi & Fantasia'
     };
     return genres[id] || 'Genero';
+}
+
+function formatDate(dateStr) {
+    if (!dateStr) return '';
+    const parts = dateStr.split('-');
+    if (parts.length !== 3) return dateStr;
+    const months = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+    return `${parseInt(parts[2])} ${months[parseInt(parts[1]) - 1]} ${parts[0]}`;
 }
 
 document.getElementById('modalClose')?.addEventListener('click', () => {

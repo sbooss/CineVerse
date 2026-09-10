@@ -239,6 +239,11 @@ class TMDBAPI {
     async searchMulti(query) {
         return this.search(query);
     }
+
+    async getSimilar(id, type = 'tv') {
+        const r = await this.fetchAPI(`/${type}/${id}/similar`);
+        return r?.results ? r.results.filter(i => !i.adult).map(i => this.formatItem(i, type)) : [];
+    }
 }
 
 const tmdb = new TMDBAPI();
