@@ -345,7 +345,7 @@ function loadLiveChannels(category) {
 
 function handleCardClick(item) {
     const isTV = item.mediaType === 'tv' || item.mediaType === 'anime';
-    if (isTV && item.seasons > 0) {
+    if (isTV) {
         openDetailPage(item);
     } else {
         openMovieModal(item);
@@ -360,10 +360,15 @@ async function openDetailPage(item) {
     currentEpisode = 1;
 
     const page = document.getElementById('detailPage');
-    document.getElementById('mainContent').style.display = 'none';
-    document.getElementById('mainFooter').style.display = 'none';
-    document.querySelector('.hero')?.style && (document.querySelector('.hero').style.display = 'none');
+    const main = document.getElementById('mainContent');
+    const footer = document.getElementById('mainFooter');
+    const heroEl = document.querySelector('.hero');
+
+    main.style.display = 'none';
+    footer.style.display = 'none';
+    if (heroEl) heroEl.style.display = 'none';
     page.style.display = 'block';
+    window.scrollTo(0, 0);
 
     if (item.backdrop) {
         document.getElementById('detailHeroBg').style.backgroundImage = `url(${item.backdrop})`;
@@ -412,12 +417,10 @@ async function openDetailPage(item) {
     document.getElementById('detailEpisodesContainer').innerHTML = '<div class="loading"><div class="loading-spinner"></div></div>';
     document.getElementById('detailSimilar').innerHTML = '';
 
-    window.scrollTo(0, 0);
-
     await loadDetailSeasons(item);
 
     try {
-        const similar = await tmdb.getSimilar(item.id, item.mediaType === 'movie' ? 'movie' : 'tv');
+        const similar = await tmdb.getSimilar(item.id, 'tv');
         if (similar && similar.length > 0) {
             const container = document.getElementById('detailSimilar');
             container.innerHTML = similar.slice(0, 15).map(i => createCard(i)).join('');
@@ -434,7 +437,35 @@ async function loadDetailSeasons(item) {
     const episodesEl = document.getElementById('detailEpisodesContainer');
     const seasonsSection = document.getElementById('detailSeasonsSection');
 
-    const seasonCount = Math.min(item.seasons || 1, 30);
+    let seasonCount = item.seasons || 0;
+
+    if (!seasonCount || seasonCount === 0) {
+        try {
+            const details = await tmdb.getDetails('tv', item.id);
+            if (details) {
+                seasonCount = details.number_of_seasons || 0;
+                detailPageItem.seasons = seasonCount;
+                detailPageItem.episodes = details.number_of_episodes || 0;
+                if (details.number_of_seasons) {
+                    document.getElementById('detailBadges').innerHTML = `
+                        <span class="detail-badge badge-rating"><i class="fas fa-star"></i> ${item.rating?.toFixed(1) || 'N/A'}</span>
+                        <span class="detail-badge"><i class="fas fa-calendar"></i> ${(item.releaseDate || '').split('-')[0] || 'N/A'}</span>
+                        <span class="detail-badge"><i class="fas fa-layer-group"></i> ${details.number_of_seasons} Temp.</span>
+                        <span class="detail-badge"><i class="fas fa-list-ol"></i> ${details.number_of_episodes || 0} Eps</span>`;
+                }
+            }
+        } catch (e) {
+            console.warn('Failed to fetch details for season count:', e);
+        }
+    }
+
+    if (!seasonCount || seasonCount === 0) {
+        document.getElementById('detailEpisodesContainer').innerHTML = '<div class="empty-eps"><i class="fas fa-film"></i><p>Nenhuma temporada encontrada</p></div>';
+        seasonsSection.style.display = 'none';
+        return;
+    }
+
+    seasonCount = Math.min(seasonCount, 30);
     let allSeasonsData = [];
 
     for (let s = 1; s <= seasonCount; s++) {
@@ -522,6 +553,7 @@ function closeDetailPage() {
     document.getElementById('mainFooter').style.display = '';
     detailPageItem = null;
     detailPageSeasonsData = [];
+    window.scrollTo(0, 0);
 }
 
 /* ===================== MOVIE MODAL ===================== */
