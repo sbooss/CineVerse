@@ -5,6 +5,11 @@ class TMDBAPI {
         this.imgURL = 'https://image.tmdb.org/t/p/';
         this.cache = new Map();
         this.cacheTimeout = 15 * 60 * 1000;
+        this.corsProxies = [
+            '',
+            'https://api.allorigins.win/raw?url=',
+            'https://corsproxy.io/?'
+        ];
         this.fallbackData = this.generateFallback();
     }
 
@@ -31,7 +36,7 @@ class TMDBAPI {
                 {id:1396,name:'Breaking Bad',overview:'Um professor de quimica se torna fabricante de metanfetamina.',poster_path:'/ggFHVNu6YYI5L9pCfOacjizRGt.jpg',backdrop_path:'/tsRy63Mu5cu8etL1X7ZLyf7UP1M.jpg',vote_average:8.9,first_air_date:'2008-01-20',genre_ids:[18],number_of_seasons:5,number_of_episodes:62},
                 {id:1399,name:'Game of Thrones',overview:'Nove familias nobres lutam pelo controle de Westeros.',poster_path:'/1XS1oqL89opfnbLl8WnZY1O1uJx.jpg',backdrop_path:'/suopoADq0k8YZr4dQXcU6pToj6s.jpg',vote_average:8.4,first_air_date:'2011-04-17',genre_ids:[10765,18],number_of_seasons:8,number_of_episodes:73},
                 {id:66732,name:'Stranger Things',overview:'Crianças enfrentam monstros sobrenaturais nos anos 80.',poster_path:'/49WJfeN0moxb9IPfGn8AIqMGskD.jpg',backdrop_path:'/56v2KjBlYj5GwIlSf8bnJP1GEUw.jpg',vote_average:8.6,first_air_date:'2016-07-15',genre_ids:[18,10765],number_of_seasons:4,number_of_episodes:34},
-                {id:114461,name:'The Last of Us',overview:'Pos-apocalipse onde humanos foram devastados por um fungo.',poster_path:'/uKvVjHNqB5VmOrdxqAt2F7J78ED.jpg',backdrop_path:'/lGiRj7gSJRkGOFOKHs3I3rO1Wq7.jpg',vote_average:8.8,first_air_date:'2023-01-15',genre_ids:[18,10765],number_of_seasons:1,number_of_episodes:9},
+                {id:114461,name:'The Last of Us',overview:'Pos-apocalipse onde humanos foram devastados por um fungo.',poster_path:'/uKvVjHNqB5VmOrdxqAt2F7J78ED.jpg',backdrop_path:'/lGiRj7gSJRkGOFOKHs3I3rO1Wq7.jpg',vote_average:8.8,first_air_date:'2023-01-15',genre_ids:[18,10765],number_of_seasons:2,number_of_episodes:18},
                 {id:93405,name:'Squid Game',overview:'Concorrentes arriscam a vida em jogos mortais.',poster_path:'/dDlEmu3EZ0Pgg93K2SVNLCjCSvE.jpg',backdrop_path:'/oaGvjB0DvdhXhOAuADfHb261ZHa.jpg',vote_average:7.8,first_air_date:'2021-09-17',genre_ids:[10765,9648],number_of_seasons:2,number_of_episodes:16},
                 {id:71790,name:'Rick and Morty',overview:'Aventuras interdimensionais de um cientista e seu neto.',poster_path:'/cvhMj9MZqPPFGbVU78f1hLFBONz.jpg',backdrop_path:'/iAx7FXXxY8m9HEsCR0FhLfV0zL.jpg',vote_average:8.7,first_air_date:'2013-12-02',genre_ids:[16,35],number_of_seasons:7,number_of_episodes:71},
                 {id:82856,name:'The Mandalorian',overview:'Um caçador de recompensas viaja pela galaxia.',poster_path:'/sWgBv7LV2PRoQgkxwlibdGXKz1S.jpg',backdrop_path:'/o094Yj9aQY2zPKN0bE6BIPuVmCE.jpg',vote_average:8.5,first_air_date:'2019-11-12',genre_ids:[10765,10759],number_of_seasons:3,number_of_episodes:24},
@@ -52,19 +57,24 @@ class TMDBAPI {
         url.searchParams.set('language', 'pt-BR');
         Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
 
-        try {
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 12000);
-            const response = await fetch(url.toString(), { signal: controller.signal });
-            clearTimeout(timeout);
-            if (!response.ok) throw new Error(`TMDB ${response.status}`);
-            const data = await response.json();
-            this.cache.set(cacheKey, { data, time: Date.now() });
-            return data;
-        } catch (error) {
-            console.warn('TMDB fetch failed:', error.message);
-            return null;
+        for (const proxy of this.corsProxies) {
+            try {
+                const fetchUrl = proxy ? proxy + encodeURIComponent(url.toString()) : url.toString();
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 10000);
+                const response = await fetch(fetchUrl, { signal: controller.signal });
+                clearTimeout(timeout);
+                if (!response.ok) continue;
+                const data = await response.json();
+                this.cache.set(cacheKey, { data, time: Date.now() });
+                return data;
+            } catch (error) {
+                continue;
+            }
         }
+
+        console.warn('TMDB fetch failed for:', endpoint);
+        return null;
     }
 
     getPoster(path) {

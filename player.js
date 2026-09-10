@@ -4,18 +4,15 @@ class VideoPlayer {
         this.wrapper = document.getElementById('playerWrapper');
         this.titleEl = document.getElementById('playerTitle');
         this.backBtn = document.getElementById('playerBack');
-        this.history = [];
+        this._setupPopupBlocker();
         this.backBtn.addEventListener('click', () => this.close());
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isOpen()) this.close();
         });
-        this._setupPopupBlocker();
     }
 
     _setupPopupBlocker() {
-        const origOpen = window.open;
         window.open = function() { return null; };
-
         document.addEventListener('click', (e) => {
             if (!this.isOpen()) return;
             const link = e.target.closest('a');
@@ -35,8 +32,7 @@ class VideoPlayer {
         return this.overlay.classList.contains('active');
     }
 
-    async open(item, season = 1, episode = 1) {
-        this.history.push({ item, season, episode });
+    open(item, season = 1, episode = 1) {
         this.titleEl.textContent = item.title;
         this.overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
@@ -47,14 +43,12 @@ class VideoPlayer {
         this.overlay.classList.remove('active');
         document.body.style.overflow = '';
         this.wrapper.innerHTML = '';
-        if (this.history.length > 0) this.history.pop();
     }
 
     _loadEmbed(item, season, episode) {
         const type = (item.mediaType === 'tv' || item.mediaType === 'anime') ? 'tv' : 'movie';
         const tmdbId = item.id;
-
-        const providers = this._getProviders(tmdbId, type, season, episode);
+        const providers = CONFIG.EMBED.PROVIDERS;
         let currentIndex = 0;
 
         const tryProvider = (index) => {
@@ -62,7 +56,7 @@ class VideoPlayer {
                 this.wrapper.innerHTML = `
                     <div class="player-error">
                         <i class="fas fa-exclamation-triangle"></i>
-                        <p>Nenhum server disponivel</p>
+                        <p>Nenhum servidor disponivel</p>
                         <button class="btn-secondary" onclick="player.close()" style="margin-top:15px">
                             <i class="fas fa-arrow-left"></i> Voltar
                         </button>
@@ -71,6 +65,8 @@ class VideoPlayer {
             }
 
             const p = providers[index];
+            const url = type === 'tv' ? p.tv(tmdbId, season, episode) : p.movie(tmdbId);
+
             this.wrapper.innerHTML = `
                 <div class="provider-selector">
                     <span class="current-provider">${p.name}</span>
@@ -79,7 +75,7 @@ class VideoPlayer {
                     </button>
                 </div>
                 <iframe 
-                    src="${p.url}" 
+                    src="${url}" 
                     frameborder="0" 
                     allowfullscreen 
                     allow="autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"
@@ -91,40 +87,28 @@ class VideoPlayer {
             currentIndex = index;
             this._currentProviders = providers;
             this._currentIndex = index;
+            this._currentType = type;
+            this._currentTmdbId = tmdbId;
+            this._currentSeason = season;
+            this._currentEpisode = episode;
         };
 
         this._nextProvider = () => {
-            tryProvider(currentIndex + 1);
-            currentIndex++;
+            if (currentIndex < providers.length - 1) {
+                currentIndex++;
+                tryProvider(currentIndex);
+            }
         };
 
         this._nextProvider = this._nextProvider.bind(this);
         tryProvider(0);
     }
 
-    _getProviders(tmdbId, type, season, episode) {
-        const tvPath = type === 'tv' ? `/tv/${tmdbId}/${season}/${episode}` : `/movie/${tmdbId}`;
-        return [
-            { name: 'Server 1 - VidLink', url: `https://vidlink.pro${tvPath}` },
-            { name: 'Server 2 - VidFast', url: `https://vidfast.vc${tvPath}` },
-            { name: 'Server 3 - Embed.su', url: `https://www.embed.su/embed${tvPath}` },
-            { name: 'Server 4 - VidSrc', url: `https://vidsrc.to/embed${tvPath}` },
-            { name: 'Server 5 - 2Embed', url: `https://www.2embed.cc/embed${tvPath}` },
-            { name: 'Server 6 - SuperEmbed', url: type === 'tv'
-                ? `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1&s=${season}&e=${episode}`
-                : `https://multiembed.mov/?video_id=${tmdbId}&tmdb=1` },
-            { name: 'Server 7 - VidCore', url: `https://vidcore.org/embed${tvPath}` },
-            { name: 'Server 8 - WFS', url: `https://embed.wfs.lol${tvPath}` },
-            { name: 'Server 9 - TouStream', url: `https://toustream.xyz/embed${tvPath}` },
-            { name: 'Server 10 - VidSrc.me', url: `https://vidsrcme.ru/embed${tvPath}` }
-        ];
-    }
-
     showServers() {
         if (!this._currentProviders) return;
         let html = '<div class="provider-list"><h3>Escolha o Server</h3><div class="provider-grid">';
         this._currentProviders.forEach((p, i) => {
-            html += `<button class="provider-btn ${i === this._currentIndex ? 'active' : ''}" onclick="player._switchServer(${i})">${p.name.replace(/Server \d+ - /, '')}</button>`;
+            html += `<button class="provider-btn ${i === this._currentIndex ? 'active' : ''}" onclick="player._switchServer(${i})">${p.name}</button>`;
         });
         html += '</div></div>';
         const existing = this.wrapper.querySelector('.provider-list');
@@ -138,10 +122,14 @@ class VideoPlayer {
         if (!this._currentProviders || index < 0 || index >= this._currentProviders.length) return;
 
         const p = this._currentProviders[index];
+        const url = this._currentType === 'tv'
+            ? p.tv(this._currentTmdbId, this._currentSeason, this._currentEpisode)
+            : p.movie(this._currentTmdbId);
+
         this._currentIndex = index;
         const iframe = this.wrapper.querySelector('iframe');
         if (iframe) {
-            iframe.src = p.url;
+            iframe.src = url;
             const prov = this.wrapper.querySelector('.current-provider');
             if (prov) prov.textContent = p.name;
         }
@@ -157,13 +145,22 @@ class VideoPlayer {
                 <div class="provider-selector">
                     <span class="current-provider">TV Ao Vivo - ${channel.title}</span>
                 </div>
-                <video id="liveVideo" class="video-iframe" controls autoplay></video>`;
+                <video id="liveVideo" class="video-iframe" controls autoplay muted></video>`;
             const video = document.getElementById('liveVideo');
             if (typeof Hls !== 'undefined' && Hls.isSupported()) {
-                const hls = new Hls();
+                const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
                 hls.loadSource(channel.streamUrl);
                 hls.attachMedia(video);
                 hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}));
+                hls.on(Hls.Events.ERROR, (_, data) => {
+                    if (data.fatal) {
+                        this.wrapper.innerHTML = `
+                            <div class="player-error">
+                                <i class="fas fa-tv"></i>
+                                <p>Stream indisponivel - tentando proximo...</p>
+                            </div>`;
+                    }
+                });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = channel.streamUrl;
                 video.play().catch(() => {});

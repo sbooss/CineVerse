@@ -135,8 +135,8 @@ function getCategorySections(category) {
             { id: 'an-new', title: 'Novos Episodios', icon: 'fa-clock', category: 'on_the_air', mediaType: 'anime' }
         ],
         'live': [
-            { id: 'tv-live-br', title: 'Canais Brasileiros', icon: 'fa-flag', category: 'br', mediaType: 'live' },
-            { id: 'tv-live-int', title: 'Canais Internacionais', icon: 'fa-globe', category: 'int', mediaType: 'live' }
+            { id: 'tv-live-br', title: 'Canais Brasileiros', icon: 'fa-flag', category: 'br', mediaType: 'live', isLive: true },
+            { id: 'tv-live-int', title: 'Canais Internacionais', icon: 'fa-globe', category: 'int', mediaType: 'live', isLive: true }
         ]
     };
     return map[category] || map['home'];
@@ -160,7 +160,7 @@ async function loadSection(sectionId, category, mediaType, isLive) {
 
     try {
         let items;
-        if (mediaType === 'live' || isLive) {
+        if (isLive || mediaType === 'live') {
             items = loadLiveChannels(category);
             container.innerHTML = items.map(item => createLiveCard(item)).join('');
             items.forEach((channel, i) => {
@@ -338,13 +338,16 @@ async function loadHomePage() {
 
     try {
         const tvChannels = loadLiveChannels('br').slice(0, 15);
-        document.getElementById('tvRow').innerHTML = tvChannels.map(item => createLiveCard(item)).join('');
-        tvChannels.forEach((channel, i) => {
-            const card = document.querySelector(`#tvRow .movie-card:nth-child(${i + 1})`);
-            if (card) {
-                card.addEventListener('click', () => player.openLiveTV(channel));
-            }
-        });
+        const tvRow = document.getElementById('tvRow');
+        if (tvRow) {
+            tvRow.innerHTML = tvChannels.map(item => createLiveCard(item)).join('');
+            tvChannels.forEach((channel, i) => {
+                const card = tvRow.querySelector(`.movie-card:nth-child(${i + 1})`);
+                if (card) {
+                    card.addEventListener('click', () => player.openLiveTV(channel));
+                }
+            });
+        }
     } catch (e) {
         console.warn('TV channels load failed:', e);
     }
@@ -413,8 +416,8 @@ function loadLiveChannels(category) {
     return channels.map(ch => ({
         id: ch.name.replace(/\s+/g, '-').toLowerCase(),
         title: ch.name,
-        poster: ch.logo,
-        logo: ch.logo,
+        poster: ch.logo || '',
+        logo: ch.logo || '',
         streamUrl: ch.stream,
         mediaType: 'live',
         rating: null,
@@ -443,6 +446,9 @@ async function openModal(item) {
     const isFav = favorites.some(f => f.id === item.id);
     document.getElementById('modalFav').innerHTML = `<i class="fas fa-heart"></i> ${isFav ? 'DESFAVORITAR' : 'FAVORITAR'}`;
     document.getElementById('modalFav').onclick = () => toggleFavorite(item);
+
+    currentSeason = 1;
+    currentEpisode = 1;
 
     if ((item.mediaType === 'tv' || item.mediaType === 'anime') && item.seasons > 0) {
         document.getElementById('modalSeasons').style.display = 'block';
