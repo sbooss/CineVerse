@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineVerse - Streaming</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Exo+2:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+</head>
+<body>
+    
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo" onclick="goHome()">
+                <div class="logo-icon"><i class="fas fa-play"></i></div>
+                <span class="logo-text">CINE<span class="accent">VERSE</span></span>
+            </a>
+            
+            <div class="nav-center">
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="Buscar filmes, series, animes...">
+                    <i class="fas fa-search search-icon"></i>
+                    <div class="search-filters">
+                        <button class="filter-btn active" data-filter="all">Todos</button>
+                        <button class="filter-btn" data-filter="movie">Filmes</button>
+                        <button class="filter-btn" data-filter="tv">Series</button>
+                        <button class="filter-btn" data-filter="anime">Anime</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nav-right">
+                <div class="nav-links">
+                    <a href="#" class="active" data-category="home"><i class="fas fa-home"></i><span>Inicio</span></a>
+                    <a href="#" data-category="movie"><i class="fas fa-film"></i><span>Filmes</span></a>
+                    <a href="#" data-category="tv"><i class="fas fa-tv"></i><span>Series</span></a>
+                    <a href="#" data-category="anime"><i class="fas fa-dragon"></i><span>Anime</span></a>
+                    <a href="#" data-category="live"><i class="fas fa-broadcast-tower"></i><span>TV Ao Vivo</span></a>
+                    <a href="#" data-category="favorites"><i class="fas fa-heart"></i><span>Favoritos</span></a>
+                </div>
+                <div class="user-profile"><i class="fas fa-user-circle"></i></div>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <section class="hero" id="hero">
+            <div class="hero-bg" id="heroBg"></div>
+            <div class="hero-particles" id="particles"></div>
+            <div class="hero-content">
+                <div class="hero-badge"><i class="fas fa-bolt"></i><span>EM ALTA</span></div>
+                <h1 class="hero-title" id="heroTitle"></h1>
+                <div class="hero-meta" id="heroMeta"></div>
+                <p class="hero-desc" id="heroDesc"></p>
+                <div class="hero-buttons">
+                    <button class="btn-primary glow" id="heroPlay"><i class="fas fa-play"></i><span>ASSISTIR AGORA</span></button>
+                    <button class="btn-secondary" id="heroInfo"><i class="fas fa-info-circle"></i><span>MAIS INFORMACOES</span></button>
+                </div>
+            </div>
+            <div class="hero-gradient"></div>
+        </section>
+
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title"><span class="title-icon"><i class="fas fa-fire"></i></span>Em Alta</h2>
+            </div>
+            <div class="movies-row" id="popular"></div>
+        </section>
+
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title"><span class="title-icon"><i class="fas fa-film"></i></span>Filmes Populares</h2>
+            </div>
+            <div class="movies-row" id="filmesRow"></div>
+        </section>
+
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title"><span class="title-icon"><i class="fas fa-tv"></i></span>Series Populares</h2>
+            </div>
+            <div class="movies-row" id="seriesRow"></div>
+        </section>
+
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title"><span class="title-icon"><i class="fas fa-dragon"></i></span>Anime</h2>
+            </div>
+            <div class="movies-row" id="animeRow"></div>
+        </section>
+
+        <section class="content-section">
+            <div class="section-header">
+                <h2 class="section-title"><span class="title-icon"><i class="fas fa-broadcast-tower"></i></span>TV Ao Vivo</h2>
+            </div>
+            <div class="movies-row" id="tvRow"></div>
+        </section>
+    </main>
+
+    <div class="modal" id="movieModal">
+        <div class="modal-backdrop"></div>
+        <div class="modal-content">
+            <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+            <div class="modal-hero" id="modalHero"></div>
+            <div class="modal-body">
+                <div class="modal-poster" id="modalPoster"></div>
+                <div class="modal-info">
+                    <h2 class="modal-title" id="modalTitle"></h2>
+                    <div class="modal-meta">
+                        <span class="meta-badge rating"><i class="fas fa-star"></i> <span id="modalRating"></span></span>
+                        <span class="meta-badge"><i class="fas fa-calendar"></i> <span id="modalYear"></span></span>
+                        <span class="meta-badge"><i class="fas fa-clock"></i> <span id="modalDuration"></span></span>
+                        <span class="meta-badge genre" id="modalGenre"></span>
+                    </div>
+                    <p class="modal-desc" id="modalDesc"></p>
+                    <div class="modal-tags" id="modalTags"></div>
+                    <div class="modal-buttons">
+                        <button class="btn-primary glow" id="modalPlay"><i class="fas fa-play"></i> ASSISTIR</button>
+                        <button class="btn-secondary" id="modalFav"><i class="fas fa-heart"></i> FAVORITAR</button>
+                    </div>
+                    <div class="modal-seasons" id="modalSeasons" style="display:none;">
+                        <h3>Temporadas</h3>
+                        <div class="seasons-list" id="seasonsList"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="player-overlay" id="playerOverlay">
+        <div class="player-bg"></div>
+        <div class="player-container">
+            <div class="player-header">
+                <button class="player-back" id="playerBack"><i class="fas fa-arrow-left"></i></button>
+                <h3 class="player-title" id="playerTitle"></h3>
+            </div>
+            <div class="player-wrapper" id="playerWrapper"></div>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <span class="logo-text">CINE<span class="accent">VERSE</span></span>
+                <p>Sua experiencia de streaming definitiva</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 CineVerse. Dados de TMDB. Conteudo de dominio publico.</p>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="tmdb.js"></script>
+    <script src="player.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+const CONFIG = {
+    EMBED: {
+        PROVIDERS: [
+            { name: 'VidSrc', url: 'https://vidsrc.to/embed' },
+            { name: 'VidSrc.me', url: 'https://vidsrcme.ru/embed' },
+            { name: 'VidSrc.in', url: 'https://vidsrc.in/embed' },
+            { name: 'VidSrc.io', url: 'https://vidsrc.io/embed' },
+            { name: 'VidSrc.pm', url: 'https://vidsrc.pm/embed' },
+            { name: '2Embed', url: 'https://www.2embed.cc/embed' },
+            { name: 'SuperEmbed', url: 'https://multiembed.mov/' },
+            { name: 'MoviesApi', url: 'https://moviesapi.to' },
+            { name: 'VidSpark', url: 'https://vidspark.to' },
+            { name: 'Embed.su', url: 'https://www.embed.su/embed' },
+            { name: 'VidLink', url: 'https://vidlink.pro' },
+            { name: 'VidFast', url: 'https://vidfast.vc' },
+            { name: 'VidCore', url: 'https://vidcore.org/embed' },
+            { name: 'VidLux', url: 'https://vidlux.xyz/embed' },
+            { name: 'TouStream', url: 'https://toustream.xyz/embed' },
+            { name: 'WFS', url: 'https://embed.wfs.lol' },
+            { name: 'Vid-Src.top', url: 'https://vid-src.top/embed' },
+            { name: 'VidRock', url: 'https://vidrock.ru/embed' },
+            { name: 'VidFlix', url: 'https://vidflix.club/embed' }
+        ],
+        DEFAULT: 0
+    },
+    IPTV: {
+        BRAZIL: [
+            { name: 'TV Cultura', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/89/TV_Cultura_Logo_2024.svg/200px-TV_Cultura_Logo_2024.svg.png', stream: 'https://live.webcamtv.com.br/tvcultura/tvcultura/playlist.m3u8' },
+            { name: 'TV Brasil', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e5/TV_Brasil_logo.svg/200px-TV_Brasil_logo.svg.png', stream: 'https://streaming.tve.gov.br/tvbr/live/playlist.m3u8' },
+            { name: 'TV Aparecida', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5c/TV_Aparecida_logo.svg/200px-TV_Aparecida_logo.svg.png', stream: 'https://streamcdn5-a.akamaihd.net/tvaparecida1/playlist.m3u8' },
+            { name: 'TV Justiça', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8a/TV_Justica_logo.svg/200px-TV_Justica_logo.svg.png', stream: 'https://stream.tvcamara.jus.br/live/tvjustica/playlist.m3u8' },
+            { name: 'Band News', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Band_logo_2014.svg/200px-Band_logo_2014.svg.png', stream: 'http://cdn-live-band.bol.com.br/live/bandnews/live/playlist.m3u8' },
+            { name: 'Rede Gospel', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/05/Rede_Gospel_logo.svg/200px-Rede_Gospel_logo.svg.png', stream: 'https://streaming-gospel.akamaized.net/redegospel/live/playlist.m3u8' },
+            { name: 'Rede Vida', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/Rede_Vida_logo.svg/200px-Rede_Vida_logo.svg.png', stream: 'https://streaming-redevida.akamaized.net/redevida/live/playlist.m3u8' },
+            { name: 'Canal Futura', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/f5/Futura_logo.svg/200px-Futura_logo.svg.png', stream: 'https://streaming.futura.org.br/futura/live/playlist.m3u8' },
+            { name: 'TV Gazeta', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/TV_Gazeta_logo.svg/200px-TV_Gazeta_logo.svg.png', stream: 'https://streaming.tvgazeta.com.br/tvgazeta/live/playlist.m3u8' },
+            { name: 'Mix TV', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/83/Mix_Tv_logo.svg/200px-Mix_Tv_logo.svg.png', stream: 'https://streaming.mixtv.com.br/mixtv/live/playlist.m3u8' },
+            { name: 'TV Mundial', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2f/TV_Mundial_logo.svg/200px-TV_Mundial_logo.svg.png', stream: 'https://streaming.tvamundi.com.br/tvmundial/live/playlist.m3u8' },
+            { name: 'NGT', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/86/NGT_logo.svg/200px-NGT_logo.svg.png', stream: 'https://streaming.ngt.com.br/ngt/live/playlist.m3u8' },
+            { name: 'TV Zero', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/52/TV_Zero_logo.svg/200px-TV_Zero_logo.svg.png', stream: 'https://streaming.tvzero.com.br/tvzero/live/playlist.m3u8' },
+            { name: 'Canal Rural', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c2/Canal_Rural_logo.svg/200px-Canal_Rural_logo.svg.png', stream: 'https://streaming.canalrural.com.br/canalrural/live/playlist.m3u8' },
+            { name: 'Band Sports', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/29/Band_logo_2014.svg/200px-Band_logo_2014.svg.png', stream: 'http://cdn-live-band.bol.com.br/live/bandsports/live/playlist.m3u8' },
+            { name: 'Canal Empreendedor', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4c/Canal_Empreendedor_logo.svg/200px-Canal_Empreendedor_logo.svg.png', stream: 'https://streaming.canalempreendedor.com.br/canalempreendedor/live/playlist.m3u8' }
+        ],
+        INTERNATIONAL: [
+            { name: 'Al Jazeera', logo: 'https://upload.wikimedia.org/wikipedia/en/thumb/f/f2/Aljazeera.svg/200px-Aljazeera.svg.png', stream: 'https://live-hls-web-aje.getaj.net/AJE/index.m3u8' },
+            { name: 'NHK World', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/NHK_World-Japan_logo.svg/200px-NHK_World-Japan_logo.svg.png', stream: 'https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp-en/index.m3u8' },
+            { name: 'France 24 EN', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/France_24_logo.svg/200px-France_24_logo.svg.png', stream: 'https://live.france24.com/hls/live/2023458/france24_en-hls/index.m3u8' },
+            { name: 'France 24 FR', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/99/France_24_logo.svg/200px-France_24_logo.svg.png', stream: 'https://live.france24.com/hls/live/2023459/france24_fr-hls/index.m3u8' },
+            { name: 'DW News', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/DW_Logo_2012.svg/200px-DW_Logo_2012.svg.png', stream: 'https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream102/index.m3u8' },
+            { name: 'Sky News', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/Sky_Logo_2023.svg/200px-Sky_Logo_2023.svg.png', stream: 'https://skynews-hls.akamaized.net/hls/live/2042891/SkyNewsMainStream/master.m3u8' },
+            { name: 'Euronews EN', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Euronews_logo.svg/200px-Euronews_logo.svg.png', stream: 'https://euronews-euronews-english-2-us.plex.wurl.tv/playlist.m3u8' },
+            { name: 'CGTN', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/CGTN_logo.svg/200px-CGTN_logo.svg.png', stream: 'https://english.cctv.com/live/cctv_English/index.m3u8' },
+            { name: 'TRT World', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/9/9e/TRT_World_logo.svg/200px-TRT_World_logo.svg.png', stream: 'https://tv-trtworld.medya.trt.com.tr/master.m3u8' },
+            { name: 'RT EN', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a0/Russia-today-logo.svg/200px-Russia-today-logo.svg.png', stream: 'https://rtd-live.cdnvideo.com/live/sime_streaming_hls_rtd_rus_vfr_hls/master.m3u8' },
+            { name: 'CNN Brasil', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6f/CNN_Brasil_logo.svg/200px-CNN_Brasil_logo.svg.png', stream: 'https://cnnbrasil-s.akamaized.net/live/cnnbrasil/live/master.m3u8' },
+            { name: 'BBC World', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/62/BBC_World_News_Logo_2019.svg/200px-BBC_World_News_Logo_2019.svg.png', stream: 'https://bbclive.akamaized.net/hls/live/2015825/bbcworld/bbcworld.isml/bbcworld-audio%3d96000.norewind.m3u8' },
+            { name: 'Bloomberg TV', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/48/Bloomberg_logo.svg/200px-Bloomberg_logo.svg.png', stream: 'https://bloomberg-cmdl-live.akamaized.net/live/us/1607/master.m3u8' },
+            { name: 'DW Espanol', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/DW_Logo_2012.svg/200px-DW_Logo_2012.svg.png', stream: 'https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream103/index.m3u8' },
+            { name: 'DW Brasil', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/0b/DW_Logo_2012.svg/200px-DW_Logo_2012.svg.png', stream: 'https://dwamdstream102.akamaized.net/hls/live/2015525/dwstream104/index.m3u8' },
+            { name: 'RTP Internacional', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/7d/RTPi_logo.svg/200px-RTPi_logo.svg.png', stream: 'https://streaming-ondemand.rtp.pt/rtp1HLS/rtpi/playlist.m3u8' },
+            { name: 'ABC Australia', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/6/6a/Australian_Broadcasting_Corporation_logo_%282014%29.svg/200px-Australian_Broadcasting_Corporation_logo_%2014%29.svg.png', stream: 'https://abc-iview-mediapackagestreams-2.akamaized.net/out/v1/89180aa2044642ea86453d909c499bfb/index.m3u8' },
+            { name: 'NDTV 24x7', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/NDTV_logo.svg/200px-NDTV_logo.svg.png', stream: 'https://ndtv24x7-lh.akamaized.net/hls/live/2043871/ndtv24x7/ndtv24x7/master.m3u8' },
+            { name: 'i24 News', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/3/35/I24_News_Logo.svg/200px-I24_News_Logo.svg.png', stream: 'https://i24news.akamaized.net/hls/live/2043600/i24newsEnLive/master.m3u8' },
+            { name: 'TV5Monde', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/TV5_Monde_logo.svg/200px-TV5_Monde_logo.svg.png', stream: 'https://tv5monde.akamaized.net/live/live3/chaine+tvm.m3u8' },
+            { name: 'Arirang', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/f/fe/Arirang_TV_logo.svg/200px-Arirang_TV_logo.svg.png', stream: 'https://amdlive-ch01-ctnd-com.akamaized.net/arirang_1ch/smil:arirang_1ch.smil/playlist.m3u8' },
+            { name: 'CBC News', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/78/CBC_logo.svg/200px-CBC_logo.svg.png', stream: 'https://live.corusrvstream.com/CBCCNews/CBCCNews.isml/master.m3u8' },
+            { name: 'CNA Brasil', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/CNA_logo.svg/200px-CNA_logo.svg.png', stream: 'https://streaming.cna.com.br/cna/live/playlist.m3u8' },
+            { name: 'NHK JP', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/7/74/NHK_World-Japan_logo.svg/200px-NHK_World-Japan_logo.svg.png', stream: 'https://nhkwlive-ojp.akamaized.net/hls/live/2003459/nhkwlive-ojp/index.m3u8' }
+        ]
+    }
+};
