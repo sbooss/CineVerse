@@ -3,50 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CineVerse - Streaming</title>
+    <title>CINE BOSS - Streaming</title>
+    <meta name="description" content="CINE BOSS - A melhor plataforma de streaming. Filmes, Series, Animes e TV Ao Vivo em Portugues.">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
-    <link rel="stylesheet" href="style.css?v=3">
+    <link rel="stylesheet" href="style.css?v=4">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
     <style>
-        #boot-screen {
-            position: fixed; inset: 0; z-index: 99999;
-            background: #0a0a0f;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            gap: 20px; transition: opacity 0.5s ease;
-        }
-        #boot-screen.fade-out { opacity: 0; pointer-events: none; }
-        #boot-screen .logo-big { font-family: 'Orbitron', monospace; font-size: 48px; font-weight: 900; }
-        #boot-screen .logo-big .accent { color: #00d4ff; text-shadow: 0 0 30px rgba(0,212,255,0.8); }
-        #boot-screen .loader { width: 200px; height: 3px; background: rgba(255,255,255,0.1); border-radius: 3px; overflow: hidden; }
-        #boot-screen .loader-bar { height: 100%; width: 0%; background: linear-gradient(90deg, #00d4ff, #7b2fff); border-radius: 3px; animation: bootLoad 2s ease forwards; }
-        #boot-screen .boot-text { color: #6b6b8d; font-size: 14px; font-family: 'Inter', sans-serif; }
-        @keyframes bootLoad { 0% { width: 0%; } 50% { width: 70%; } 100% { width: 100%; } }
-        #boot-error { display: none; color: #ff2d95; margin-top: 10px; font-size: 13px; max-width: 400px; text-align: center; }
+        #boot-screen{position:fixed;inset:0;z-index:99999;background:#050508;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;transition:opacity .6s ease}
+        #boot-screen.fade-out{opacity:0;pointer-events:none}
+        #boot-screen .logo-big{font-family:'Orbitron',monospace;font-size:clamp(36px,6vw,60px);font-weight:900;letter-spacing:4px}
+        #boot-screen .logo-big .boss{color:#00d4ff;text-shadow:0 0 40px rgba(0,212,255,.9),0 0 80px rgba(0,212,255,.4)}
+        #boot-screen .loader{width:220px;height:2px;background:rgba(255,255,255,.08);border-radius:2px;overflow:hidden}
+        #boot-screen .loader-bar{height:100%;width:0%;background:linear-gradient(90deg,#00d4ff,#7b2fff,#00d4ff);background-size:200% 100%;animation:bootLoad 2.2s ease forwards,shimmerLoad .8s linear infinite}
+        #boot-screen .boot-text{color:#4a4a6a;font-size:13px;font-family:'Inter',sans-serif;letter-spacing:3px;text-transform:uppercase}
+        @keyframes bootLoad{0%{width:0%}40%{width:60%}100%{width:100%}}
+        @keyframes shimmerLoad{0%{background-position:200% center}100%{background-position:-200% center}}
+        #boot-error{display:none;color:#ff2d95;margin-top:8px;font-size:12px;max-width:400px;text-align:center}
     </style>
 </head>
 <body>
     <div id="boot-screen">
-        <div class="logo-big">CINE<span class="accent">VERSE</span></div>
+        <div class="logo-big">CINE <span class="boss">BOSS</span></div>
         <div class="loader"><div class="loader-bar"></div></div>
-        <div class="boot-text">Carregando plataforma...</div>
+        <div class="boot-text">Preparando sua experiencia...</div>
         <div id="boot-error"></div>
     </div>
-    
+
     <nav class="navbar" style="display:none" id="mainNav">
         <div class="nav-container">
             <a href="#" class="logo" onclick="goHome()">
                 <div class="logo-icon"><i class="fas fa-play"></i></div>
-                <span class="logo-text">CINE<span class="accent">VERSE</span></span>
+                <span class="logo-text">CINE <span class="accent">BOSS</span></span>
             </a>
-            
             <div class="nav-center">
                 <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="Buscar filmes, series, animes...">
+                    <input type="text" id="searchInput" placeholder="Buscar filmes, series, animes..." autocomplete="off">
                     <i class="fas fa-search search-icon"></i>
                     <div class="search-filters">
                         <button class="filter-btn active" data-filter="all">Todos</button>
@@ -56,7 +49,6 @@
                     </div>
                 </div>
             </div>
-            
             <div class="nav-right">
                 <div class="nav-links">
                     <a href="#" class="active" data-category="home"><i class="fas fa-home"></i><span>Inicio</span></a>
@@ -71,10 +63,8 @@
         </div>
     </nav>
 
-    <main class="main-content" id="mainContent" style="display:none">
-    </main>
+    <main class="main-content" id="mainContent" style="display:none"></main>
 
-    <!-- SERIES/FILM FULL PAGE VIEW -->
     <div class="detail-page" id="detailPage" style="display:none">
         <div class="detail-hero" id="detailHero">
             <div class="detail-hero-bg" id="detailHeroBg"></div>
@@ -94,7 +84,6 @@
                 </div>
             </div>
         </div>
-
         <div class="detail-body" id="detailBody">
             <div class="detail-section" id="detailSeasonsSection" style="display:none">
                 <div class="season-selector" id="seasonSelector"></div>
@@ -109,7 +98,6 @@
         </div>
     </div>
 
-    <!-- MOVIE MODAL (only for movies) -->
     <div class="modal" id="movieModal">
         <div class="modal-backdrop"></div>
         <div class="modal-content">
@@ -150,37 +138,40 @@
     <footer class="footer" id="mainFooter" style="display:none">
         <div class="footer-content">
             <div class="footer-logo">
-                <span class="logo-text">CINE<span class="accent">VERSE</span></span>
+                <span class="logo-text">CINE <span class="accent">BOSS</span></span>
                 <p>Sua experiencia de streaming definitiva</p>
             </div>
         </div>
         <div class="footer-bottom">
-            <p>&copy; 2026 CineVerse. Dados de TMDB.</p>
+            <p>&copy; 2026 CINE BOSS. Dados de TMDB.</p>
         </div>
     </footer>
 
-    <script src="config.js?v=3"></script>
-    <script src="tmdb.js?v=3"></script>
-    <script src="player.js?v=3"></script>
-    <script src="app.js?v=3"></script>
+    <script src="config.js?v=4"></script>
+    <script src="tmdb.js?v=4"></script>
+    <script src="player.js?v=4"></script>
+    <script src="app.js?v=4"></script>
     <script>
         window.addEventListener('load', function() {
+            var audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbsGczIj2NysijaTkmTaLE0bpqMxxLj8PQums0HkqKvtC5bDUhTIi7zLhtNiBLhrfJt284IEqDtcW2cDkhS4GywLVxOiFKf7C+c3E7IUp+rb10cjwhS32ru3ZzPSJMe6i6d3Q+I0t6prl4dT8kTHmluHl2QCNLd6O3enlBJEx1oLZ6e0ImTHOetHt8QyZMcZuzfH1EJ0xwlrF9f0YoTG6Rr36ARyhMa4usf4FIKU1qi6mAg0kqTWmJqIGESSpNZ4eog4hKK01lh6eEiUssTGKFp4WKSytLYIWmhopMLEsehKWHjEwtShyCpIiNTS5JGoCjiY5OL0gZf6GKkU8wSBh9noyTUDBIF3qbjpVSMUcWd5qQmFQyRhR1mZKaVTNGE3KXlJxXNEQRb5aWnlg2QQ9slJigWjdDDWiTm6JcOEEJZpCdpF06QQNij6CnYDxB AmGNoqphPkEAX4yjrGI/Qn5c
+', volume: 0.3);
+            audio.play().catch(function(){});
             setTimeout(function() {
                 var boot = document.getElementById('boot-screen');
                 if (boot) {
                     boot.classList.add('fade-out');
-                    setTimeout(function() { boot.remove(); }, 600);
+                    setTimeout(function() { boot.remove(); }, 700);
                 }
                 document.getElementById('mainNav').style.display = '';
                 document.getElementById('mainContent').style.display = '';
                 document.getElementById('mainFooter').style.display = '';
-            }, 2200);
+            }, 2400);
         });
         window.addEventListener('error', function(e) {
             var errEl = document.getElementById('boot-error');
             if (errEl) {
                 errEl.style.display = 'block';
-                errEl.textContent = 'Erro: ' + e.message + ' (' + (e.filename || '').split('/').pop() + ':' + e.lineno + ')';
+                errEl.textContent = 'Erro: ' + e.message;
             }
         }, true);
     </script>

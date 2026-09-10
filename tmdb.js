@@ -50,6 +50,7 @@ class TMDBAPI {
         const url = new URL(this.baseURL + endpoint);
         url.searchParams.set('api_key', this.apiKey);
         url.searchParams.set('language', 'pt-BR');
+        url.searchParams.set('include_adult', 'false');
         Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
 
         try {
