@@ -8,3 +8,6 @@ server.py
 start.bat
 start_server.ps1
 database.js
+server.log
+server_err.log
+.vercel/
