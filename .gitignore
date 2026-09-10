@@ -3,3 +3,8 @@ node_modules/
 *.log
 .DS_Store
 Thumbs.db
+server.js
+server.py
+start.bat
+start_server.ps1
+database.js

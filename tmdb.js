@@ -1,6 +1,7 @@
 class TMDBAPI {
     constructor() {
-        this.baseURL = '/api/tmdb';
+        this.apiKey = 'eb9690431d1dd3d86de35def2b1b0a2c';
+        this.baseURL = 'https://api.themoviedb.org/3';
         this.imgURL = 'https://image.tmdb.org/t/p/';
         this.cache = new Map();
         this.cacheTimeout = 15 * 60 * 1000;
@@ -33,11 +34,9 @@ class TMDBAPI {
                 {id:114461,name:'The Last of Us',overview:'Pos-apocalipse onde humanos foram devastados por um fungo.',poster_path:'/uKvVjHNqB5VmOrdxqAt2F7J78ED.jpg',backdrop_path:'/lGiRj7gSJRkGOFOKHs3I3rO1Wq7.jpg',vote_average:8.8,first_air_date:'2023-01-15',genre_ids:[18,10765],number_of_seasons:1,number_of_episodes:9},
                 {id:93405,name:'Squid Game',overview:'Concorrentes arriscam a vida em jogos mortais.',poster_path:'/dDlEmu3EZ0Pgg93K2SVNLCjCSvE.jpg',backdrop_path:'/oaGvjB0DvdhXhOAuADfHb261ZHa.jpg',vote_average:7.8,first_air_date:'2021-09-17',genre_ids:[10765,9648],number_of_seasons:2,number_of_episodes:16},
                 {id:71790,name:'Rick and Morty',overview:'Aventuras interdimensionais de um cientista e seu neto.',poster_path:'/cvhMj9MZqPPFGbVU78f1hLFBONz.jpg',backdrop_path:'/iAx7FXXxY8m9HEsCR0FhLfV0zL.jpg',vote_average:8.7,first_air_date:'2013-12-02',genre_ids:[16,35],number_of_seasons:7,number_of_episodes:71},
-                {id:60735,name:'The Flash',overview:'Bar Allen ganha velocidade sobre-humana.',poster_path:'/lJA2RCMfsWoskqlQhXPSLFQGXEJ.jpg',backdrop_path:'/z59kJfcElR9eHO9rJbWp4qWMuee.jpg',vote_average:7.8,first_air_date:'2014-10-07',genre_ids:[18,10765],number_of_seasons:9,number_of_episodes:184},
                 {id:82856,name:'The Mandalorian',overview:'Um caçador de recompensas viaja pela galaxia.',poster_path:'/sWgBv7LV2PRoQgkxwlibdGXKz1S.jpg',backdrop_path:'/o094Yj9aQY2zPKN0bE6BIPuVmCE.jpg',vote_average:8.5,first_air_date:'2019-11-12',genre_ids:[10765,10759],number_of_seasons:3,number_of_episodes:24},
                 {id:76479,name:'The Witcher',overview:'Geralt de Rivia caça monstros em um mundo perigoso.',poster_path:'/7vjaCdMw15FEbXyLQTVa04URsPm.jpg',backdrop_path:'/jBJWaqoSCiARWtfV0GlqHrcdiJq.jpg',vote_average:8.2,first_air_date:'2019-12-20',genre_ids:[10765,10759],number_of_seasons:3,number_of_episodes:24},
                 {id:95557,name:'Invincible',overview:'Um jovem descobre que seu pai e o super-heroi mais poderoso.',poster_path:'/yGchBUrrsKrpUVPK4FhJbNsJfwh.jpg',backdrop_path:'/iSfXkF2O5rE7R7j2WN944UqoIfO.jpg',vote_average:8.7,first_air_date:'2021-03-25',genre_ids:[16,10759],number_of_seasons:3,number_of_episodes:24},
-                {id:71712,name:'The Good Doctor',overview:'Um jovem cirurgiao autista se destaca em um hospital.',poster_path:'/g2VHsnSkkGPl0WBa6TtLr2J6bAE.jpg',backdrop_path:'/6YmVBwG6zr6RYJPPqt2F7kIirjL.jpg',vote_average:8.2,first_air_date:'2017-09-25',genre_ids:[18],number_of_seasons:7,number_of_episodes:126},
                 {id:124364,name:'One Piece',overview:'Luffy e sua tripulacao buscam o One Piece.',poster_path:'/cMD9Ygz11zjJzAovURpO75Qg7rT.jpg',backdrop_path:'/2rmK7mnchw9Xr3XdiTFSxTTLXqv.jpg',vote_average:8.7,first_air_date:'1999-10-20',genre_ids:[10759,35],number_of_seasons:21,number_of_episodes:1100}
             ]
         };
@@ -48,7 +47,9 @@ class TMDBAPI {
         const cached = this.cache.get(cacheKey);
         if (cached && Date.now() - cached.time < this.cacheTimeout) return cached.data;
 
-        const url = new URL(this.baseURL + endpoint, window.location.origin);
+        const url = new URL(this.baseURL + endpoint);
+        url.searchParams.set('api_key', this.apiKey);
+        url.searchParams.set('language', 'pt-BR');
         Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
 
         try {
