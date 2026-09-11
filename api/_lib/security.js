@@ -76,50 +76,75 @@ function isValidUUID(str) {
     return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
 }
 
-/* ===================== RATE LIMITING (Supabase) ===================== */
+/* ===================== RATE LIMITING (Supabase with fallback) ===================== */
+const memRateLimits = new Map();
+
 async function checkRateLimit(key, maxAttempts, windowMinutes) {
-    const windowStart = new Date(Date.now() - windowMinutes * 60 * 1000).toISOString();
-
-    const { data } = await supabase
-        .from('rate_limits')
-        .select('id')
-        .eq('key', key)
-        .gte('created_at', windowStart)
-        .limit(maxAttempts);
-
-    const attempts = data ? data.length : 0;
-
-    if (attempts >= maxAttempts) {
-        return { blocked: true, remaining: 0 };
+    try {
+        const windowStart = new Date(Date.now() - windowMinutes * 60 * 1000).toISOString();
+        const { data, error } = await supabase
+            .from('rate_limits')
+            .select('id')
+            .eq('key', key)
+            .gte('created_at', windowStart)
+            .limit(maxAttempts);
+        if (error) throw error;
+        const attempts = data ? data.length : 0;
+        if (attempts >= maxAttempts) return { blocked: true, remaining: 0 };
+        return { blocked: false, remaining: maxAttempts - attempts - 1 };
+    } catch {
+        const now = Date.now();
+        const entry = memRateLimits.get(key) || { count: 0, first: now };
+        if (now - entry.first > windowMinutes * 60 * 1000) {
+            memRateLimits.set(key, { count: 1, first: now });
+            return { blocked: false, remaining: maxAttempts - 1 };
+        }
+        entry.count++;
+        if (entry.count >= maxAttempts) return { blocked: true, remaining: 0 };
+        return { blocked: false, remaining: maxAttempts - entry.count };
     }
-
-    return { blocked: false, remaining: maxAttempts - attempts - 1 };
 }
 
 async function recordRateLimitAttempt(key) {
-    await supabase.from('rate_limits').insert({
-        key,
-        created_at: new Date().toISOString()
-    });
+    try {
+        await supabase.from('rate_limits').insert({ key, created_at: new Date().toISOString() });
+    } catch {
+        const entry = memRateLimits.get(key) || { count: 0, first: Date.now() };
+        entry.count++;
+        memRateLimits.set(key, entry);
+    }
 }
 
 async function cleanupRateLimits() {
-    const cutoff = new Date(Date.now() - 60 * 60 * 1000).toISOString();
-    await supabase.from('rate_limits').delete().lt('created_at', cutoff);
+    try {
+        const cutoff = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+        await supabase.from('rate_limits').delete().lt('created_at', cutoff);
+    } catch {}
 }
 
 /* ===================== SESSION AUDIT ===================== */
 async function createSession(userId, token, expiryDays, ip, userAgent) {
     const expiresAt = new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000);
-    await supabase.from('sessions').insert({
+    const sessionData = {
         id: crypto.randomUUID(),
         user_id: userId,
         token,
-        ip_address: ip || null,
-        user_agent: userAgent || null,
         expires_at: expiresAt.toISOString(),
         created_at: new Date().toISOString()
-    });
+    };
+    if (ip) sessionData.ip_address = ip;
+    if (userAgent) sessionData.user_agent = userAgent;
+    try {
+        await supabase.from('sessions').insert(sessionData);
+    } catch {
+        await supabase.from('sessions').insert({
+            id: sessionData.id,
+            user_id: userId,
+            token,
+            expires_at: expiresAt.toISOString(),
+            created_at: sessionData.created_at
+        });
+    }
 }
 
 async function validateSession(token) {
