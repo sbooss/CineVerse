@@ -2,9 +2,29 @@ const CONFIG = {
     EMBED: {
         PROVIDERS: [
             {
-                name: 'APIPlayer',
-                movie: function(id) { return 'https://apiplayer.ru/embed/movie/' + id + '?autoplay=1&lang=pt&color=00d4ff'; },
-                tv: function(id, s, e) { return 'https://apiplayer.ru/embed/tv/' + id + '?autoplay=1&lang=pt&color=00d4ff&s=' + s + '&e=' + e; }
+                name: 'SuperEmbed',
+                movie: function(id) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1&lang=pt'; },
+                tv: function(id, s, e) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1&lang=pt&season=' + s + '&episode=' + e; }
+            },
+            {
+                name: 'VidLink',
+                movie: function(id) { return 'https://vidlink.pro/movie/' + id + '?lang=pt&quality=1080&autoplay=1&color=00d4ff'; },
+                tv: function(id, s, e) { return 'https://vidlink.pro/tv/' + id + '/' + s + '/' + e + '?lang=pt&quality=1080&autoplay=1&color=00d4ff'; }
+            },
+            {
+                name: 'VidFast',
+                movie: function(id) { return 'https://vidfast.vc/movie/' + id + '?lang=pt&quality=1080&autoplay=1&color=00d4ff'; },
+                tv: function(id, s, e) { return 'https://vidfast.vc/tv/' + id + '/' + s + '/' + e + '?lang=pt&quality=1080&autoplay=1&color=00d4ff'; }
+            },
+            {
+                name: 'Embed.su',
+                movie: function(id) { return 'https://www.embed.su/embed/movie/' + id; },
+                tv: function(id, s, e) { return 'https://www.embed.su/embed/tv/' + id + '/' + s + '/' + e; }
+            },
+            {
+                name: 'VidSrc',
+                movie: function(id) { return 'https://vidsrc.to/embed/movie/' + id + '?lang=pt'; },
+                tv: function(id, s, e) { return 'https://vidsrc.to/embed/tv/' + id + '/' + s + '-' + e + '?lang=pt'; }
             }
         ]
     },
