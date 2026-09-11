@@ -49,6 +49,7 @@ function createCard(item) {
     card.innerHTML =
         '<div class="card-poster">' + posterHTML +
             '<div class="card-rating"><i class="fas fa-star"></i> ' + rating + '</div>' +
+            '<div class="card-dub"><i class="fas fa-language"></i> DUB</div>' +
             '<button class="card-fav ' + (fav ? 'active' : '') + '"><i class="fas fa-heart"></i></button>' +
             '<div class="card-play"><div class="card-play-icon"><i class="fas fa-play"></i></div></div>' +
         '</div>' +
@@ -144,6 +145,7 @@ function openDetailPage(item) {
     badges.innerHTML =
         '<span class="detail-badge rating"><i class="fas fa-star"></i> ' + rating + '</span>' +
         '<span class="detail-badge year">' + year + '</span>' +
+        '<span class="detail-badge dub"><i class="fas fa-language"></i> DUBLADO PT-BR</span>' +
         (item.runtime ? '<span class="detail-badge duration"><i class="fas fa-clock"></i> ' + formatRuntime(item.runtime) + '</span>' : '');
     titleEl.textContent = item.title;
     meta.innerHTML = '';
