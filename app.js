@@ -1,505 +1,702 @@
-let currentCategory='home',currentFilter='all',favorites=JSON.parse(localStorage.getItem('cineboss_favorites')||'[]');
-let currentSeason=1,currentEpisode=1,detailPageItem=null,detailPageSeasonsData=[];
+/* =====================================================
+   CINE BOSS - Premium Streaming App v6
+   ===================================================== */
 
-document.addEventListener('DOMContentLoaded',()=>{
-    initNavigation();initSearch();initFilters();initDetailPage();loadHomePage();
-});
+const TMDB_KEY = 'eb9690431d1dd3d86de35def2b1b0a2c';
+const IMG_BASE = 'https://image.tmdb.org/t/p/';
+const FAV_KEY = 'cineboss_favorites';
 
-function initNavigation(){
-    document.querySelectorAll('.nav-links a').forEach(link=>{
-        link.addEventListener('click',e=>{
-            e.preventDefault();
-            document.querySelectorAll('.nav-links a').forEach(l=>l.classList.remove('active'));
-            link.classList.add('active');
-            currentCategory=link.dataset.category;
-            loadContent(currentCategory);
-        });
-    });
+let currentFilter = 'all';
+let heroData = null;
+let isLoading = false;
+
+/* ===================== TMDB API ===================== */
+const tmdb = {
+    async fetch(endpoint, params = {}) {
+        const url = new URL(`https://api.themoviedb.org/3${endpoint}`);
+        url.searchParams.set('api_key', TMDB_KEY);
+        url.searchParams.set('language', 'pt-BR');
+        url.searchParams.set('include_adult', 'false');
+        Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+        try {
+            const r = await fetch(url);
+            if (!r.ok) throw new Error(r.status);
+            return await r.json();
+        } catch (e) {
+            console.warn('TMDB fetch error:', endpoint, e);
+            return null;
+        }
+    },
+    trending() { return this.fetch('/trending/all/week'); },
+    popular() { return this.fetch('/movie/popular'); },
+    nowPlaying() { return this.fetch('/movie/now_playing'); },
+    upcoming() { return this.fetch('/movie/upcoming'); },
+    topRated() { return this.fetch('/movie/top_rated'); },
+    tvPopular() { return this.fetch('/tv/popular'); },
+    tvAiring() { return this.fetch('/tv/airing_today'); },
+    tvTopRated() { return this.fetch('/tv/top_rated'); },
+    anime() { return this.fetch('/discover/tv', { with_keywords: '210024', sort_by: 'popularity.desc' }); },
+    byGenre(genreId, type = 'movie') { return this.fetch(`/discover/${type}`, { with_genres: genreId, sort_by: 'popularity.desc' }); },
+    search(query, type = 'multi') { return this.fetch(`/search/${type}`, { query }); },
+    details(type, id) { return this.fetch(`/${type}/${id}`); },
+    seasons(type, id, season) { return this.fetch(`/${type}/${id}/season/${season}`); },
+    similar(type, id) { return this.fetch(`/${type}/${id}/similar`); },
+    credits(type, id) { return this.fetch(`/${type}/${id}/credits`); }
+};
+
+/* ===================== UTILITIES ===================== */
+function posterURL(path, size = 'w342') {
+    if (!path) return null;
+    return `${IMG_BASE}${size}${path}`;
 }
 
-function initSearch(){
-    const input=document.getElementById('searchInput');let timeout;
-    input.addEventListener('input',e=>{
-        clearTimeout(timeout);
-        timeout=setTimeout(()=>{
-            if(e.target.value.length>2)performSearch(e.target.value);
-            else if(currentCategory==='home')loadHomePage();
-            else loadContent(currentCategory);
-        },400);
-    });
-    input.addEventListener('keydown',e=>{
-        if(e.key==='Enter'&&e.target.value.length>2)performSearch(e.target.value);
-    });
+function backdropURL(path, size = 'w1280') {
+    if (!path) return null;
+    return `${IMG_BASE}${size}${path}`;
 }
 
-function initFilters(){
-    document.querySelectorAll('.filter-btn').forEach(btn=>{
-        btn.addEventListener('click',()=>{
-            document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
-            btn.classList.add('active');
-            currentFilter=btn.dataset.filter;
-            const v=document.getElementById('searchInput').value;
-            if(v.length>2)performSearch(v);
-        });
-    });
+function getFavorites() {
+    try { return JSON.parse(localStorage.getItem(FAV_KEY)) || []; } catch { return []; }
 }
 
-function initDetailPage(){
-    document.getElementById('detailBack').addEventListener('click',closeDetailPage);
+function saveFavorites(favs) {
+    localStorage.setItem(FAV_KEY, JSON.stringify(favs));
 }
 
-async function loadContent(category){
-    if(category==='home'){await loadHomePage();return}
-    if(category==='favorites'){loadFavorites();return}
-    const main=document.getElementById('mainContent');main.innerHTML='';
-    const sections=getCategorySections(category);
-    for(const s of sections)main.innerHTML+=createSectionHTML(s.id,s.title,s.icon);
-    for(const s of sections)await loadSection(s.id,s.category,s.mediaType,s.isLive);
+function isFavorite(id) {
+    return getFavorites().some(f => f.id === id);
 }
 
-function getCategorySections(cat){
-    const map={
-        'movie':[
-            {id:'fil-popular',title:'Filmes Populares',icon:'fa-fire',category:'popular',mediaType:'movie'},
-            {id:'fil-now',title:'Em Cartaz',icon:'fa-ticket-alt',category:'now_playing',mediaType:'movie'},
-            {id:'fil-upcoming',title:'Lancamentos',icon:'fa-calendar',category:'upcoming',mediaType:'movie'},
-            {id:'fil-top',title:'Melhores Avaliados',icon:'fa-trophy',category:'top_rated',mediaType:'movie'},
-            {id:'fil-action',title:'Acao',icon:'fa-fist-raised',category:'action',mediaType:'movie'},
-            {id:'fil-comedy',title:'Comedia',icon:'fa-laugh',category:'comedy',mediaType:'movie'},
-            {id:'fil-horror',title:'Terror',icon:'fa-ghost',category:'horror',mediaType:'movie'},
-            {id:'fil-scifi',title:'Ficcao Cientifica',icon:'fa-rocket',category:'scifi',mediaType:'movie'},
-            {id:'fil-drama',title:'Drama',icon:'fa-masks-theater',category:'drama',mediaType:'movie'},
-            {id:'fil-thriller',title:'Suspense',icon:'fa-mask',category:'thriller',mediaType:'movie'},
-            {id:'fil-romance',title:'Romance',icon:'fa-heart',category:'romance',mediaType:'movie'},
-            {id:'fil-animation',title:'Animacao',icon:'fa-hat-wizard',category:'animation',mediaType:'movie'},
-            {id:'fil-crime',title:'Crime',icon:'fa-bomb',category:'crime',mediaType:'movie'},
-            {id:'fil-family',title:'Familia',icon:'fa-people-roof',category:'family',mediaType:'movie'},
-            {id:'fil-fantasy',title:'Fantasia',icon:'fa-wand-sparkles',category:'fantasy',mediaType:'movie'}
-        ],
-        'tv':[
-            {id:'tv-popular',title:'Series Populares',icon:'fa-fire',category:'popular',mediaType:'tv'},
-            {id:'tv-airing',title:'No Ar Hoje',icon:'fa-broadcast-tower',category:'airing_today',mediaType:'tv'},
-            {id:'tv-top',title:'Melhores Series',icon:'fa-trophy',category:'top_rated',mediaType:'tv'},
-            {id:'tv-onair',title:'Em Exibicao',icon:'fa-play-circle',category:'on_the_air',mediaType:'tv'},
-            {id:'tv-drama',title:'Drama',icon:'fa-masks-theater',category:'drama',mediaType:'tv'},
-            {id:'tv-comedy',title:'Comedia',icon:'fa-laugh',category:'comedy',mediaType:'tv'},
-            {id:'tv-scifi',title:'Sci-Fi & Fantasia',icon:'fa-rocket',category:'scifi',mediaType:'tv'},
-            {id:'tv-crime',title:'Crime',icon:'fa-bomb',category:'crime',mediaType:'tv'}
-        ],
-        'anime':[
-            {id:'an-popular',title:'Animes Populares',icon:'fa-fire',category:'popular',mediaType:'anime'},
-            {id:'an-top',title:'Melhores Animes',icon:'fa-trophy',category:'top_rated',mediaType:'anime'},
-            {id:'an-new',title:'Novos Episodios',icon:'fa-clock',category:'on_the_air',mediaType:'anime'}
-        ],
-        'live':[
-            {id:'tv-live-br',title:'Canais Brasileiros',icon:'fa-flag',category:'br',mediaType:'live',isLive:true},
-            {id:'tv-live-int',title:'Canais Internacionais',icon:'fa-globe',category:'int',mediaType:'live',isLive:true}
-        ]
+function toggleFavorite(item) {
+    let favs = getFavorites();
+    const idx = favs.findIndex(f => f.id === item.id);
+    if (idx >= 0) {
+        favs.splice(idx, 1);
+    } else {
+        favs.push(item);
+    }
+    saveFavorites(favs);
+    return idx < 0;
+}
+
+function formatYear(dateStr) {
+    if (!dateStr) return '';
+    return dateStr.substring(0, 4);
+}
+
+function formatRuntime(min) {
+    if (!min) return '';
+    const h = Math.floor(min / 60);
+    const m = min % 60;
+    return h > 0 ? `${h}h ${m}min` : `${m}min`;
+}
+
+function shuffleArray(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+}
+
+function makeItem(data, mediaType) {
+    return {
+        id: data.id,
+        title: data.title || data.name || 'Sem titulo',
+        overview: data.overview || '',
+        poster: data.poster_path,
+        backdrop: data.backdrop_path,
+        rating: data.vote_average ? data.vote_average.toFixed(1) : '0',
+        year: formatYear(data.release_date || data.first_air_date),
+        mediaType: mediaType || data.media_type || 'movie',
+        genres: data.genres || [],
+        runtime: data.runtime || data.episode_run_time?.[0] || 0,
+        seasons: data.number_of_seasons || 0,
+        episodes: data.number_of_episodes || 0
     };
-    return map[cat]||map['home'];
 }
 
-function createSectionHTML(id,title,icon){
-    return '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas '+icon+'"></i></span>'+title+'</h2></div><div class="movies-row" id="'+id+'"><div class="loading"><div class="loading-spinner"></div></div></div></section>';
-}
-
-async function loadSection(sectionId,category,mediaType,isLive){
-    const c=document.getElementById(sectionId);if(!c)return;
-    try{
-        let items;
-        if(isLive||mediaType==='live'){
-            items=loadLiveChannels(category);
-            c.innerHTML=items.map(function(i){return createLiveCard(i)}).join('');
-            items.forEach(function(ch,i){var card=c.querySelector('.movie-card:nth-child('+(i+1)+')');if(card)card.addEventListener('click',function(){player.openLiveTV(ch)})});
+/* ===================== CREATE CARD ===================== */
+function createCard(item) {
+    const poster = posterURL(item.poster);
+    const fav = isFavorite(item.id);
+    const card = document.createElement('div');
+    card.className = 'movie-card';
+    card.innerHTML = `
+        <div class="card-poster">
+            ${poster
+                ? `<img src="${poster}" alt="${item.title}" loading="lazy">`
+                : `<div class="poster-placeholder"><i class="fas fa-film"></i></div>`
+            }
+            <div class="card-rating"><i class="fas fa-star"></i> ${item.rating}</div>
+            <button class="card-fav ${fav ? 'active' : ''}" data-id="${item.id}"><i class="fas fa-heart"></i></button>
+            <div class="card-play"><div class="card-play-icon"><i class="fas fa-play"></i></div></div>
+        </div>
+        <div class="card-info">
+            <div class="card-title">${item.title}</div>
+            <div class="card-year">${item.year}</div>
+        </div>`;
+    
+    card.addEventListener('click', (e) => {
+        if (e.target.closest('.card-fav')) {
+            e.stopPropagation();
+            const added = toggleFavorite(item);
+            const btn = card.querySelector('.card-fav');
+            btn.classList.toggle('active', added);
             return;
         }
-        if(mediaType==='anime')items=await tmdb.getAnimeByCategory(category);
-        else if(mediaType==='movie')items=await tmdb.getMoviesByCategory(category);
-        else if(mediaType==='tv')items=await tmdb.getTVByCategory(category);
-        else items=await tmdb.getMoviesByCategory(category);
-        if(!items||!items.length){c.innerHTML='<div class="empty-state"><i class="fas fa-film"></i><p>Nenhum conteudo encontrado</p></div>';return}
-        c.innerHTML=items.map(function(i){return createCard(i)}).join('');
-        var cards=c.querySelectorAll('.movie-card');
-        cards.forEach(function(card,idx){
-            card.addEventListener('click',function(){handleCardClick(items[idx])});
-            setTimeout(function(){card.classList.add('visible')},idx*40);
-        });
-    }catch(e){console.error('loadSection error:',e);c.innerHTML='<div class="error-message">Erro ao carregar</div>'}
+        openDetailPage(item);
+    });
+    return card;
 }
 
-async function loadHomePage(){
-    const main=document.getElementById('mainContent');
-    main.innerHTML='\n'+
-        '<section class="hero" id="hero"><div class="hero-bg" id="heroBg"></div>\n'+
-        '<div class="hero-content">\n'+
-        '<div class="hero-badge"><i class="fas fa-bolt"></i><span>EM ALTA</span></div>\n'+
-        '<h1 class="hero-title" id="heroTitle"></h1>\n'+
-        '<div class="hero-meta" id="heroMeta"></div>\n'+
-        '<p class="hero-desc" id="heroDesc"></p>\n'+
-        '<div class="hero-buttons">\n'+
-        '<button class="btn-primary" id="heroPlay"><i class="fas fa-play"></i><span>ASSISTIR AGORA</span></button>\n'+
-        '<button class="btn-secondary" id="heroInfo"><i class="fas fa-info-circle"></i><span>MAIS INFORMACOES</span></button>\n'+
-        '</div></div><div class="hero-gradient"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-fire"></i></span>Em Alta</h2></div><div class="movies-row" id="popular"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-film"></i></span>Filmes Populares</h2></div><div class="movies-row" id="filmesRow"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-ticket-alt"></i></span>Em Cartaz</h2></div><div class="movies-row" id="nowPlaying"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-calendar"></i></span>Lancamentos</h2></div><div class="movies-row" id="upcoming"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-trophy"></i></span>Melhores Avaliados</h2></div><div class="movies-row" id="topRated"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-tv"></i></span>Series Populares</h2></div><div class="movies-row" id="seriesRow"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-play-circle"></i></span>Em Exibicao</h2></div><div class="movies-row" id="onTheAir"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-dragon"></i></span>Anime</h2></div><div class="movies-row" id="animeRow"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-fist-raised"></i></span>Acao</h2></div><div class="movies-row" id="actionRow"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-rocket"></i></span>Ficcao Cientifica</h2></div><div class="movies-row" id="scifiRow"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-ghost"></i></span>Terror</h2></div><div class="movies-row" id="horrorRow"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-laugh"></i></span>Comedia</h2></div><div class="movies-row" id="comedyRow"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-masks-theater"></i></span>Drama</h2></div><div class="movies-row" id="dramaRow"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-mask"></i></span>Suspense</h2></div><div class="movies-row" id="thrillerRow"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-heart"></i></span>Romance</h2></div><div class="movies-row" id="romanceRow"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-hat-wizard"></i></span>Animacao</h2></div><div class="movies-row" id="animationRow"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-wand-sparkles"></i></span>Fantasia</h2></div><div class="movies-row" id="fantasyRow"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-bomb"></i></span>Crime</h2></div><div class="movies-row" id="crimeRow"></div></section>\n'+
-        '<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-broadcast-tower"></i></span>TV Ao Vivo</h2></div><div class="movies-row" id="tvRow"></div></section>';
+function createRow(items, container) {
+    const row = document.createElement('div');
+    row.className = 'movies-row';
+    items.forEach(item => row.appendChild(createCard(item)));
+    container.appendChild(row);
+}
 
-    var hero=await tmdb.getHeroContent();
-    if(hero){
-        if(hero.backdrop)document.getElementById('heroBg').style.backgroundImage='url('+hero.backdrop+')';
-        document.getElementById('heroTitle').textContent=hero.title;
-        var desc=hero.overview||'';
-        document.getElementById('heroDesc').textContent=desc.substring(0,250)+(desc.length>250?'...':'');
-        document.getElementById('heroMeta').innerHTML='<span class="meta-item"><i class="fas fa-star"></i> '+(hero.rating?hero.rating.toFixed(1):'N/A')+'</span><span class="meta-item"><i class="fas fa-calendar"></i> '+(hero.releaseDate?hero.releaseDate.split('-')[0]:'N/A')+'</span><span class="meta-item"><i class="fas fa-clock"></i> '+(hero.runtime||'N/A')+' min</span>';
-        document.getElementById('heroPlay').onclick=function(){player.open(hero)};
-        document.getElementById('heroInfo').onclick=function(){handleCardClick(hero)};
+function createSection(title, items, container) {
+    if (!items || items.length === 0) return;
+    const section = document.createElement('div');
+    section.className = 'content-section';
+    section.innerHTML = `
+        <div class="section-header">
+            <h2 class="section-title">${title}</h2>
+        </div>`;
+    createRow(items, section);
+    container.appendChild(section);
+}
+
+/* ===================== HERO ===================== */
+function setupHero(item) {
+    heroData = item;
+    const hero = document.getElementById('mainContent');
+    const backdrop = backdropURL(item.backdrop, 'original');
+    
+    const heroEl = document.createElement('div');
+    heroEl.className = 'hero';
+    heroEl.innerHTML = `
+        <div class="hero-bg" style="background-image:url('${backdrop || ''}')"></div>
+        <div class="hero-content">
+            <div class="hero-badge"><i class="fas fa-fire"></i> Destaque da Semana</div>
+            <h1 class="hero-title">${item.title}</h1>
+            <div class="hero-meta">
+                <div class="meta-item"><i class="fas fa-star"></i> ${item.rating}</div>
+                <div class="meta-dot"></div>
+                <div class="meta-item"><i class="fas fa-calendar"></i> ${item.year}</div>
+                ${item.runtime ? `<div class="meta-dot"></div><div class="meta-item"><i class="fas fa-clock"></i> ${formatRuntime(item.runtime)}</div>` : ''}
+                ${item.genres?.length ? `<div class="meta-dot"></div><div class="meta-item"><i class="fas fa-tag"></i> ${item.genres.slice(0, 3).map(g => g.name).join(', ')}</div>` : ''}
+            </div>
+            <p class="hero-desc">${item.overview}</p>
+            <div class="hero-buttons">
+                <button class="btn-primary" onclick="openDetailPage(heroData)"><i class="fas fa-play"></i> Assistir Agora</button>
+                <button class="btn-secondary" onclick="toggleFavoriteFromHero()"><i class="fas fa-heart"></i> ${isFavorite(item.id) ? 'Favoritado' : 'Favoritar'}</button>
+            </div>
+        </div>`;
+    hero.appendChild(heroEl);
+}
+
+function toggleFavoriteFromHero() {
+    if (heroData) {
+        toggleFavorite(heroData);
     }
+}
 
-    var loadRow=async function(id,fn){
-        try{
-            var items=await fn();
-            if(items){var el=document.getElementById(id);if(el){
-                el.innerHTML=items.slice(0,25).map(function(i){return createCard(i)}).join('');
-                el.querySelectorAll('.movie-card').forEach(function(card,idx){
-                    card.addEventListener('click',function(){handleCardClick(items[idx])});
-                    setTimeout(function(){card.classList.add('visible')},idx*35);
-                });
-            }}
-        }catch(e){console.warn(id+' failed:',e)}
+/* ===================== DETAIL PAGE ===================== */
+async function openDetailPage(item) {
+    const page = document.getElementById('detailPage');
+    const bg = document.getElementById('detailHeroBg');
+    const poster = document.getElementById('detailPoster');
+    const badges = document.getElementById('detailBadges');
+    const title = document.getElementById('detailTitle');
+    const meta = document.getElementById('detailMeta');
+    const overview = document.getElementById('detailOverview');
+    const seasonsSection = document.getElementById('detailSeasonsSection');
+    const episodesContainer = document.getElementById('detailEpisodesContainer');
+    const similarContainer = document.getElementById('detailSimilar');
+
+    // Reset
+    seasonsSection.style.display = 'none';
+    episodesContainer.innerHTML = '';
+    similarContainer.innerHTML = '';
+
+    // Set background
+    const backdrop = backdropURL(item.backdrop, 'original');
+    bg.style.backgroundImage = backdrop ? `url('${backdrop}')` : 'none';
+
+    // Set poster
+    const posterUrl = posterURL(item.poster, 'w342');
+    poster.innerHTML = posterUrl
+        ? `<img src="${posterUrl}" alt="${item.title}">`
+        : `<div class="poster-placeholder"><i class="fas fa-film"></i></div>`;
+
+    // Set badges
+    badges.innerHTML = `
+        <span class="detail-badge rating"><i class="fas fa-star"></i> ${item.rating}</span>
+        <span class="detail-badge year">${item.year}</span>
+        ${item.runtime ? `<span class="detail-badge duration"><i class="fas fa-clock"></i> ${formatRuntime(item.runtime)}</span>` : ''}`;
+
+    // Set title
+    title.textContent = item.title;
+
+    // Set meta
+    const type = (item.mediaType === 'tv' || item.mediaType === 'anime') ? 'tv' : 'movie';
+    meta.innerHTML = item.genres?.length
+        ? item.genres.map(g => `<div class="meta-item"><i class="fas fa-tag"></i> ${g.name}</div>`).join('<div class="meta-dot"></div>')
+        : '';
+
+    // Set overview
+    overview.textContent = item.overview || 'Sinopse nao disponivel.';
+
+    // Setup buttons
+    document.getElementById('detailBtnPlay').onclick = () => {
+        const playItem = { id: item.id, title: item.title, mediaType: type };
+        player.open(playItem, 1, 1);
     };
-
-    await Promise.all([
-        loadRow('popular',function(){return tmdb.getTrending('all','week')}),
-        loadRow('filmesRow',function(){return tmdb.getMoviesByCategory('popular')}),
-        loadRow('nowPlaying',function(){return tmdb.getMoviesByCategory('now_playing')}),
-        loadRow('upcoming',function(){return tmdb.getMoviesByCategory('upcoming')}),
-        loadRow('topRated',function(){return tmdb.getMoviesByCategory('top_rated')}),
-        loadRow('seriesRow',function(){return tmdb.getTVByCategory('popular')}),
-        loadRow('onTheAir',function(){return tmdb.getTVByCategory('on_the_air')}),
-        loadRow('animeRow',function(){return tmdb.getAnimeByCategory('popular')}),
-        loadRow('actionRow',function(){return tmdb.getMoviesByCategory('action')}),
-        loadRow('scifiRow',function(){return tmdb.getMoviesByCategory('scifi')}),
-        loadRow('horrorRow',function(){return tmdb.getMoviesByCategory('horror')}),
-        loadRow('comedyRow',function(){return tmdb.getMoviesByCategory('comedy')}),
-        loadRow('dramaRow',function(){return tmdb.getMoviesByCategory('drama')}),
-        loadRow('thrillerRow',function(){return tmdb.getMoviesByCategory('thriller')}),
-        loadRow('romanceRow',function(){return tmdb.getMoviesByCategory('romance')}),
-        loadRow('animationRow',function(){return tmdb.getMoviesByCategory('animation')}),
-        loadRow('fantasyRow',function(){return tmdb.getMoviesByCategory('fantasy')}),
-        loadRow('crimeRow',function(){return tmdb.getMoviesByCategory('crime')}),
-    ]);
-
-    try{
-        var tv=loadLiveChannels('br').slice(0,12);
-        var tvRow=document.getElementById('tvRow');
-        if(tvRow){tvRow.innerHTML=tv.map(function(i){return createLiveCard(i)}).join('');
-        tv.forEach(function(ch,i){var card=tvRow.querySelector('.movie-card:nth-child('+(i+1)+')');if(card)card.addEventListener('click',function(){player.openLiveTV(ch)})})}
-    }catch(e){}
-}
-
-function createCard(item){
-    var isFav=favorites.some(function(f){return f.id===item.id});
-    var poster=item.poster||'';
-    var posterHtml=poster?'<img src="'+poster+'" alt="'+(item.title||'')+'" loading="lazy" onerror="this.style.display=\'none\'">':'';
-    var placeholderStyle=poster?'display:none':'';
-    return '<div class="movie-card" data-id="'+item.id+'">'+
-        '<div class="card-poster">'+
-        posterHtml+
-        '<div class="card-placeholder" style="'+placeholderStyle+'"><i class="fas fa-film"></i></div>'+
-        '<div class="card-overlay"><div class="card-play"><i class="fas fa-play"></i></div></div>'+
-        '<div class="card-rating"><i class="fas fa-star"></i> '+(item.rating?item.rating.toFixed(1):'N/A')+'</div>'+
-        '<div class="card-fav '+(isFav?'active':'')+'" onclick="event.stopPropagation();toggleFavorite(this.closest(\'.movie-card\').dataset.id)"><i class="fas fa-heart"></i></div>'+
-        '</div>'+
-        '<div class="card-info"><h3 class="card-title">'+(item.title||'Sem titulo')+'</h3><p class="card-year">'+(item.releaseDate?item.releaseDate.split('-')[0]:'N/A')+'</p></div>'+
-        '</div>';
-}
-
-function createLiveCard(item){
-    return '<div class="movie-card live-card"><div class="card-poster"><div class="card-placeholder" style="background:linear-gradient(135deg,#0a0a1a,#1a0a2e)"><i class="fas fa-broadcast-tower"></i><span style="font-size:10px;text-align:center;padding:0 6px;color:var(--text-muted)">'+item.title+'</span></div><div class="card-overlay"><div class="card-play"><i class="fas fa-play"></i></div></div><div class="live-badge"><i class="fas fa-circle"></i> AO VIVO</div></div><div class="card-info"><h3 class="card-title">'+item.title+'</h3></div></div>';
-}
-
-function loadLiveChannels(category){
-    var ch;
-    if(category==='br')ch=CONFIG.IPTV.BRAZIL;
-    else if(category==='int')ch=CONFIG.IPTV.INTERNATIONAL;
-    else ch=CONFIG.IPTV.BRAZIL.concat(CONFIG.IPTV.INTERNATIONAL);
-    return ch.map(function(c){return{id:c.name.replace(/\s+/g,'-').toLowerCase(),title:c.name,streamUrl:c.stream,mediaType:'live'}});
-}
-
-function handleCardClick(item){
-    openDetailPage(item);
-}
-
-/* ===================== DETAIL PAGE (ALL CONTENT) ===================== */
-async function openDetailPage(item){
-    detailPageItem=item;
-    detailPageSeasonsData=[];
-    currentSeason=1;
-    currentEpisode=1;
-
-    var page=document.getElementById('detailPage');
-    var main=document.getElementById('mainContent');
-    var footer=document.getElementById('mainFooter');
-    var heroEl=document.querySelector('.hero');
-
-    main.style.display='none';
-    footer.style.display='none';
-    if(heroEl)heroEl.style.display='none';
-    page.style.display='block';
-    window.scrollTo(0,0);
-
-    if(item.backdrop)document.getElementById('detailHeroBg').style.backgroundImage='url('+item.backdrop+')';
-    document.getElementById('detailPoster').innerHTML=item.poster?'<img src="'+item.poster+'" alt="'+(item.title||'')+'">':'<div class="poster-placeholder"><i class="fas fa-film"></i></div>';
-
-    var badges=[];
-    if(item.rating)badges.push('<span class="detail-badge badge-rating"><i class="fas fa-star"></i> '+item.rating.toFixed(1)+'</span>');
-    if(item.releaseDate)badges.push('<span class="detail-badge"><i class="fas fa-calendar"></i> '+item.releaseDate.split('-')[0]+'</span>');
-    if(item.seasons)badges.push('<span class="detail-badge"><i class="fas fa-layer-group"></i> '+item.seasons+' Temp.</span>');
-    if(item.episodes)badges.push('<span class="detail-badge"><i class="fas fa-list-ol"></i> '+item.episodes+' Eps</span>');
-    if(item.runtime)badges.push('<span class="detail-badge"><i class="fas fa-clock"></i> '+item.runtime+' min</span>');
-    document.getElementById('detailBadges').innerHTML=badges.join('');
-    document.getElementById('detailTitle').textContent=item.title||'';
-
-    var meta=[];
-    if(item.genreIds&&item.genreIds.length)item.genreIds.slice(0,4).forEach(function(gid){var n=getGenreName(gid);if(n)meta.push('<span class="detail-meta-item">'+n+'</span>')});
-    document.getElementById('detailMeta').innerHTML=meta.map(function(m,i){return '<span class="detail-meta-item">'+m+'</span>'+(i<meta.length-1?'<span class="detail-meta-dot"></span>':'')}).join('');
-    document.getElementById('detailOverview').textContent=item.overview||'Sinopse nao disponivel.';
-
-    var isFav=favorites.some(function(f){return f.id===item.id});
-    document.getElementById('detailBtnFav').innerHTML='<i class="fas fa-heart"></i> '+(isFav?'Favoritado':'Favoritar');
-    document.getElementById('detailBtnFav').onclick=function(){
-        toggleFavorite(item);
-        var nf=favorites.some(function(f){return f.id===item.id});
-        document.getElementById('detailBtnFav').innerHTML='<i class="fas fa-heart"></i> '+(nf?'Favoritado':'Favoritar');
+    document.getElementById('detailBtnFav').onclick = () => {
+        const added = toggleFavorite(item);
+        const btn = document.getElementById('detailBtnFav');
+        btn.innerHTML = added
+            ? '<i class="fas fa-heart"></i> Favoritado'
+            : '<i class="fas fa-heart"></i> Favoritar';
     };
-    document.getElementById('detailBtnPlay').onclick=function(){player.open(item,currentSeason,currentEpisode)};
+    document.getElementById('detailBtnFav').innerHTML = isFavorite(item.id)
+        ? '<i class="fas fa-heart"></i> Favoritado'
+        : '<i class="fas fa-heart"></i> Favoritar';
 
-    document.getElementById('detailSeasonsSection').style.display='none';
-    document.getElementById('detailEpisodesContainer').innerHTML='<div class="loading"><div class="loading-spinner"></div></div>';
-    document.getElementById('detailSimilar').innerHTML='';
+    // Show page
+    page.classList.add('active');
+    page.scrollTop = 0;
+    document.body.style.overflow = 'hidden';
 
-    var isTV=item.mediaType==='tv'||item.mediaType==='anime';
-    if(isTV){
-        await loadDetailSeasons(item);
-    }else{
-        document.getElementById('detailSeasonsSection').style.display='none';
-        document.getElementById('detailEpisodesContainer').innerHTML='';
-        var runtimeHtml='';
-        if(item.runtime)runtimeHtml='<span class="detail-badge"><i class="fas fa-clock"></i> '+item.runtime+' min</span>';
-        document.getElementById('detailEpisodesContainer').innerHTML=
-            '<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px">'+
-            '<button class="detail-btn-play" onclick="player.open(detailPageItem)" style="margin-top:10px"><i class="fas fa-play"></i> Assistir Agora</button>'+
-            '</div>';
-    }
-
-    try{
-        var similarType=isTV?'tv':'movie';
-        var similar=await tmdb.getSimilar(item.id,similarType);
-        if(similar&&similar.length>0){
-            var sc=document.getElementById('detailSimilar');
-            sc.innerHTML=similar.slice(0,15).map(function(i){return createCard(i)}).join('');
-            sc.querySelectorAll('.movie-card').forEach(function(card,idx){
-                card.addEventListener('click',function(){handleCardClick(similar[idx])});
-                setTimeout(function(){card.classList.add('visible')},idx*40);
-            });
+    // Load seasons for TV
+    if (type === 'tv') {
+        const details = await tmdb.details('tv', item.id);
+        if (details && details.seasons && details.seasons.length > 0) {
+            seasonsSection.style.display = 'block';
+            loadSeasons(item, details.seasons);
         }
-    }catch(e){console.warn('Similar failed:',e)}
+    }
+
+    // Load similar
+    loadSimilar(type, item.id);
 }
 
-async function loadDetailSeasons(item){
-    var selectorEl=document.getElementById('seasonSelector');
-    var seasonsSection=document.getElementById('detailSeasonsSection');
-    var seasonCount=item.seasons||0;
+function loadSeasons(item, seasons) {
+    const selector = document.getElementById('seasonSelector');
+    const container = document.getElementById('detailEpisodesContainer');
+    
+    selector.innerHTML = `<div class="season-tabs">${
+        seasons.filter(s => s.season_number > 0).map((s, i) => `
+            <div class="season-tab ${i === 0 ? 'active' : ''}" data-season="${s.season_number}">
+                <span class="season-num">T${s.season_number}</span>
+                <span class="season-eps">${s.episode_count} eps</span>
+            </div>`).join('')
+    }</div>`;
 
-    if(!seasonCount){
-        try{
-            var details=await tmdb.getDetails('tv',item.id);
-            if(details){
-                seasonCount=details.number_of_seasons||0;
-                detailPageItem.seasons=seasonCount;
-                detailPageItem.episodes=details.number_of_episodes||0;
-                if(seasonCount){
-                    var badges=[];
-                    if(item.rating)badges.push('<span class="detail-badge badge-rating"><i class="fas fa-star"></i> '+(item.rating?item.rating.toFixed(1):'N/A')+'</span>');
-                    if(item.releaseDate)badges.push('<span class="detail-badge"><i class="fas fa-calendar"></i> '+(item.releaseDate?item.releaseDate.split('-')[0]:'N/A')+'</span>');
-                    badges.push('<span class="detail-badge"><i class="fas fa-layer-group"></i> '+seasonCount+' Temp.</span>');
-                    badges.push('<span class="detail-badge"><i class="fas fa-list-ol"></i> '+(details.number_of_episodes||0)+' Eps</span>');
-                    document.getElementById('detailBadges').innerHTML=badges.join('');
-                }
+    // Load first season
+    loadEpisodes(item, seasons[0].season_number);
+
+    // Tab clicks
+    selector.querySelectorAll('.season-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            selector.querySelectorAll('.season-tab').forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            loadEpisodes(item, parseInt(tab.dataset.season));
+        });
+    });
+}
+
+async function loadEpisodes(item, seasonNum) {
+    const container = document.getElementById('detailEpisodesContainer');
+    container.innerHTML = '<div class="loading"><div class="loading-spinner"></div></div>';
+
+    const data = await tmdb.seasons('tv', item.id, seasonNum);
+    if (!data || !data.episodes) {
+        container.innerHTML = '<div class="empty-state"><i class="fas fa-film"></i><p>Nenhum episodio encontrado</p></div>';
+        return;
+    }
+
+    const grid = document.createElement('div');
+    grid.className = 'detail-episodes-grid';
+
+    data.episodes.forEach(ep => {
+        const thumb = ep.still_path ? posterURL(ep.still_path, 'w185') : null;
+        const card = document.createElement('div');
+        card.className = 'detail-episode-card';
+        card.innerHTML = `
+            <div class="detail-ep-thumb">
+                ${thumb ? `<img src="${thumb}" alt="E${ep.episode_number}" loading="lazy">` : '<div class="detail-ep-noimg"><i class="fas fa-play"></i></div>'}
+                <div class="detail-ep-play"><i class="fas fa-play"></i></div>
+                <div class="detail-ep-number">E${ep.episode_number}</div>
+            </div>
+            <div class="detail-ep-info">
+                <div class="detail-ep-top">
+                    <div class="detail-ep-name">${ep.name || `Episodio ${ep.episode_number}`}</div>
+                    ${ep.runtime ? `<div class="detail-ep-runtime">${ep.runtime}min</div>` : ''}
+                </div>
+                ${ep.air_date ? `<div class="detail-ep-date">${ep.air_date}</div>` : ''}
+                <div class="detail-ep-desc">${ep.overview || 'Sem descricao.'}</div>
+            </div>`;
+        
+        card.addEventListener('click', () => {
+            player.open({ id: item.id, title: item.title, mediaType: 'tv' }, seasonNum, ep.episode_number);
+        });
+        grid.appendChild(card);
+    });
+
+    container.innerHTML = '';
+    container.appendChild(grid);
+}
+
+async function loadSimilar(type, id) {
+    const container = document.getElementById('detailSimilar');
+    const data = await tmdb.similar(type, id);
+    if (!data || !data.results || data.results.length === 0) return;
+
+    const items = data.results.slice(0, 12).map(d => makeItem(d, type));
+    items.forEach(item => container.appendChild(createCard(item)));
+}
+
+function closeDetailPage() {
+    const page = document.getElementById('detailPage');
+    page.classList.remove('active');
+    document.body.style.overflow = '';
+}
+
+/* ===================== CATEGORIES ===================== */
+async function loadHome() {
+    const main = document.getElementById('mainContent');
+    main.innerHTML = '';
+    isLoading = true;
+
+    try {
+        // Hero from trending
+        const trending = await tmdb.trending();
+        if (trending && trending.results) {
+            const items = trending.results.filter(i => i.backdrop_path && i.vote_average >= 6);
+            if (items.length > 0) {
+                const heroItem = makeItem(items[Math.floor(Math.random() * Math.min(5, items.length))]);
+                setupHero(heroItem);
             }
-        }catch(e){console.warn('Details fetch failed:',e)}
-    }
-
-    if(!seasonCount){
-        document.getElementById('detailEpisodesContainer').innerHTML='<div class="empty-eps"><i class="fas fa-film"></i><p>Nenhuma temporada encontrada</p></div>';
-        seasonsSection.style.display='none';return;
-    }
-
-    seasonCount=Math.min(seasonCount,30);
-    var allSeasonsData=[];
-    for(var s=1;s<=seasonCount;s++){
-        try{var sd=await tmdb.getSeasonDetails(item.id,s);allSeasonsData.push({season:s,data:sd})}
-        catch(e){allSeasonsData.push({season:s,data:null})}
-    }
-    detailPageSeasonsData=allSeasonsData;
-
-    var tabsHtml='<div class="season-tabs">';
-    allSeasonsData.forEach(function(sd,i){
-        var ep=sd.data&&sd.data.episodes?sd.data.episodes.length:0;
-        tabsHtml+='<button class="season-tab '+(i===0?'active':'')+'" onclick="switchDetailSeason('+i+')"><span class="season-num">T'+String(sd.season).padStart(2,'0')+'</span><span class="season-eps">'+ep+' ep'+(ep!==1?'s':'')+'</span></button>';
-    });
-    tabsHtml+='</div>';
-    selectorEl.innerHTML=tabsHtml;
-    seasonsSection.style.display='block';
-    var first=allSeasonsData[0];
-    renderDetailEpisodes(first?first.data:null,first?first.season:1);
-}
-
-function renderDetailEpisodes(seasonData,seasonNum){
-    var c=document.getElementById('detailEpisodesContainer');
-    if(!seasonData||!seasonData.episodes||!seasonData.episodes.length){
-        c.innerHTML='<div class="empty-eps"><i class="fas fa-film"></i><p>Nenhum episodio encontrado</p></div>';return;
-    }
-    var html='<div class="detail-episodes-grid">';
-    seasonData.episodes.forEach(function(ep){
-        var epN=String(ep.episode_number).padStart(2,'0');
-        var sN=String(seasonNum).padStart(2,'0');
-        var still=ep.still_path?'https://image.tmdb.org/t/p/w500'+ep.still_path:'';
-        var air=ep.air_date?formatDate(ep.air_date):'';
-        var stillHtml=still?'<img src="'+still+'" alt="S'+sN+'E'+epN+'" loading="lazy" onerror="this.style.display=\'none\'">':'<div class="detail-ep-noimg"><i class="fas fa-film"></i></div>';
-        html+='<div class="detail-episode-card" onclick="playDetailEpisode('+seasonNum+','+ep.episode_number+')">'+
-            '<div class="detail-ep-thumb">'+stillHtml+
-            '<div class="detail-ep-play"><i class="fas fa-play"></i></div>'+
-            '<div class="detail-ep-number">S'+sN+'E'+epN+'</div></div>'+
-            '<div class="detail-ep-info"><div class="detail-ep-top"><span class="detail-ep-name">'+(ep.name||'Episodio '+ep.episode_number)+'</span>'+
-            (ep.runtime?'<span class="detail-ep-runtime">'+ep.runtime+'min</span>':'')+'</div>'+
-            (air?'<span class="detail-ep-date">'+air+'</span>':'')+
-            '<p class="detail-ep-desc">'+((ep.overview||'Sinopse nao disponivel.').substring(0,120))+((ep.overview||'').length>120?'...':'')+'</p></div></div>';
-    });
-    html+='</div>';c.innerHTML=html;
-}
-
-function switchDetailSeason(idx){
-    document.querySelectorAll('.detail-page .season-tab').forEach(function(t){t.classList.remove('active')});
-    document.querySelectorAll('.detail-page .season-tab')[idx].classList.add('active');
-    var sd=detailPageSeasonsData[idx];currentSeason=sd.season;currentEpisode=1;
-    renderDetailEpisodes(sd.data,sd.season);
-}
-
-function playDetailEpisode(s,e){currentSeason=s;currentEpisode=e;if(detailPageItem)player.open(detailPageItem,s,e)}
-
-function closeDetailPage(){
-    document.getElementById('detailPage').style.display='none';
-    document.getElementById('mainContent').style.display='';
-    document.getElementById('mainFooter').style.display='';
-    detailPageItem=null;detailPageSeasonsData=[];
-    window.scrollTo(0,0);
-}
-
-/* ===================== MOVIE MODAL (kept as fallback) ===================== */
-function openMovieModal(item){
-    var modal=document.getElementById('movieModal');
-    document.getElementById('modalTitle').textContent=item.title||'';
-    document.getElementById('modalDesc').textContent=item.overview||'';
-    document.getElementById('modalRating').textContent=item.rating?item.rating.toFixed(1):'N/A';
-    document.getElementById('modalYear').textContent=item.releaseDate?item.releaseDate.split('-')[0]:'N/A';
-    document.getElementById('modalDuration').textContent=item.runtime?item.runtime+' min':'N/A';
-    document.getElementById('modalGenre').textContent=getGenreName(item.genreIds?item.genreIds[0]:null);
-    if(item.backdrop)document.getElementById('modalHero').style.backgroundImage='url('+item.backdrop+')';
-    var p=document.getElementById('modalPoster');
-    p.innerHTML=item.poster?'<img src="'+item.poster+'" alt="'+(item.title||'')+'" onerror="this.style.display=\'none\'">':'<div class="card-placeholder" style="height:280px"><i class="fas fa-film"></i></div>';
-    var isFav=favorites.some(function(f){return f.id===item.id});
-    document.getElementById('modalFav').innerHTML='<i class="fas fa-heart"></i> '+(isFav?'DESFAVORITAR':'FAVORITAR');
-    document.getElementById('modalFav').onclick=function(){toggleFavorite(item);var nf=favorites.some(function(f){return f.id===item.id});document.getElementById('modalFav').innerHTML='<i class="fas fa-heart"></i> '+(nf?'DESFAVORITAR':'FAVORITAR')};
-    document.getElementById('modalPlay').onclick=function(){player.open(item);modal.classList.remove('active')};
-    modal.classList.add('active');
-}
-
-function toggleFavorite(idOrItem){
-    var item;
-    if(typeof idOrItem==='string'||typeof idOrItem==='number'){
-        var n=Number(idOrItem);
-        item=favorites.find(function(f){return f.id===n})||null;
-        if(!item){
-            item={id:n,title:'',poster:null,backdrop:null,overview:'',rating:0,releaseDate:'',mediaType:'movie',genreIds:[]};
         }
-    }else{
-        item=idOrItem;
+
+        // Content sections - all in parallel
+        const [pop, np, up, tr, tvp, tva, tvt, action, scifi, horror, comedy, drama, thriller, animation, crime] = await Promise.all([
+            tmdb.popular(),
+            tmdb.nowPlaying(),
+            tmdb.upcoming(),
+            tmdb.topRated(),
+            tmdb.tvPopular(),
+            tmdb.tvAiring(),
+            tmdb.tvTopRated(),
+            tmdb.byGenre(28),
+            tmdb.byGenre(878),
+            tmdb.byGenre(27),
+            tmdb.byGenre(35),
+            tmdb.byGenre(18),
+            tmdb.byGenre(53),
+            tmdb.byGenre(16),
+            tmdb.byGenre(80)
+        ]);
+
+        const sections = [
+            ['Filmes Populares', pop],
+            ['Lancamentos', np],
+            ['Em Breve', up],
+            ['Melhores Avaliados', tr],
+            ['Series Populares', tvp],
+            ['Estreias de Hoje', tva],
+            ['Series Bem Avaliadas', tvt],
+            ['Acao e Aventura', action],
+            ['Ficcao Cientifica', scifi],
+            ['Terror', horror],
+            ['Comedia', comedy],
+            ['Drama', drama],
+            ['Suspense', thriller],
+            ['Animacao', animation],
+            ['Crime', crime]
+        ];
+
+        sections.forEach(([title, data]) => {
+            if (data && data.results) {
+                const items = data.results
+                    .filter(i => i.poster_path)
+                    .slice(0, 20)
+                    .map(i => makeItem(i));
+                if (items.length > 0) createSection(title, shuffleArray(items), main);
+            }
+        });
+    } catch (e) {
+        console.error('loadHome error:', e);
+        main.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Erro ao carregar conteudo</p></div>';
     }
-    var idx=favorites.findIndex(function(f){return f.id===item.id});
-    if(idx>-1){
-        favorites.splice(idx,1);
-    }else{
-        favorites.push({
-            id:item.id,title:item.title,poster:item.poster,backdrop:item.backdrop,
-            overview:item.overview,rating:item.rating,releaseDate:item.releaseDate,
-            mediaType:item.mediaType,genreIds:item.genreIds,seasons:item.seasons,episodes:item.episodes,runtime:item.runtime
+    isLoading = false;
+}
+
+async function loadCategory(category) {
+    const main = document.getElementById('mainContent');
+    main.innerHTML = '';
+    isLoading = true;
+
+    try {
+        if (category === 'favorites') {
+            const favs = getFavorites();
+            if (favs.length === 0) {
+                main.innerHTML = '<div class="empty-state"><i class="fas fa-heart"></i><p>Nenhum favorito ainda</p><p style="font-size:12px;margin-top:8px;color:var(--text-muted)">Clique no icone de coração para favoritar</p></div>';
+            } else {
+                const section = document.createElement('div');
+                section.className = 'content-section';
+                section.innerHTML = '<div class="section-header"><h2 class="section-title">Meus Favoritos</h2></div>';
+                createRow(favs, section);
+                main.appendChild(section);
+            }
+            isLoading = false;
+            return;
+        }
+
+        if (category === 'live') {
+            loadLiveTV(main);
+            isLoading = false;
+            return;
+        }
+
+        let data;
+        switch (category) {
+            case 'movie': data = await tmdb.popular(); break;
+            case 'tv': data = await tmdb.tvPopular(); break;
+            case 'anime': data = await tmdb.anime(); break;
+            default: data = await tmdb.trending();
+        }
+
+        if (data && data.results) {
+            const items = data.results
+                .filter(i => i.poster_path)
+                .map(i => makeItem(i, category === 'anime' ? 'tv' : undefined));
+            
+            const titles = { movie: 'Filmes Populares', tv: 'Series Populares', anime: 'Animes Populares' };
+            createSection(titles[category] || 'Conteudo', items, main);
+        }
+    } catch (e) {
+        console.error('loadCategory error:', e);
+        main.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Erro ao carregar</p></div>';
+    }
+    isLoading = false;
+}
+
+function loadLiveTV(container) {
+    const section = document.createElement('div');
+    section.className = 'content-section';
+    section.innerHTML = '<div class="section-header"><h2 class="section-title"><i class="fas fa-broadcast-tower"></i> TV Ao Vivo</h2></div>';
+
+    const channels = CONFIG.IPTV.BRAZIL;
+    const grid = document.createElement('div');
+    grid.className = 'live-channels';
+
+    channels.forEach(ch => {
+        const card = document.createElement('div');
+        card.className = 'channel-card';
+        card.innerHTML = `
+            <div class="channel-icon"><i class="fas fa-tv"></i></div>
+            <div>
+                <div class="channel-name">${ch.name}</div>
+                <div class="channel-live">AO VIVO</div>
+            </div>`;
+        card.addEventListener('click', () => {
+            player.openLiveTV({ title: ch.name, streamUrl: ch.stream });
+        });
+        grid.appendChild(card);
+    });
+
+    section.appendChild(grid);
+
+    // International
+    const intlSection = document.createElement('div');
+    intlSection.className = 'content-section';
+    intlSection.innerHTML = '<div class="section-header"><h2 class="section-title"><i class="fas fa-globe"></i> Internacional</h2></div>';
+    
+    const intlGrid = document.createElement('div');
+    intlGrid.className = 'live-channels';
+    CONFIG.IPTV.INTERNATIONAL.forEach(ch => {
+        const card = document.createElement('div');
+        card.className = 'channel-card';
+        card.innerHTML = `
+            <div class="channel-icon" style="background:linear-gradient(135deg,#7b2fff,#ff2d78)"><i class="fas fa-globe"></i></div>
+            <div>
+                <div class="channel-name">${ch.name}</div>
+                <div class="channel-live">AO VIVO</div>
+            </div>`;
+        card.addEventListener('click', () => {
+            player.openLiveTV({ title: ch.name, streamUrl: ch.stream });
+        });
+        intlGrid.appendChild(card);
+    });
+    intlSection.appendChild(intlGrid);
+
+    container.appendChild(section);
+    container.appendChild(intlSection);
+}
+
+/* ===================== SEARCH ===================== */
+let searchTimeout = null;
+function setupSearch() {
+    const input = document.getElementById('searchInput');
+    const mobileInput = document.getElementById('mobileSearchInput');
+    
+    function doSearch(query) {
+        const main = document.getElementById('mainContent');
+        if (!query || query.length < 2) {
+            loadHome();
+            return;
+        }
+        main.innerHTML = '<div class="loading"><div class="loading-spinner"></div></div>';
+        
+        let searchType = 'multi';
+        if (currentFilter === 'movie') searchType = 'movie';
+        else if (currentFilter === 'tv') searchType = 'tv';
+
+        tmdb.search(query, searchType).then(data => {
+            if (!data || !data.results) {
+                main.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>Nenhum resultado encontrado</p></div>';
+                return;
+            }
+            const items = data.results
+                .filter(i => i.poster_path)
+                .map(i => makeItem(i));
+            
+            main.innerHTML = '';
+            if (items.length > 0) {
+                createSection(`Resultados para "${query}"`, items, main);
+            } else {
+                main.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>Nenhum resultado encontrado</p></div>';
+            }
         });
     }
-    localStorage.setItem('cineboss_favorites',JSON.stringify(favorites));
-    document.querySelectorAll('.movie-card[data-id="'+item.id+'"]').forEach(function(card){var f=card.querySelector('.card-fav');if(f)f.classList.toggle('active')});
-}
 
-function loadFavorites(){
-    var main=document.getElementById('mainContent');
-    main.innerHTML='<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-heart"></i></span>Meus Favoritos</h2></div><div class="movies-row" id="favoritesRow"></div></section>';
-    var c=document.getElementById('favoritesRow');
-    if(!favorites.length)c.innerHTML='<div class="empty-state"><i class="fas fa-heart-broken"></i><p>Nenhum favorito ainda</p></div>';
-    else{c.innerHTML=favorites.map(function(i){return createCard(i)}).join('');c.querySelectorAll('.movie-card').forEach(function(card,idx){card.addEventListener('click',function(){handleCardClick(favorites[idx])});setTimeout(function(){card.classList.add('visible')},idx*40)})}
-}
-
-async function performSearch(query){
-    var main=document.getElementById('mainContent');
-    main.innerHTML='<section class="content-section"><div class="section-header"><h2 class="section-title"><span class="title-icon"><i class="fas fa-search"></i></span>Resultados para "'+query+'"</h2></div><div class="movies-row" id="searchResults"><div class="loading"><div class="loading-spinner"></div></div></div></section>';
-    try{
-        var results=await tmdb.searchMulti(query);
-        if(currentFilter!=='all')results=results.filter(function(i){
-            if(currentFilter==='anime')return i.genreIds&&i.genreIds.includes(16);
-            if(currentFilter==='tv')return i.mediaType==='tv';
-            return i.mediaType===currentFilter;
+    [input, mobileInput].forEach(inp => {
+        if (!inp) return;
+        inp.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => doSearch(e.target.value), 400);
         });
-        var c=document.getElementById('searchResults');
-        if(!results.length)c.innerHTML='<div class="empty-state"><i class="fas fa-search"></i><p>Nenhum resultado encontrado</p></div>';
-        else{c.innerHTML=results.map(function(i){return createCard(i)}).join('');c.querySelectorAll('.movie-card').forEach(function(card,idx){card.addEventListener('click',function(){handleCardClick(results[idx])});setTimeout(function(){card.classList.add('visible')},idx*40)})}
-    }catch(e){document.getElementById('searchResults').innerHTML='<div class="error-message">Erro na busca</div>'}
+        inp.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                clearTimeout(searchTimeout);
+                doSearch(e.target.value);
+            }
+        });
+    });
+
+    // Filter buttons
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentFilter = btn.dataset.filter;
+            if (input.value) {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    const searchType = currentFilter === 'all' ? 'multi' : currentFilter;
+                    tmdb.search(input.value, searchType).then(data => {
+                        const main = document.getElementById('mainContent');
+                        if (!data || !data.results) return;
+                        const items = data.results.filter(i => i.poster_path).map(i => makeItem(i));
+                        main.innerHTML = '';
+                        if (items.length > 0) createSection(`Resultados para "${input.value}"`, items, main);
+                    });
+                }, 300);
+            }
+        });
+    });
 }
 
-function goHome(){
-    closeDetailPage();
-    currentCategory='home';
-    document.querySelectorAll('.nav-links a').forEach(function(l){l.classList.remove('active')});
-    var homeLink=document.querySelector('.nav-links a[data-category="home"]');
-    if(homeLink)homeLink.classList.add('active');
-    loadHomePage();
+/* ===================== NAVIGATION ===================== */
+function setupNavigation() {
+    const navLinks = document.querySelectorAll('.nav-link');
+    const mobileLinks = document.querySelectorAll('.mobile-link');
+
+    function navigate(category) {
+        navLinks.forEach(l => l.classList.remove('active'));
+        mobileLinks.forEach(l => l.classList.remove('active'));
+        
+        const target = `[data-category="${category}"]`;
+        document.querySelectorAll(target).forEach(l => l.classList.add('active'));
+        
+        closeDetailPage();
+        closeMobileMenu();
+
+        if (category === 'home') loadHome();
+        else loadCategory(category);
+    }
+
+    navLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            navigate(link.dataset.category);
+        });
+    });
+
+    mobileLinks.forEach(link => {
+        link.addEventListener('click', (e) => {
+            e.preventDefault();
+            navigate(link.dataset.category);
+        });
+    });
+
+    // Logo click
+    document.getElementById('logoLink')?.addEventListener('click', (e) => {
+        e.preventDefault();
+        navigate('home');
+    });
+
+    // Detail back
+    document.getElementById('detailBack')?.addEventListener('click', closeDetailPage);
+
+    // Player back
+    document.getElementById('playerBack')?.addEventListener('click', () => player.close());
+    document.getElementById('playerBg')?.addEventListener('click', () => player.close());
 }
 
-function getGenreName(id){
-    var g={28:'Acao',12:'Aventura',16:'Animacao',35:'Comedia',80:'Crime',99:'Documentario',18:'Drama',10751:'Familia',14:'Fantasia',36:'Historia',27:'Terror',10402:'Musica',9648:'Misterio',10749:'Romance',878:'Ficcao Cientifica',53:'Suspense',10752:'Guerra',37:'Faroeste',10759:'Acao & Aventura',10762:'Infantil',10765:'Sci-Fi & Fantasia'};
-    return g[id]||'Genero';
+/* ===================== MOBILE MENU ===================== */
+function setupMobileMenu() {
+    const menuBtn = document.getElementById('mobileMenuBtn');
+    const menu = document.getElementById('mobileMenu');
+    const closeBtn = document.getElementById('mobileMenuClose');
+
+    menuBtn?.addEventListener('click', () => menu.classList.add('open'));
+    closeBtn?.addEventListener('click', closeMobileMenu);
+    menu?.addEventListener('click', (e) => {
+        if (e.target === menu) closeMobileMenu();
+    });
 }
 
-function formatDate(d){
-    if(!d)return'';var p=d.split('-');if(p.length!==3)return d;
-    var m=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-    return parseInt(p[2])+' '+m[parseInt(p[1])-1]+' '+p[0];
+function closeMobileMenu() {
+    document.getElementById('mobileMenu')?.classList.remove('open');
 }
 
-document.getElementById('modalClose').addEventListener('click',function(){document.getElementById('movieModal').classList.remove('active')});
-document.querySelector('.modal-backdrop').addEventListener('click',function(){document.getElementById('movieModal').classList.remove('active')});
-document.querySelector('.player-bg').addEventListener('click',function(){player.close()});
+/* ===================== KEYBOARD ===================== */
+function setupKeyboard() {
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            if (player.isOpen()) {
+                player.close();
+            } else if (document.getElementById('detailPage').classList.contains('active')) {
+                closeDetailPage();
+            } else if (document.getElementById('mobileMenu').classList.contains('open')) {
+                closeMobileMenu();
+            }
+        }
+    });
+}
+
+/* ===================== INIT ===================== */
+document.addEventListener('DOMContentLoaded', () => {
+    setupNavigation();
+    setupSearch();
+    setupMobileMenu();
+    setupKeyboard();
+    loadHome();
+});

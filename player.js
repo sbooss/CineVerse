@@ -5,7 +5,6 @@ class VideoPlayer {
         this.titleEl = document.getElementById('playerTitle');
         this.backBtn = document.getElementById('playerBack');
         this._setupAntiAds();
-        this._setupPopupBlocker();
         this._setupFullscreenLock();
         this.backBtn.addEventListener('click', () => this.close());
         document.addEventListener('keydown', (e) => {
