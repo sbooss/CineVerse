@@ -4,277 +4,57 @@ class VideoPlayer {
         this.wrapper = document.getElementById('playerWrapper');
         this.titleEl = document.getElementById('playerTitle');
         this.backBtn = document.getElementById('playerBack');
-        this._setupGlobalAntiAds();
-        this._setupAntiAds();
-        this._setupFullscreenLock();
-        this._setupIframeMessageBlocker();
         this.backBtn.addEventListener('click', () => this.close());
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isOpen()) this.close();
         });
+        this._setupPlayerAntiAds();
+        this._setupIframeMessageBlocker();
     }
 
-    _setupGlobalAntiAds() {
-        if (window._globalAntiAdsSetup) return;
-        window._globalAntiAdsSetup = true;
-
-        // Kill window.open globally and permanently - ABSOLUTE BLOCK
-        const deadFn = function() { return null; };
-        window.open = deadFn;
-        window.open.toString = function() { return 'function open() { [native code] }'; };
-        Object.defineProperty(window, 'open', { value: deadFn, writable: false, configurable: false });
-
-        // Also block on all frames
-        try {
-            if (window.frames && window.frames.length > 0) {
-                for (let i = 0; i < window.frames.length; i++) {
-                    try { window.frames[i].window.open = deadFn; } catch(ex) {}
-                }
-            }
-        } catch(ex) {}
-
-        // Block ALL navigation - ABSOLUTE
-        window.addEventListener('beforeunload', (e) => {
-            e.preventDefault();
-            e.returnValue = '';
-            return '';
-        });
-
-        // Block location changes
-        try {
-            const origAssign = window.location.assign.bind(window.location);
-            const origReplace = window.location.replace.bind(window.location);
-            window.location.assign = function() { return false; };
-            window.location.replace = function() { return false; };
-        } catch(ex) {}
-
-        // Block ALL clicks on ANY links - ABSOLUTE
-        document.addEventListener('click', (e) => {
-            const target = e.target;
-
-            // Block ANY link
-            const link = target.closest('a');
-            if (link) {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-                return false;
-            }
-
-            // Block onclick handlers
-            const onclickEl = target.closest('[onclick]');
-            if (onclickEl) {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-                return false;
-            }
-
-            // Block ANY element with data-href or data-url
-            if (target.dataset && (target.dataset.href || target.dataset.url)) {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-                return false;
-            }
-
-            // Block ad overlays
-            const style = window.getComputedStyle(target);
-            if ((style.position === 'fixed' || style.position === 'absolute') && parseInt(style.zIndex) > 9000) {
-                e.preventDefault();
-                e.stopPropagation();
-                e.stopImmediatePropagation();
-                try { target.remove(); } catch(ex) {}
-                return false;
-            }
-        }, true);
-
-        // MutationObserver - NUCLEAR OPTION - remove ALL non-player elements
-        const adObserver = new MutationObserver((mutations) => {
-            mutations.forEach((m) => {
-                m.addedNodes.forEach((node) => {
-                    if (node.nodeType !== 1) return;
-                    // Remove ALL iframes except our video
-                    if (node.tagName === 'IFRAME') {
-                        if (!node.classList.contains('video-iframe')) {
-                            try { node.remove(); } catch(ex) {}
-                        }
-                        return;
-                    }
-                    // Remove ALL elements with ad-related classes/ids
-                    if (node.classList) {
-                        const classes = Array.from(node.classList).join(' ').toLowerCase();
-                        const id = (node.id || '').toLowerCase();
-                        if (classes.includes('ad') || classes.includes('popup') || classes.includes('modal') ||
-                            classes.includes('overlay') || classes.includes('backdrop') || classes.includes('interstitial') ||
-                            id.includes('ad') || id.includes('popup') || id.includes('modal')) {
-                            try { node.remove(); } catch(ex) {}
-                            return;
-                        }
-                    }
-                    // Remove fixed/absolute elements with high z-index
-                    if (node.style) {
-                        try {
-                            const pos = window.getComputedStyle(node).position;
-                            const z = parseInt(window.getComputedStyle(node).zIndex);
-                            if ((pos === 'fixed' || pos === 'absolute') && z > 9000) {
-                                if (!node.classList.contains('player-header') && !node.id.includes('playerBack') && !node.classList.contains('provider-selector') && !node.classList.contains('provider-list')) {
-                                    setTimeout(() => { try { node.remove(); } catch(ex) {} }, 50);
-                                }
-                            }
-                        } catch(ex) {}
-                    }
-                    // Fix ALL links in added nodes
-                    if (node.tagName === 'A') {
-                        node.removeAttribute('target');
-                        node.href = 'javascript:void(0)';
-                        node.onclick = function() { return false; };
-                    }
-                    if (node.querySelectorAll) {
-                        node.querySelectorAll('a').forEach(a => {
-                            a.removeAttribute('target');
-                            a.href = 'javascript:void(0)';
-                            a.onclick = function() { return false; };
-                        });
-                    }
-                });
-            });
-        });
-        adObserver.observe(document.body, { childList: true, subtree: true });
-        adObserver.observe(document.documentElement, { childList: true, subtree: true });
-
-        // Block ALL keyboard shortcuts
-        document.addEventListener('keydown', (e) => {
-            // Block Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+Z, Ctrl+S, Ctrl+P
-            if (e.ctrlKey || e.metaKey) {
-                e.preventDefault();
-                return false;
-            }
-            // Block F1-F12
-            if (e.key >= 'F1' && e.key <= 'F12') {
-                e.preventDefault();
-                return false;
-            }
-        }, true);
-
-        // Block middle-click globally
-        document.addEventListener('mousedown', (e) => {
-            if (e.button === 1) {
-                e.preventDefault();
-                return false;
-            }
-        }, true);
-
-        // Block drag (prevent dragging to new tab)
-        document.addEventListener('dragstart', (e) => {
-            e.preventDefault();
-            return false;
-        }, true);
-
-        // Block context menu globally
-        document.addEventListener('contextmenu', (e) => {
-            e.preventDefault();
-            return false;
-        }, true);
-    }
-
-    _setupIframeMessageBlocker() {
-        // Block postMessage from iframe trying to open windows
-        window.addEventListener('message', (e) => {
-            if (!this.isOpen()) return;
-            const data = e.data;
-            if (typeof data === 'string') {
-                const lower = data.toLowerCase();
-                if (lower.includes('open') || lower.includes('popup') || lower.includes('redirect') ||
-                    lower.includes('navigate') || lower.includes('location')) {
-                    e.stopImmediatePropagation();
-                    return false;
-                }
-            }
-            if (typeof data === 'object' && data) {
-                if (data.type && (data.type.includes('open') || data.type.includes('popup') || data.type.includes('navigate'))) {
-                    e.stopImmediatePropagation();
-                    return false;
-                }
-            }
-        }, true);
-    }
-
-    _setupAntiAds() {
-        // Block ALL clicks inside player overlay - ONLY allow our UI buttons
+    _setupPlayerAntiAds() {
         this.overlay.addEventListener('click', (e) => {
+            if (!this.isOpen()) return;
             const target = e.target;
-
-            // Allow clicks on our specific UI elements
             const isOurUI = target.closest('#playerBack') ||
                            target.closest('.change-provider-btn') ||
                            target.closest('.provider-btn') ||
                            target.closest('#playerErrorBack') ||
-                           target.closest('#changeProviderBtn');
-
-            if (!isOurUI) {
+                           target.closest('#changeProviderBtn') ||
+                           target.closest('.provider-list');
+            if (!isOurUI && target.tagName === 'IFRAME') {
                 e.preventDefault();
                 e.stopPropagation();
-                e.stopImmediatePropagation();
-
-                // Remove any ad overlay that was clicked
-                const style = window.getComputedStyle(target);
-                if ((style.position === 'fixed' || style.position === 'absolute') && parseInt(style.zIndex) > 9000) {
-                    try { target.remove(); } catch(ex) {}
-                }
                 return false;
             }
         }, true);
 
-        // Block ALL touch events on non-UI elements
         this.overlay.addEventListener('touchstart', (e) => {
+            if (!this.isOpen()) return;
             const target = e.target;
             const isOurUI = target.closest('#playerBack') ||
                            target.closest('.change-provider-btn') ||
                            target.closest('.provider-btn') ||
                            target.closest('#playerErrorBack');
-
-            if (!isOurUI) {
+            if (!isOurUI && target.tagName === 'IFRAME') {
                 e.preventDefault();
                 return false;
             }
         }, { passive: false, capture: true });
-
-        // Block ALL keyboard except Escape
-        document.addEventListener('keydown', (e) => {
-            if (!this.isOpen()) return;
-            if (e.key === 'Escape') {
-                this.close();
-                return;
-            }
-            // Block EVERYTHING else
-            e.preventDefault();
-            e.stopPropagation();
-            e.stopImmediatePropagation();
-            return false;
-        }, true);
     }
 
-    _setupFullscreenLock() {
-        const lockFullscreen = () => {
-            if (!document.fullscreenElement && this.overlay.classList.contains('active')) {
-                try {
-                    this.overlay.requestFullscreen().catch(() => {});
-                } catch(e) {}
+    _setupIframeMessageBlocker() {
+        window.addEventListener('message', (e) => {
+            if (!this.isOpen()) return;
+            const data = e.data;
+            if (typeof data === 'string') {
+                const lower = data.toLowerCase();
+                if (lower.includes('open') || lower.includes('popup') || lower.includes('redirect')) {
+                    e.stopImmediatePropagation();
+                    return false;
+                }
             }
-        };
-
-        document.addEventListener('fullscreenchange', () => {
-            if (this.isOpen() && !document.fullscreenElement) {
-                setTimeout(lockFullscreen, 500);
-            }
-        });
-
-        const origExit = document.exitFullscreen.bind(document);
-        document.exitFullscreen = () => {
-            if (this.isOpen()) return Promise.reject();
-            return origExit();
-        };
+        }, true);
     }
 
     isOpen() {
@@ -283,7 +63,7 @@ class VideoPlayer {
 
     async open(item, season = 1, episode = 1) {
         if (typeof auth !== 'undefined') {
-            const canPlay = await auth.requireSubscription();
+            const canPlay = auth.requireSubscription();
             if (!canPlay) {
                 window.playAfterAuth = () => this.open(item, season, episode);
                 return;
@@ -292,15 +72,12 @@ class VideoPlayer {
         this.titleEl.textContent = item.title;
         this.overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
-        document.body.classList.add('player-open');
         this._loadEmbed(item, season, episode);
     }
 
     close() {
         this.overlay.classList.remove('active');
         document.body.style.overflow = '';
-        document.body.classList.remove('player-open');
-        // Remove ALL iframes
         const iframes = this.wrapper.querySelectorAll('iframe');
         iframes.forEach(f => { try { f.src = 'about:blank'; f.remove(); } catch(ex) {} });
         this.wrapper.innerHTML = '';
@@ -346,17 +123,11 @@ class VideoPlayer {
             iframe.setAttribute('allowfullscreen', 'true');
             iframe.setAttribute('allow', 'autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen');
             iframe.setAttribute('class', 'video-iframe');
-
-            // NO SANDBOX - providers block sandboxed iframes
-            // Anti-ads handled by our global protections instead
-            // window.open is permanently blocked, MutationObserver removes ads
-
             iframe.setAttribute('referrerpolicy', 'no-referrer');
             iframe.setAttribute('loading', 'eager');
             iframe.style.opacity = '0';
             iframe.style.transition = 'opacity 0.3s';
             iframe.onload = function() { this.style.opacity = '1'; };
-            iframe.onerror = function() { player._nextProvider(); };
 
             this.wrapper.appendChild(iframe);
 
@@ -431,7 +202,6 @@ class VideoPlayer {
         this.titleEl.textContent = channel.title;
         this.overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
-        document.body.classList.add('player-open');
 
         if (channel.streamUrl && channel.streamUrl.includes('.m3u8')) {
             this.wrapper.innerHTML = `
@@ -475,7 +245,6 @@ class VideoPlayer {
             iframe.setAttribute('allowfullscreen', 'true');
             iframe.setAttribute('allow', 'autoplay; encrypted-media');
             iframe.setAttribute('class', 'video-iframe');
-            // No sandbox for Live TV - providers need full access
             this.wrapper.appendChild(iframe);
         } else {
             this.wrapper.innerHTML = `
