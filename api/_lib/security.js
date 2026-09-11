@@ -1,0 +1,187 @@
+const { createClient } = require('@supabase/supabase-js');
+const jwt = require('jsonwebtoken');
+
+const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+const JWT_SECRET = process.env.JWT_SECRET;
+
+/* ===================== CORS ===================== */
+function setCors(req, res) {
+    const origin = req.headers.origin || '*';
+    res.setHeader('Access-Control-Allow-Origin', origin);
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+}
+
+function handleOptions(res) {
+    return res.status(200).end();
+}
+
+/* ===================== COOKIE ===================== */
+function setAuthCookie(res, token, maxAgeSeconds) {
+    const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+    const parts = [
+        `token=${token}`,
+        'Path=/',
+        'HttpOnly',
+        'SameSite=Lax',
+        `Max-Age=${maxAgeSeconds}`
+    ];
+    if (isProd) parts.push('Secure');
+    res.setHeader('Set-Cookie', parts.join('; '));
+}
+
+function clearAuthCookie(res) {
+    const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
+    const parts = ['token=', 'Path=/', 'HttpOnly', 'SameSite=Lax', 'Max-Age=0'];
+    if (isProd) parts.push('Secure');
+    res.setHeader('Set-Cookie', parts.join('; '));
+}
+
+/* ===================== TOKEN ===================== */
+function getToken(req) {
+    const cookie = req.headers.cookie || '';
+    const match = cookie.match(/token=([^;]+)/);
+    if (match) return match[1];
+    const auth = req.headers.authorization;
+    if (auth && auth.startsWith('Bearer ')) return auth.slice(7);
+    return null;
+}
+
+function verifyToken(token) {
+    return jwt.verify(token, JWT_SECRET);
+}
+
+/* ===================== INPUT SANITIZATION ===================== */
+function sanitizeString(str, maxLen) {
+    if (typeof str !== 'string') return '';
+    let s = str.trim();
+    s = s.replace(/[<>]/g, '');
+    s = s.replace(/javascript:/gi, '');
+    s = s.replace(/on\w+\s*=/gi, '');
+    if (maxLen && s.length > maxLen) s = s.substring(0, maxLen);
+    return s;
+}
+
+function sanitizeEmail(email) {
+    if (typeof email !== 'string') return '';
+    return email.toLowerCase().trim().substring(0, 254);
+}
+
+function isValidEmail(email) {
+    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+
+function isValidUUID(str) {
+    return /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(str);
+}
+
+/* ===================== RATE LIMITING (Supabase) ===================== */
+async function checkRateLimit(key, maxAttempts, windowMinutes) {
+    const windowStart = new Date(Date.now() - windowMinutes * 60 * 1000).toISOString();
+
+    const { data } = await supabase
+        .from('rate_limits')
+        .select('id')
+        .eq('key', key)
+        .gte('created_at', windowStart)
+        .limit(maxAttempts);
+
+    const attempts = data ? data.length : 0;
+
+    if (attempts >= maxAttempts) {
+        return { blocked: true, remaining: 0 };
+    }
+
+    return { blocked: false, remaining: maxAttempts - attempts - 1 };
+}
+
+async function recordRateLimitAttempt(key) {
+    await supabase.from('rate_limits').insert({
+        key,
+        created_at: new Date().toISOString()
+    });
+}
+
+async function cleanupRateLimits() {
+    const cutoff = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+    await supabase.from('rate_limits').delete().lt('created_at', cutoff);
+}
+
+/* ===================== SESSION AUDIT ===================== */
+async function createSession(userId, token, expiryDays, ip, userAgent) {
+    const expiresAt = new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000);
+    await supabase.from('sessions').insert({
+        id: crypto.randomUUID(),
+        user_id: userId,
+        token,
+        ip_address: ip || null,
+        user_agent: userAgent || null,
+        expires_at: expiresAt.toISOString(),
+        created_at: new Date().toISOString()
+    });
+}
+
+async function validateSession(token) {
+    const { data: sessions } = await supabase
+        .from('sessions')
+        .select('*')
+        .eq('token', token)
+        .limit(1);
+
+    if (!sessions || sessions.length === 0) return null;
+
+    const session = sessions[0];
+    if (new Date(session.expires_at) < new Date()) {
+        await supabase.from('sessions').delete().eq('id', session.id);
+        return null;
+    }
+
+    return session;
+}
+
+async function destroySession(token) {
+    await supabase.from('sessions').delete().eq('token', token);
+}
+
+async function destroyAllUserSessions(userId) {
+    await supabase.from('sessions').delete().eq('user_id', userId);
+}
+
+async function cleanupExpiredSessions() {
+    await supabase.from('sessions').delete().lt('expires_at', new Date().toISOString());
+}
+
+/* ===================== RESPONSE HELPERS ===================== */
+function jsonError(res, status, message) {
+    return res.status(status).json({ error: message });
+}
+
+function jsonSuccess(res, data) {
+    return res.status(200).json({ success: true, ...data });
+}
+
+module.exports = {
+    supabase,
+    JWT_SECRET,
+    setCors,
+    handleOptions,
+    setAuthCookie,
+    clearAuthCookie,
+    getToken,
+    verifyToken,
+    sanitizeString,
+    sanitizeEmail,
+    isValidEmail,
+    isValidUUID,
+    checkRateLimit,
+    recordRateLimitAttempt,
+    cleanupRateLimits,
+    createSession,
+    validateSession,
+    destroySession,
+    destroyAllUserSessions,
+    cleanupExpiredSessions,
+    jsonError,
+    jsonSuccess
+};
