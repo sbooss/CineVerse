@@ -337,15 +337,12 @@ class VideoPlayer {
             iframe.setAttribute('src', url);
             iframe.setAttribute('frameborder', '0');
             iframe.setAttribute('allowfullscreen', 'true');
-            iframe.setAttribute('allow', 'autoplay; encrypted-media; gyroscope; picture-in-picture');
+            iframe.setAttribute('allow', 'autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen');
             iframe.setAttribute('class', 'video-iframe');
 
-            // STRICTEST POSSIBLE SANDBOX - NO POPUPS, NO NEW WINDOWS
-            // allow-scripts: needed for video player
-            // allow-same-origin: needed for cookie/storage
-            // allow-presentation: needed for picture-in-picture
-            // NO allow-popups - COMPLETELY BLOCKS POPUPS
-            iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
+            // NO SANDBOX - providers block sandboxed iframes
+            // Anti-ads handled by our global protections instead
+            // window.open is permanently blocked, MutationObserver removes ads
 
             iframe.setAttribute('referrerpolicy', 'no-referrer');
             iframe.setAttribute('loading', 'eager');
@@ -471,7 +468,7 @@ class VideoPlayer {
             iframe.setAttribute('allowfullscreen', 'true');
             iframe.setAttribute('allow', 'autoplay; encrypted-media');
             iframe.setAttribute('class', 'video-iframe');
-            iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
+            // No sandbox for Live TV - providers need full access
             this.wrapper.appendChild(iframe);
         } else {
             this.wrapper.innerHTML = `
