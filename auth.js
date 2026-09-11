@@ -251,12 +251,23 @@ class AuthManager {
 
     async _selectPlan(plan) {
         sounds.click();
+        const btn = document.querySelector('.pw-select-btn, #planMonthBtn, #planQtrBtn');
+        if(btn){btn.disabled=true;btn.textContent='PROCESSANDO...';}
         try {
             const r = await fetch(`${API_BASE}/subscription/checkout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ plan }) });
             const d = await r.json();
             if (!r.ok) throw new Error(d.error);
-            if (d.url) window.location.href = d.url;
-        } catch (e) { alert(e.message || 'Erro ao processar pagamento'); }
+            const subId = d.subscriptionId || d.subscription_id;
+            if (subId) {
+                await fetch(`${API_BASE}/subscription/simulate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ subscription_id: subId }) });
+            }
+            sounds.ok();
+            if(btn){btn.textContent='PAGO!';btn.style.background='var(--blue)';}
+            setTimeout(function(){window.location.href='/'},1500);
+        } catch (e) {
+            if(btn){btn.disabled=false;btn.textContent='ASSINAR';}
+            alert(e.message || 'Erro ao processar pagamento');
+        }
     }
 
     async forgotPassword() {

@@ -55,7 +55,7 @@ module.exports = async function handler(req, res) {
             metadata: { userId: user.id, plan, planDays: String(planInfo.days) }
         });
 
-        await supabase.from('subscriptions').insert({
+        const { data: subData } = await supabase.from('subscriptions').insert({
             id: crypto.randomUUID(),
             user_id: user.id, plan, status: 'pending',
             payment_id: session.payment_intent,
@@ -66,7 +66,7 @@ module.exports = async function handler(req, res) {
             updated_at: new Date().toISOString()
         });
 
-        return jsonSuccess(res, { sessionId: session.id, url: session.url });
+        return jsonSuccess(res, { sessionId: session.id, url: session.url, subscriptionId: subData && subData[0] ? subData[0].id : null });
     } catch (error) {
         console.error('Checkout session error:', error);
         return jsonError(res, 500, 'Erro ao criar sessao de pagamento');
