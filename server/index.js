@@ -23,7 +23,7 @@ app.use('/api/webhook', webhookRoutes);
 
 app.use(express.static(path.join(__dirname, '..')));
 
-app.get('*', (req, res) => {
+app.use((req, res) => {
     if (!req.path.startsWith('/api/')) {
         res.sendFile(path.join(__dirname, '..', 'index.html'));
     }

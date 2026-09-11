@@ -5,7 +5,13 @@ const JWT_SECRET = process.env.JWT_SECRET || 'cineboss_secret_key_2026_ultra_sec
 
 function authMiddleware(req, res, next) {
     try {
-        const token = req.cookies.token || req.headers.authorization?.replace('Bearer ', '');
+        let token = null;
+        
+        if (req.cookies && req.cookies.token) {
+            token = req.cookies.token;
+        } else if (req.headers.authorization) {
+            token = req.headers.authorization.replace('Bearer ', '');
+        }
         
         if (!token) {
             return res.status(401).json({ error: 'Token nao fornecido' });
@@ -13,13 +19,24 @@ function authMiddleware(req, res, next) {
 
         const decoded = jwt.verify(token, JWT_SECRET);
         
-        const session = db.prepare('SELECT * FROM sessions WHERE token = ? AND expires_at > datetime("now")').get(token);
+        const sessions = db.query('sessions', {
+            select: '*',
+            filter: `token=eq.${token}`
+        });
+        
+        const session = sessions && sessions.length > 0 ? sessions[0] : null;
         
         if (!session) {
+            console.log('[AUTH] Session not found for token:', token.substring(0, 30));
             return res.status(401).json({ error: 'Sessao expirada' });
         }
 
-        const user = db.prepare('SELECT id, name, email, created_at FROM users WHERE id = ?').get(decoded.userId);
+        const users = db.query('users', {
+            select: 'id, name, email, created_at',
+            filter: `id=eq.${decoded.userId}`
+        });
+        
+        const user = users && users.length > 0 ? users[0] : null;
         
         if (!user) {
             return res.status(401).json({ error: 'Usuario nao encontrado' });
@@ -29,6 +46,7 @@ function authMiddleware(req, res, next) {
         req.token = token;
         next();
     } catch (error) {
+        console.log('[AUTH] Error:', error.message);
         if (error.name === 'TokenExpiredError') {
             return res.status(401).json({ error: 'Token expirado' });
         }
@@ -38,12 +56,15 @@ function authMiddleware(req, res, next) {
 
 function subscriptionMiddleware(req, res, next) {
     try {
-        const subscription = db.prepare(`
-            SELECT * FROM subscriptions 
-            WHERE user_id = ? AND status = 'active' AND expires_at > datetime('now')
-            ORDER BY expires_at DESC LIMIT 1
-        `).get(req.user.id);
+        const subscriptions = db.query('subscriptions', {
+            select: '*',
+            filter: `user_id=eq.${req.user.id} AND status=eq.active AND expires_at=gt.${new Date().toISOString()}`,
+            order: 'expires_at.desc',
+            limit: '1'
+        });
 
+        const subscription = subscriptions && subscriptions.length > 0 ? subscriptions[0] : null;
+        
         req.subscription = subscription;
         
         if (!subscription) {
