@@ -2,14 +2,9 @@ const CONFIG = {
     EMBED: {
         PROVIDERS: [
             {
-                name: 'VidLink',
-                movie: function(id) { return 'https://vidlink.pro/movie/' + id + '?lang=pt&quality=1080&autoplay=1&color=00d4ff'; },
-                tv: function(id, s, e) { return 'https://vidlink.pro/tv/' + id + '/' + s + '/' + e + '?lang=pt&quality=1080&autoplay=1&color=00d4ff'; }
-            },
-            {
-                name: 'VidFast',
-                movie: function(id) { return 'https://vidfast.vc/movie/' + id + '?lang=pt&quality=1080&autoplay=1&color=00d4ff'; },
-                tv: function(id, s, e) { return 'https://vidfast.vc/tv/' + id + '/' + s + '/' + e + '?lang=pt&quality=1080&autoplay=1&color=00d4ff'; }
+                name: 'MyEmbed',
+                movie: function(id) { return 'https://myembed.biz/filme/' + id; },
+                tv: function(id, s, e) { return 'https://myembed.biz/serie/' + id + '/' + s + '/' + e; }
             }
         ]
     },

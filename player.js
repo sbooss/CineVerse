@@ -325,12 +325,10 @@ class VideoPlayer {
             const p = providers[index];
             const url = type === 'tv' ? p.tv(tmdbId, season, episode) : p.movie(tmdbId);
 
+            // Simple header with provider name only
             this.wrapper.innerHTML = `
                 <div class="provider-selector">
-                    <span class="current-provider">${p.name}</span>
-                    <button class="change-provider-btn" id="changeProviderBtn">
-                        <i class="fas fa-exchange-alt"></i> Trocar Server
-                    </button>
+                    <span class="current-provider"><i class="fas fa-play-circle"></i> ${p.name} - Dublado PT-BR</span>
                 </div>`;
 
             const iframe = document.createElement('iframe');
@@ -352,8 +350,6 @@ class VideoPlayer {
             iframe.onerror = function() { player._nextProvider(); };
 
             this.wrapper.appendChild(iframe);
-
-            document.getElementById('changeProviderBtn').addEventListener('click', () => this.showServers());
 
             currentIndex = index;
             this._currentProviders = providers;
