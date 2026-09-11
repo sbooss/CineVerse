@@ -24,7 +24,7 @@ function setAuthCookie(res, token, maxAgeSeconds) {
         `token=${token}`,
         'Path=/',
         'HttpOnly',
-        'SameSite=Lax',
+        'SameSite=None',
         `Max-Age=${maxAgeSeconds}`
     ];
     if (isProd) parts.push('Secure');
@@ -33,7 +33,7 @@ function setAuthCookie(res, token, maxAgeSeconds) {
 
 function clearAuthCookie(res) {
     const isProd = process.env.NODE_ENV === 'production' || process.env.VERCEL_ENV === 'production';
-    const parts = ['token=', 'Path=/', 'HttpOnly', 'SameSite=Lax', 'Max-Age=0'];
+    const parts = ['token=', 'Path=/', 'HttpOnly', 'SameSite=None', 'Max-Age=0'];
     if (isProd) parts.push('Secure');
     res.setHeader('Set-Cookie', parts.join('; '));
 }

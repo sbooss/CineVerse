@@ -93,7 +93,7 @@
         /* ===== AUTH CARD ===== */
         .auth-area{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .5s ease}
         .auth-area.show{opacity:1}
-        .auth-card{position:relative;width:100%;max-width:480px;background:rgba(8,8,14,0.85);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border:1px solid var(--brd);border-radius:16px;overflow:hidden;transform:translateY(40px) scale(0.96);transition:all .6s cubic-bezier(.4,0,.2,1)}
+        .auth-card{position:relative;width:100%;max-width:430px;background:rgba(8,8,14,0.85);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border:1px solid var(--brd);border-radius:16px;overflow:hidden;transform:translateY(40px) scale(0.96);transition:all .6s cubic-bezier(.4,0,.2,1)}
         .auth-area.show .auth-card{transform:translateY(0) scale(1)}
         .auth-card::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,168,224,0.4),transparent)}
         .auth-card-inner{padding:36px 32px}
@@ -263,7 +263,7 @@
                 <!-- PAYMENT PANEL -->
                 <div class="payment-panel" id="paymentPanel">
                     <div class="payment-panel-title">Escolha seu plano</div>
-                    <div class="payment-panel-desc">Pagamento unico via Stripe. Sem renovacao automatica.</div>
+                    <div class="payment-panel-desc">Pagamento unico via Mercado Pago. Sem renovacao automatica.</div>
                     <div class="plan-card" id="planMonthly" onclick="auth._selectPlan('monthly')">
                         <div class="plan-name">CINE BOSS MENSAL</div>
                         <div class="plan-period">30 dias de acesso</div>
@@ -272,7 +272,6 @@
                             <li><i class="fas fa-check"></i>Todos os filmes e series</li>
                             <li><i class="fas fa-check"></i>Qualidade ate 1080p</li>
                             <li><i class="fas fa-check"></i>Sem anuncios</li>
-                            <li><i class="fas fa-check"></i>TV ao vivo</li>
                         </ul>
                         <button class="plan-btn blue" id="planMonthBtn">ASSINAR</button>
                     </div>
@@ -283,8 +282,7 @@
                         <ul class="plan-features">
                             <li><i class="fas fa-check"></i>Tudo do plano mensal</li>
                             <li><i class="fas fa-check"></i>3 meses de acesso</li>
-                            <li><i class="fas fa-check"></i>Suporte prioritario</li>
-                            <li><i class="fas fa-check" style="color:var(--gold)"></i>Economize!</li>
+                            <li><i class="fas fa-check" style="color:var(--gold)"></i>Suporte prioritario</li>
                         </ul>
                         <button class="plan-btn gold" id="planQtrBtn">ASSINAR AGORA</button>
                     </div>
