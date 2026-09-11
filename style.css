@@ -1164,3 +1164,158 @@ input { font-family: inherit; }
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
     .card-poster img, .detail-ep-thumb img { image-rendering: -webkit-optimize-contrast; }
 }
+
+/* ===================== APP-LIKE STYLES ===================== */
+/* Prevent pull-to-refresh on mobile */
+html, body {
+    overscroll-behavior: none;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* App-like smooth scrolling */
+.main-content {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* App-like card hover effect */
+.movie-card {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+}
+
+/* App-like button press effect */
+.btn-primary:active, .btn-secondary:active, .detail-btn-play:active, .detail-btn-secondary:active {
+    transform: scale(0.96);
+    transition: transform 0.1s;
+}
+
+/* App-like safe area for notch devices */
+@supports (padding: env(safe-area-inset-top)) {
+    .navbar {
+        padding-top: env(safe-area-inset-top);
+    }
+    .main-content {
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+    .player-overlay {
+        padding-top: env(safe-area-inset-top);
+        padding-bottom: env(safe-area-inset-bottom);
+    }
+}
+
+/* TV / Large screen optimizations */
+@media (min-width: 1920px) {
+    .nav-container { max-width: 1800px; }
+    .main-content { padding: 0 60px; }
+    .movie-card { width: 220px; }
+    .movie-card .card-poster { height: 330px; }
+    .hero-title { font-size: 56px; }
+    .hero-desc { font-size: 18px; }
+    .section-title { font-size: 28px; }
+}
+
+/* Smart TV navigation focus styles */
+@media (pointer: coarse) and (min-width: 1024px) {
+    .movie-card:focus, .movie-card:focus-visible {
+        outline: 3px solid var(--neon-blue);
+        outline-offset: 4px;
+        transform: scale(1.05);
+        z-index: 10;
+    }
+    .nav-link:focus, .nav-link:focus-visible {
+        outline: 2px solid var(--neon-blue);
+        outline-offset: 2px;
+    }
+    .btn-primary:focus, .btn-primary:focus-visible {
+        outline: 2px solid var(--neon-blue);
+        outline-offset: 2px;
+    }
+}
+
+/* Prevent text selection on app elements */
+.navbar, .mobile-menu, .player-overlay, .detail-page {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* App-like loading animation */
+@keyframes appShimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+.loading-placeholder {
+    background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-elevated) 50%, var(--bg-card) 75%);
+    background-size: 200% 100%;
+    animation: appShimmer 1.5s infinite;
+}
+
+/* App-like toast notification */
+.toast {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    padding: 12px 24px;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+    z-index: 999999;
+    transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.toast.show {
+    transform: translateX(-50%) translateY(0);
+}
+
+/* App-like fade transitions */
+.fade-in {
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Install prompt styling */
+.install-banner {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: var(--gradient-primary);
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    z-index: 999998;
+    box-shadow: 0 -4px 20px rgba(0, 212, 255, 0.3);
+}
+
+.install-banner-text {
+    color: white;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+.install-banner-btn {
+    background: white;
+    color: var(--bg-primary);
+    padding: 8px 20px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    font-size: 13px;
+    transition: transform 0.2s;
+}
+
+.install-banner-btn:active {
+    transform: scale(0.95);
+}

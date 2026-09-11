@@ -12,24 +12,29 @@
     "dir": "ltr",
     "scope": "/CineVerse/",
     "prefer_related_applications": false,
+    "handle_links": "preferred",
+    "launch_handler": {
+        "client_mode": "navigate-existing"
+    },
+    "related_applications": [],
     "icons": [
         {
             "src": "icon-72.png",
             "sizes": "72x72",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
         },
         {
             "src": "icon-96.png",
             "sizes": "96x96",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
         },
         {
             "src": "icon-128.png",
             "sizes": "128x128",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
         },
         {
             "src": "icon-144.png",
@@ -41,7 +46,7 @@
             "src": "icon-152.png",
             "sizes": "152x152",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
         },
         {
             "src": "icon-192.png",
@@ -53,7 +58,7 @@
             "src": "icon-384.png",
             "sizes": "384x384",
             "type": "image/png",
-            "purpose": "any maskable"
+            "purpose": "any"
         },
         {
             "src": "icon-512.png",
@@ -62,22 +67,50 @@
             "purpose": "any maskable"
         }
     ],
-    "screenshots": [],
-    "shortcuts": [
+    "screenshots": [
         {
-            "name": "Filmes",
-            "url": "/CineVerse/#filmes",
-            "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
+            "src": "icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "form_factor": "wide",
+            "label": "CINE BOSS Streaming"
         },
         {
-            "name": "Series",
-            "url": "/CineVerse/#series",
-            "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
+            "src": "icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "form_factor": "narrow",
+            "label": "CINE BOSS Mobile"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Filmes Populares",
+            "short_name": "Filmes",
+            "url": "/CineVerse/#movie",
+            "icons": [{ "src": "icon-96.png", "sizes": "96x96" }],
+            "description": "Assistir filmes populares"
+        },
+        {
+            "name": "Series Populares",
+            "short_name": "Series",
+            "url": "/CineVerse/#tv",
+            "icons": [{ "src": "icon-96.png", "sizes": "96x96" }],
+            "description": "Assistir series populares"
+        },
+        {
+            "name": "Animes",
+            "short_name": "Animes",
+            "url": "/CineVerse/#anime",
+            "icons": [{ "src": "icon-96.png", "sizes": "96x96" }],
+            "description": "Assistir animes populares"
         },
         {
             "name": "TV Ao Vivo",
-            "url": "/CineVerse/#tv",
-            "icons": [{ "src": "icon-96.png", "sizes": "96x96" }]
+            "short_name": "TV",
+            "url": "/CineVerse/#live",
+            "icons": [{ "src": "icon-96.png", "sizes": "96x96" }],
+            "description": "Assistir TV ao vivo"
         }
     ]
 }

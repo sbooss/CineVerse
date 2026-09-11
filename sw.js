@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cineboss-v1';
+const CACHE_NAME = 'cineboss-v2';
 const STATIC_ASSETS = [
     '/CineVerse/',
     '/CineVerse/index.html',
@@ -8,12 +8,18 @@ const STATIC_ASSETS = [
     '/CineVerse/player.js',
     '/CineVerse/app.js',
     '/CineVerse/manifest.json',
+    '/CineVerse/icon-72.png',
+    '/CineVerse/icon-96.png',
+    '/CineVerse/icon-128.png',
+    '/CineVerse/icon-144.png',
+    '/CineVerse/icon-152.png',
     '/CineVerse/icon-192.png',
+    '/CineVerse/icon-384.png',
     '/CineVerse/icon-512.png'
 ];
 
-const TMDB_CACHE = 'cineboss-tmdb-v1';
-const IMAGE_CACHE = 'cineboss-images-v1';
+const TMDB_CACHE = 'cineboss-tmdb-v2';
+const IMAGE_CACHE = 'cineboss-images-v2';
 
 // Install - cache static assets
 self.addEventListener('install', (event) => {

@@ -364,9 +364,14 @@ class VideoPlayer {
 
     showServers() {
         if (!this._currentProviders) return;
-        let html = '<div class="provider-list"><h3>Escolha o Server</h3><div class="provider-grid">';
+        let html = '<div class="provider-list"><h3>Escolha o Servidor</h3><div class="provider-grid">';
         this._currentProviders.forEach((p, i) => {
-            html += `<button class="provider-btn ${i === this._currentIndex ? 'active' : ''}" data-server="${i}">${p.name}</button>`;
+            const isActive = i === this._currentIndex;
+            const icon = i === 0 ? 'fa-bolt' : 'fa-rocket';
+            html += `<button class="provider-btn ${isActive ? 'active' : ''}" data-server="${i}">
+                <i class="fas ${icon}"></i> ${p.name}
+                ${isActive ? '<span class="provider-active-label">Atual</span>' : ''}
+            </button>`;
         });
         html += '</div></div>';
         const existing = this.wrapper.querySelector('.provider-list');

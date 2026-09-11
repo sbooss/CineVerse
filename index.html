@@ -6,19 +6,45 @@
     <title>CINE BOSS - Streaming Premium</title>
     <meta name="description" content="CINE BOSS - Streaming premium. Filmes, Series, Animes e TV Ao Vivo em Portugues.">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    
+    <!-- PWA Meta Tags -->
     <meta name="theme-color" content="#050508">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="CINE BOSS">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="CINE BOSS">
+    <meta name="msapplication-TileColor" content="#050508">
+    <meta name="msapplication-TileImage" content="icon-144.png">
+    <meta name="msapplication-navbutton-color" content="#050508">
+    
+    <!-- Smart TV / Android TV -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="screen-orientation" content="any">
+    <meta name="HandheldFriendly" content="true">
+    <meta name="MobileOptimized" content="320">
+    
+    <!-- Open Graph -->
+    <meta property="og:title" content="CINE BOSS - Streaming Premium">
+    <meta property="og:description" content="A melhor plataforma de streaming. Filmes, Series, Animes e TV Ao Vivo em Portugues.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="icon-512.png">
+    
+    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icon-96.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="icon-192.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
+    
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=6">
+    <link rel="stylesheet" href="style.css?v=7">
 </head>
 <body>
 
@@ -165,14 +191,66 @@
     </footer>
 
     <!-- SCRIPTS -->
-    <script src="config.js?v=6"></script>
-    <script src="tmdb.js?v=6"></script>
-    <script src="player.js?v=6"></script>
-    <script src="app.js?v=6"></script>
+    <script src="config.js?v=7"></script>
+    <script src="tmdb.js?v=7"></script>
+    <script src="player.js?v=7"></script>
+    <script src="app.js?v=7"></script>
     <script>
         // Register Service Worker
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.register('sw.js').catch(function(){});
+        }
+
+        // PWA Install Prompt
+        var deferredPrompt;
+        window.addEventListener('beforeinstallprompt', function(e) {
+            e.preventDefault();
+            deferredPrompt = e;
+            // Show install banner after 30 seconds
+            setTimeout(function() {
+                if (deferredPrompt && !localStorage.getItem('cineboss_install_dismissed')) {
+                    showInstallBanner();
+                }
+            }, 30000);
+        });
+
+        function showInstallBanner() {
+            var banner = document.createElement('div');
+            banner.className = 'install-banner';
+            banner.innerHTML = '<div class="install-banner-text"><i class="fas fa-download"></i> Instalar CINE BOSS</div><div><button class="install-banner-btn" id="installBtn">Instalar</button><button class="install-banner-btn" id="dismissInstall" style="margin-left:8px;background:transparent;color:white;border:1px solid rgba(255,255,255,0.3)">Depois</button></div>';
+            document.body.appendChild(banner);
+
+            document.getElementById('installBtn').addEventListener('click', function() {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    deferredPrompt.userChoice.then(function(choice) {
+                        if (choice.outcome === 'accepted') {
+                            showToast('CINE BOSS instalado!');
+                        }
+                        deferredPrompt = null;
+                        banner.remove();
+                    });
+                }
+            });
+
+            document.getElementById('dismissInstall').addEventListener('click', function() {
+                localStorage.setItem('cineboss_install_dismissed', 'true');
+                banner.remove();
+            });
+        }
+
+        window.addEventListener('appinstalled', function() {
+            showToast('CINE BOSS instalado com sucesso!');
+            localStorage.removeItem('cineboss_install_dismissed');
+        });
+
+        function showToast(message) {
+            var toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            setTimeout(function() { toast.classList.add('show'); }, 100);
+            setTimeout(function() { toast.classList.remove('show'); setTimeout(function() { toast.remove(); }, 300); }, 3000);
         }
 
         // Boot screen removal - FAILSAFE: always removes boot screen

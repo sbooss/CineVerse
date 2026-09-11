@@ -2,19 +2,14 @@ const CONFIG = {
     EMBED: {
         PROVIDERS: [
             {
-                name: 'MegaEmbed',
-                movie: function(id) { return 'https://mgeb.top/embed/movie/' + id + '?lang=pt'; },
-                tv: function(id, s, e) { return 'https://mgeb.top/embed/tv/' + id + '/' + s + '/' + e + '?lang=pt'; }
+                name: 'VidLink',
+                movie: function(id) { return 'https://vidlink.pro/movie/' + id + '?lang=pt&quality=1080&autoplay=1&color=00d4ff'; },
+                tv: function(id, s, e) { return 'https://vidlink.pro/tv/' + id + '/' + s + '/' + e + '?lang=pt&quality=1080&autoplay=1&color=00d4ff'; }
             },
             {
-                name: 'EmbedplayApi',
-                movie: function(id) { return 'https://embedplayapi.top/embed/' + id; },
-                tv: function(id, s, e) { return 'https://embedplayapi.top/embed/' + id + '/' + s + '/' + e; }
-            },
-            {
-                name: 'MultiEmbed',
-                movie: function(id) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1&lang=pt'; },
-                tv: function(id, s, e) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1&s=' + s + '&e=' + e + '&lang=pt'; }
+                name: 'VidFast',
+                movie: function(id) { return 'https://vidfast.vc/movie/' + id + '?lang=pt&quality=1080&autoplay=1&color=00d4ff'; },
+                tv: function(id, s, e) { return 'https://vidfast.vc/tv/' + id + '/' + s + '/' + e + '?lang=pt&quality=1080&autoplay=1&color=00d4ff'; }
             }
         ]
     },
