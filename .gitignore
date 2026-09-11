@@ -26,3 +26,5 @@ start-server.bat
 # OS
 .DS_Store
 Thumbs.db
+
+.vercel
