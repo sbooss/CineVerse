@@ -6,8 +6,8 @@ module.exports = async function handler(req, res) {
 
     return res.status(200).json({
         plans: {
-            monthly: { id: 'monthly', name: 'CINE BOSS MENSAL', price: 4.99, days: 30, priceLabel: 'R$ 4,99', periodLabel: '/mes' },
-            quarterly: { id: 'quarterly', name: 'CINE BOSS TRIMESTRAL', price: 14.99, days: 90, priceLabel: 'R$ 14,99', periodLabel: '/3 meses' }
+            monthly: { id: 'monthly', name: 'CINE BOSS MENSAL', price: 6.99, days: 30, priceLabel: 'R$ 6,99', periodLabel: '/mes' },
+            quarterly: { id: 'quarterly', name: 'CINE BOSS TRIMESTRAL', price: 15.99, days: 90, priceLabel: 'R$ 15,99', periodLabel: '/3 meses' }
         }
     });
 };

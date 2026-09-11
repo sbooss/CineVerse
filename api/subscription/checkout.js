@@ -7,8 +7,8 @@ const {
 
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 const PLANS = {
-    monthly: { price: 499, days: 30, name: 'CINE BOSS - 30 Dias' },
-    quarterly: { price: 1499, days: 90, name: 'CINE BOSS - 90 Dias' }
+    monthly: { price: 699, days: 30, name: 'CINE BOSS - 30 Dias' },
+    quarterly: { price: 1599, days: 90, name: 'CINE BOSS - 90 Dias' }
 };
 
 module.exports = async function handler(req, res) {

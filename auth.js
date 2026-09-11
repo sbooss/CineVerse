@@ -215,7 +215,7 @@ class AuthManager {
                     <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:22px 18px;position:relative">
                         <div style="font-family:Sora,sans-serif;font-size:11px;font-weight:700;color:#e8e8f0;letter-spacing:1px;margin-bottom:2px">CINE BOSS</div>
                         <div style="font-size:10px;color:#4a4a60;margin-bottom:10px">30 dias</div>
-                        <div style="font-family:Sora,sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:12px">R$ 4,99</div>
+                        <div style="font-family:Sora,sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:12px">R$ 6,99</div>
                         <ul style="list-style:none;margin:0 0 16px">
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Todos os filmes e series</li>
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Qualidade ate 1080p</li>
@@ -228,13 +228,13 @@ class AuthManager {
                         <div style="position:absolute;top:-9px;right:14px;background:#00a8e0;color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:8px;letter-spacing:.5px">MAIS POPULAR</div>
                         <div style="font-family:Sora,sans-serif;font-size:11px;font-weight:700;color:#e8e8f0;letter-spacing:1px;margin-bottom:2px">CINE BOSS</div>
                         <div style="font-size:10px;color:#4a4a60;margin-bottom:10px">90 dias</div>
-                        <div style="font-family:Sora,sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:2px">R$ 14,99</div>
+                        <div style="font-family:Sora,sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:2px">R$ 15,99</div>
                         <div style="font-size:11px;color:#c9a54e;font-weight:600;margin-bottom:12px">Economize 25%</div>
                         <ul style="list-style:none;margin:0 0 16px">
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Tudo do plano mensal</li>
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>3 meses de acesso</li>
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Suporte prioritario</li>
-                            <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>R$ 4,98 de economia</li>
+                            <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>R$ 5,02 de economia</li>
                         </ul>
                         <button class="pw-select-btn gold" onclick="auth._selectPlan('quarterly')" style="width:100%;padding:11px;background:linear-gradient(135deg,#c9a54e,#e0be6a);border:none;border-radius:8px;color:#0a0a12;font-size:12px;font-weight:700;cursor:pointer;transition:all .25s;font-family:Inter,sans-serif">Assinar agora</button>
                     </div>

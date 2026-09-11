@@ -20,12 +20,13 @@
         /* ===== POSTER BACKGROUND ===== */
         .cinema-bg{position:fixed;inset:0;z-index:0;overflow:hidden}
         .poster-row{position:absolute;display:flex;gap:6px;will-change:transform}
-        .poster-row img{width:110px;height:165px;object-fit:cover;border-radius:4px;filter:brightness(.35) saturate(.5)}
-        .poster-row.r1{top:1%;animation:scrollR 90s linear infinite}.poster-row.r1 img{opacity:.18}
-        .poster-row.r2{top:21%;animation:scrollL 110s linear infinite}.poster-row.r2 img{opacity:.1;filter:brightness(.2) saturate(.3) blur(1.5px);transform:scale(1.1)}
-        .poster-row.r3{top:43%;animation:scrollR 75s linear infinite}.poster-row.r3 img{opacity:.2;filter:brightness(.4) saturate(.6)}
-        .poster-row.r4{top:63%;animation:scrollL 120s linear infinite}.poster-row.r4 img{opacity:.07;filter:brightness(.15) saturate(.2) blur(2.5px);transform:scale(1.15)}
-        .poster-row.r5{top:82%;animation:scrollR 95s linear infinite}.poster-row.r5 img{opacity:.13;filter:brightness(.3) saturate(.4)}
+        .poster-row img{width:110px;height:165px;object-fit:cover;border-radius:4px;filter:brightness(.6) saturate(.8);transition:filter .3s}
+        .poster-row img:hover{filter:brightness(.9) saturate(1) scale(1.1);z-index:1}
+        .poster-row.r1{top:0%;animation:scrollR 320s linear infinite}.poster-row.r1 img{opacity:.22}
+        .poster-row.r2{top:18%;animation:scrollL 380s linear infinite}.poster-row.r2 img{opacity:.16;filter:brightness(.5) saturate(.7)}
+        .poster-row.r3{top:36%;animation:scrollR 280s linear infinite}.poster-row.r3 img{opacity:.25;filter:brightness(.7) saturate(.9)}
+        .poster-row.r4{top:54%;animation:scrollL 400s linear infinite}.poster-row.r4 img{opacity:.12;filter:brightness(.4) saturate(.6)}
+        .poster-row.r5{top:72%;animation:scrollR 350s linear infinite}.poster-row.r5 img{opacity:.18;filter:brightness(.55) saturate(.7)}
         @keyframes scrollR{from{transform:translateX(-20%)}to{transform:translateX(-50%)}}
         @keyframes scrollL{from{transform:translateX(-50%)}to{transform:translateX(-20%)}}
         .bg-overlay{position:absolute;inset:0;z-index:2;pointer-events:none}
@@ -69,6 +70,26 @@
         .brand-line{width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent);opacity:0;transition:all .8s .5s ease;margin-top:24px}
         .brand-center.show .brand-line{opacity:1}
 
+        /* ===== FEATURED HERO ===== */
+        .hero-section{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1;pointer-events:none;opacity:0;transition:opacity 1s ease}
+        .hero-section.show{opacity:1}
+        .hero-content{position:absolute;top:50%;left:5%;transform:translateY(-50%);width:320px;max-width:40vw;pointer-events:all}
+        .hero-poster{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.8),0 0 40px rgba(0,168,224,0.1);position:relative}
+        .hero-info{position:absolute;bottom:0;left:0;right:0;padding:30px 20px;background:linear-gradient(transparent,rgba(5,5,8,0.98));border-radius:0 0 12px 12px}
+        .hero-badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 8px;background:var(--gold);color:#0a0a12;border-radius:4px;margin-bottom:6px;font-family:'Sora',sans-serif;text-transform:uppercase}
+        .hero-title{font-family:'Sora',sans-serif;font-size:clamp(14px,2.2vw,20px);font-weight:800;color:#fff;margin-bottom:4px;line-height:1.2}
+        .hero-meta{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--txt2);margin-bottom:8px}
+        .hero-meta .rating{color:var(--gold);font-weight:700}
+        .hero-desc{font-size:11px;color:var(--txt3);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;margin-bottom:10px}
+        .hero-btn{width:100%;padding:10px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .25s;font-family:'Inter',sans-serif;background:linear-gradient(135deg,var(--blue),#0090c0);color:#fff;letter-spacing:.5px}
+        .hero-btn:hover{box-shadow:0 4px 20px rgba(0,168,224,0.4);transform:translateY(-1px)}
+        .hero-label{position:absolute;top:0;left:0;right:0;text-align:center;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;letter-spacing:4px;color:var(--gold);text-transform:uppercase;padding-top:2px;opacity:0;transition:opacity .5s}
+        .hero-section.show .hero-label{opacity:.7}
+        .hero-scroll{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:4px;pointer-events:none;opacity:0;transition:opacity .5s}
+        .hero-section.show .hero-scroll{opacity:.5}
+        .hero-scroll-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);transition:all .3s}
+        .hero-scroll-dot.active{background:var(--gold);transform:scale(1.3)}
+
         /* ===== AUTH CARD ===== */
         .auth-area{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .5s ease}
         .auth-area.show{opacity:1}
@@ -106,9 +127,33 @@
         .auth-switch{text-align:center;font-size:11px;color:var(--txt3);margin-top:4px}
         .auth-switch span{color:var(--blue);cursor:pointer;font-weight:600}
         .auth-switch span:hover{text-decoration:underline}
-        .auth-perks{display:flex;flex-direction:column;gap:10px;margin-top:20px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.04)}
-        .auth-perk{display:flex;align-items:center;gap:10px;font-size:12px;color:var(--txt3)}
-        .auth-perk i{width:28px;height:28px;background:rgba(0,168,224,0.08);border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--blue);font-size:11px;flex-shrink:0}
+
+        /* ===== PAYMENT PANEL ===== */
+        .payment-panel{display:none;flex-direction:column;gap:14px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.04)}
+        .payment-panel.active{display:flex}
+        .payment-panel-title{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;text-align:center}
+        .payment-panel-desc{font-size:11px;color:var(--txt3);text-align:center;margin-bottom:8px}
+        .plan-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px 14px;position:relative;cursor:pointer;transition:all .25s}
+        .plan-card:hover{border-color:rgba(0,168,224,0.3);background:rgba(0,168,224,0.03)}
+        .plan-card.selected{border-color:var(--blue);background:rgba(0,168,224,0.06)}
+        .plan-card.popular{border-color:rgba(201,165,78,0.3)}
+        .plan-card.popular::before{content:'MAIS POPULAR';position:absolute;top:-8px;right:12px;background:var(--gold);color:#0a0a12;font-size:8px;font-weight:700;padding:2px 7px;border-radius:6px;letter-spacing:.5px}
+        .plan-name{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--txt);letter-spacing:.5px;margin-bottom:2px}
+        .plan-period{font-size:10px;color:var(--txt3);margin-bottom:8px}
+        .plan-price{font-family:'Sora',sans-serif;font-size:24px;font-weight:800;color:#fff;margin-bottom:10px}
+        .plan-price .period{font-size:11px;font-weight:500;color:var(--txt3)}
+        .plan-features{list-style:none;margin:0 0 12px;padding:0}
+        .plan-features li{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--txt2);padding:3px 0}
+        .plan-features i{color:var(--blue);font-size:9px;width:12px;text-align:center}
+        .plan-btn{width:100%;padding:10px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .25s;font-family:'Inter',sans-serif;letter-spacing:.3px}
+        .plan-btn.blue{background:var(--blue);color:#fff}
+        .plan-btn.blue:hover{background:#0090c0;box-shadow:0 4px 16px rgba(0,168,224,0.3)}
+        .plan-btn.gold{background:linear-gradient(135deg,var(--gold),#e0be6a);color:#0a0a12}
+        .plan-btn.gold:hover{box-shadow:0 4px 16px rgba(201,165,78,0.3)}
+        .plan-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+        .plan-footer{text-align:center;font-size:10px;color:var(--txt3);margin-top:8px}
+        .plan-footer i{color:var(--blue);margin-right:4px}
+
         .sound-btn{position:fixed;top:14px;right:14px;z-index:20;width:34px;height:34px;background:rgba(255,255,255,0.04);border:1px solid var(--brd);border-radius:50%;color:var(--txt3);font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
         .sound-btn:hover{color:var(--txt);background:rgba(255,255,255,0.08)}
         .sound-btn.muted i::before{content:'\f6a9'}
@@ -119,7 +164,17 @@
         .success-icon{width:56px;height:56px;background:rgba(0,168,224,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--blue);margin-bottom:14px;animation:pop .35s cubic-bezier(.34,1.56,.64,1)}
         @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
         .success-txt{font-family:'Sora',sans-serif;font-size:17px;font-weight:700}
-        @media(max-width:520px){.auth-card-inner{padding:28px 22px}.brand-main{letter-spacing:4px}.brand-sub{letter-spacing:5px}}
+        @media(max-width:640px){
+            .hero-content{width:180px;left:2%;top:auto;bottom:10px;transform:none}
+            .hero-poster{aspect-ratio:2/3}
+            .hero-info{padding:16px 12px}
+            .hero-title{font-size:13px}
+            .hero-desc{display:none}
+            .hero-btn{font-size:10px;padding:8px}
+            .auth-card-inner{padding:28px 22px}
+            .brand-main{letter-spacing:4px}
+            .brand-sub{letter-spacing:5px}
+        }
         @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     </style>
 </head>
@@ -147,6 +202,28 @@
         <div class="brand-main">CINE <span class="accent">BOSS</span></div>
         <div class="brand-sub">Filmes e Series</div>
         <div class="brand-line"></div>
+    </div>
+
+    <!-- FEATURED HERO -->
+    <div class="hero-section" id="heroSection">
+        <div class="hero-label">Filme em Destaque da Semana</div>
+        <div class="hero-content" id="heroContent">
+            <div class="hero-poster" id="heroPoster" style="background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center">
+                <i class="fas fa-film" style="font-size:40px;color:rgba(255,255,255,0.1)"></i>
+            </div>
+            <div class="hero-info">
+                <div class="hero-badge">Em Destaque</div>
+                <div class="hero-title" id="heroTitle">Carregando...</div>
+                <div class="hero-meta">
+                    <span class="rating" id="heroRating">-</span>
+                    <span id="heroYear">-</span>
+                    <span id="heroGenre">-</span>
+                </div>
+                <div class="hero-desc" id="heroDesc">Carregando...</div>
+                <button class="hero-btn" id="heroBtn" onclick="auth._selectPlan('monthly')">ASSINE AGORA</button>
+            </div>
+        </div>
+        <div class="hero-scroll" id="heroScroll"></div>
     </div>
 
     <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
@@ -182,11 +259,36 @@
                     <button type="submit" class="auth-submit blue" id="lBtn">ENTRAR</button>
                     <p class="auth-switch">Nao tem conta? <span data-tab="0">Cadastre-se</span></p>
                 </form>
-                <div class="auth-perks">
-                    <div class="auth-perk"><i class="fas fa-film"></i><span>Filmes e series atualizados semanalmente</span></div>
-                    <div class="auth-perk"><i class="fas fa-language"></i><span>Dublado e legendado em PT-BR</span></div>
-                    <div class="auth-perk"><i class="fas fa-tv"></i><span>TV ao vivo e conteudo internacional</span></div>
-                    <div class="auth-perk"><i class="fas fa-mobile-screen"></i><span>Assista em qualquer dispositivo</span></div>
+
+                <!-- PAYMENT PANEL -->
+                <div class="payment-panel" id="paymentPanel">
+                    <div class="payment-panel-title">Escolha seu plano</div>
+                    <div class="payment-panel-desc">Pagamento unico via Stripe. Sem renovacao automatica.</div>
+                    <div class="plan-card" id="planMonthly" onclick="auth._selectPlan('monthly')">
+                        <div class="plan-name">CINE BOSS MENSAL</div>
+                        <div class="plan-period">30 dias de acesso</div>
+                        <div class="plan-price">R$ 6,99 <span class="period">/mes</span></div>
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i>Todos os filmes e series</li>
+                            <li><i class="fas fa-check"></i>Qualidade ate 1080p</li>
+                            <li><i class="fas fa-check"></i>Sem anuncios</li>
+                            <li><i class="fas fa-check"></i>TV ao vivo</li>
+                        </ul>
+                        <button class="plan-btn blue" id="planMonthBtn">ASSINAR</button>
+                    </div>
+                    <div class="plan-card popular" id="planQuarterly" onclick="auth._selectPlan('quarterly')">
+                        <div class="plan-name">CINE BOSS TRIMESTRAL</div>
+                        <div class="plan-period">90 dias de acesso</div>
+                        <div class="plan-price">R$ 15,99 <span class="period">/3 meses</span></div>
+                        <ul class="plan-features">
+                            <li><i class="fas fa-check"></i>Tudo do plano mensal</li>
+                            <li><i class="fas fa-check"></i>3 meses de acesso</li>
+                            <li><i class="fas fa-check"></i>Suporte prioritario</li>
+                            <li><i class="fas fa-check" style="color:var(--gold)"></i>Economize!</li>
+                        </ul>
+                        <button class="plan-btn gold" id="planQtrBtn">ASSINAR AGORA</button>
+                    </div>
+                    <div class="plan-footer"><i class="fas fa-shield-halved"></i>Pagamento unico. Sem renovacao automatica.</div>
                 </div>
             </div>
         </div>
@@ -213,11 +315,7 @@
                 g.gain.exponentialRampToValueAtTime(.001,this.ctx.currentTime+d);
                 o.connect(g).connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+d);
             },
-            click:function(){
-                this.init();
-                this.tone(1200,.03,'sine',.08);
-                this.tone(800,.05,'sine',.05);
-            },
+            click:function(){this.init();this.tone(1200,.03,'sine',.08);this.tone(800,.05,'sine',.05)},
             ok:function(){
                 this.init();
                 this.tone(523,.15,'sine',.1);
@@ -225,11 +323,7 @@
                 setTimeout(function(){S.tone(784,.12,'sine',.12)},200);
                 setTimeout(function(){S.tone(1047,.25,'sine',.08)},320);
             },
-            err:function(){
-                this.init();
-                this.tone(300,.2,'sawtooth',.07);
-                setTimeout(function(){S.tone(220,.25,'sawtooth',.05)},120);
-            },
+            err:function(){this.init();this.tone(300,.2,'sawtooth',.07);setTimeout(function(){S.tone(220,.25,'sawtooth',.05)},120)},
             brand:function(){
                 this.init();
                 this.tone(220,.6,'sine',.06);
@@ -238,11 +332,8 @@
                 setTimeout(function(){S.tone(660,.3,'sine',.04)},400);
                 setTimeout(function(){S.tone(880,.5,'sine',.03)},600);
             },
-            boot:function(){
-                this.init();
-                this.tone(440,.3,'sine',.04);
-                setTimeout(function(){S.tone(550,.2,'sine',.03)},300);
-            }
+            boot:function(){this.init();this.tone(440,.3,'sine',.04);setTimeout(function(){S.tone(550,.2,'sine',.03)},300)},
+            pay:function(){this.init();this.tone(440,.1,'sine',.08);setTimeout(function(){S.tone(554,.1,'sine',.08)},80);setTimeout(function(){S.tone(659,.15,'sine',.1)},160)}
         };
 
         document.getElementById('sndBtn').addEventListener('click',function(){
@@ -263,6 +354,19 @@
                     var s=p.slice().sort(function(){return Math.random()-.5});
                     el.innerHTML=s.concat(s).map(function(s){return'<img src="'+s+'" alt="" loading="lazy">'}).join('');
                 });
+                /* Feature hero */
+                if(d.results&&d.results.length>0){
+                    var featured=d.results.sort(function(){return Math.random()-.5})[0];
+                    if(featured.poster_path){
+                        document.getElementById('heroPoster').innerHTML='<img src="https://image.tmdb.org/t/p/w500'+featured.poster_path+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:12px" loading="lazy">';
+                        document.getElementById('heroTitle').textContent=featured.title||featured.name||'Desconhecido';
+                        document.getElementById('heroRating').textContent=featured.vote_average?featured.vote_average.toFixed(1)+'/10':'-';
+                        document.getElementById('heroYear').textContent=featured.release_date?featured.release_date.substring(0,4):(featured.first_air_date?featured.first_air_date.substring(0,4):'-');
+                        var genres=featured.genre_ids?featured.genre_ids.slice(0,2).join(', '):'-';
+                        document.getElementById('heroGenre').textContent=genres;
+                        document.getElementById('heroDesc').textContent=featured.overview||'Sem descricao disponivel.';
+                    }
+                }
             }).catch(function(){});
         }
 
@@ -279,25 +383,26 @@
 
         /* ===== SEQUENCE ===== */
         function startSequence(){
-            S.init();
-            S.boot();
-
+            S.init();S.boot();
             setTimeout(function(){
                 document.getElementById('bootScreen').classList.add('out');
                 S.brand();
             },2400);
-
             setTimeout(function(){
                 document.getElementById('brandCenter').classList.add('show');
             },2800);
-
             setTimeout(function(){
                 document.getElementById('brandCenter').classList.remove('show');
             },5200);
-
+            setTimeout(function(){
+                document.getElementById('heroSection').classList.add('show');
+                /* Dots for hero */
+                var scroll=document.getElementById('heroScroll');
+                for(var i=0;i<5;i++){var d=document.createElement('div');d.className='hero-scroll-dot'+(i===0?' active':'');scroll.appendChild(d)}
+            },5600);
             setTimeout(function(){
                 document.getElementById('authArea').classList.add('show');
-            },5600);
+            },6200);
         }
 
         /* ===== TABS ===== */
@@ -307,6 +412,7 @@
             document.querySelectorAll('.auth-form').forEach(function(f){f.classList.remove('active');f.style.display='none'});
             this.classList.add('active');
             var f=document.getElementById(this.dataset.f);f.classList.add('active');f.style.display='flex';
+            document.getElementById('paymentPanel').classList.remove('active');
         })});
         document.querySelectorAll('.auth-switch span').forEach(function(s){s.addEventListener('click',function(){
             var i=parseInt(this.dataset.tab);
@@ -319,7 +425,13 @@
             err.textContent='';btn.disabled=true;btn.textContent='ENTRANDO...';
             fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({email:document.getElementById('lEmail').value,password:document.getElementById('lPass').value,remember:document.getElementById('lRemember').checked})})
             .then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d}})})
-            .then(function(r){if(!r.ok)throw new Error(r.data.error);S.ok();showOk('Bem-vindo, '+(r.data.user.name||'')+'!');setTimeout(function(){window.location.href='/'},1100)})
+            .then(function(r){
+                if(!r.ok)throw new Error(r.data.error);
+                S.ok();showOk('Bem-vindo, '+(r.data.user.name||'')+'!');
+                /* Show payment panel, stay on page */
+                setTimeout(function(){document.getElementById('paymentPanel').classList.add('active')},600);
+                btn.disabled=false;btn.textContent='ENTRAR';
+            })
             .catch(function(e){err.textContent=e.message;S.err();btn.disabled=false;btn.textContent='ENTRAR'});
         });
 
@@ -333,7 +445,13 @@
             if(pw.length<6){err.textContent='Senha deve ter pelo menos 6 caracteres';S.err();btn.disabled=false;btn.textContent='CRIAR MINHA CONTA';return}
             fetch(API+'/auth/register',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({name:nm,email:em,password:pw})})
             .then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d}})})
-            .then(function(r){if(!r.ok)throw new Error(r.data.error);S.ok();showOk('Conta criada! Bem-vindo ao CINE BOSS');setTimeout(function(){window.location.href='/'},1100)})
+            .then(function(r){
+                if(!r.ok)throw new Error(r.data.error);
+                S.ok();showOk('Conta criada! Bem-vindo ao CINE BOSS');
+                /* Show payment panel, stay on page - user is already logged in */
+                setTimeout(function(){document.getElementById('paymentPanel').classList.add('active')},600);
+                btn.disabled=false;btn.textContent='CRIAR MINHA CONTA';
+            })
             .catch(function(e){err.textContent=e.message;S.err();btn.disabled=false;btn.textContent='CRIAR MINHA CONTA'});
         });
 
@@ -349,7 +467,7 @@
         function showOk(t){document.getElementById('okTxt').textContent=t;document.getElementById('okScreen').classList.add('on')}
 
         /* ===== INIT ===== */
-        fetch(API+'/auth/me',{credentials:'include'}).then(function(r){return r.json()}).then(function(d){if(d.loggedIn)window.location.href='/'}).catch(function(){});
+        fetch(API+'/auth/me',{credentials:'include'}).then(function(r){return r.json()}).then(function(d){if(d.loggedIn){document.getElementById('authArea').classList.add('show');document.getElementById('paymentPanel').classList.add('active');window.location.href='/'}}).catch(function(){});
         loadPosters();particles();
         startSequence();
     })();
