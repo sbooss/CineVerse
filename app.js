@@ -445,10 +445,198 @@ document.addEventListener('keydown', function(e) {
     }
 });
 
+/* ===================== SMART TV REMOTE CONTROL ===================== */
+var tvFocusIndex = -1;
+var tvFocusableElements = [];
+
+function setupTVRemote() {
+    // Detect if device is TV (Smart TV, Android TV, Fire TV, etc.)
+    var isTV = /Android|SmartTV|WebTV|TV|Opera|Bear Diploma|三星|LG|Tizen|webOS/i.test(navigator.userAgent) ||
+               (navigator.maxTouchPoints > 0 && window.innerWidth > 1000) ||
+               window.location.search.indexOf('tv') !== -1;
+
+    if (!isTV) return;
+
+    document.body.classList.add('tv-mode');
+
+    // Get all focusable elements
+    function updateFocusableElements() {
+        tvFocusableElements = Array.from(document.querySelectorAll(
+            '.nav-link, .mobile-link, .movie-card, .channel-card, .filter-btn, ' +
+            '.btn-primary, .btn-secondary, .detail-btn-play, .detail-btn-secondary, ' +
+            '.change-provider-btn, .provider-btn, #heroPlayBtn, #heroFavBtn, ' +
+            '.season-tab, .detail-episode-card, .card-fav'
+        )).filter(function(el) {
+            return el.offsetParent !== null && el.offsetWidth > 0;
+        });
+    }
+
+    // Move focus to element
+    function focusElement(el) {
+        if (!el) return;
+        el.focus();
+        el.classList.add('tv-focused');
+        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // Remove focus from all
+    function clearFocus() {
+        tvFocusableElements.forEach(function(el) {
+            el.classList.remove('tv-focused');
+        });
+    }
+
+    // Find closest element in direction
+    function findClosest(current, direction) {
+        if (!current) return tvFocusableElements[0];
+        var rect = current.getBoundingClientRect();
+        var best = null;
+        var bestDist = Infinity;
+
+        tvFocusableElements.forEach(function(el) {
+            if (el === current) return;
+            var elRect = el.getBoundingClientRect();
+            var dx = elRect.left - rect.left;
+            var dy = elRect.top - rect.top;
+            var dist = Math.sqrt(dx * dx + dy * dy);
+
+            var isValid = false;
+            switch(direction) {
+                case 'up': isValid = dy < -10 && Math.abs(dx) < Math.abs(dy) * 2; break;
+                case 'down': isValid = dy > 10 && Math.abs(dx) < Math.abs(dy) * 2; break;
+                case 'left': isValid = dx < -10 && Math.abs(dy) < Math.abs(dx) * 2; break;
+                case 'right': isValid = dx > 10 && Math.abs(dy) < Math.abs(dx) * 2; break;
+            }
+
+            if (isValid && dist < bestDist) {
+                bestDist = dist;
+                best = el;
+            }
+        });
+
+        return best;
+    }
+
+    // Handle TV remote keys
+    document.addEventListener('keydown', function(e) {
+        updateFocusableElements();
+        if (tvFocusableElements.length === 0) return;
+
+        var current = document.activeElement;
+        var currentIdx = tvFocusableElements.indexOf(current);
+        var target = null;
+
+        switch(e.key) {
+            case 'ArrowUp':
+                e.preventDefault();
+                target = findClosest(current, 'up');
+                break;
+            case 'ArrowDown':
+                e.preventDefault();
+                target = findClosest(current, 'down');
+                break;
+            case 'ArrowLeft':
+                e.preventDefault();
+                if (current && current.classList.contains('movie-card')) {
+                    // Navigate within row
+                    target = current.previousElementSibling;
+                    if (!target || !target.classList.contains('movie-card')) {
+                        target = findClosest(current, 'left');
+                    }
+                } else {
+                    target = findClosest(current, 'left');
+                }
+                break;
+            case 'ArrowRight':
+                e.preventDefault();
+                if (current && current.classList.contains('movie-card')) {
+                    target = current.nextElementSibling;
+                    if (!target || !target.classList.contains('movie-card')) {
+                        target = findClosest(current, 'right');
+                    }
+                } else {
+                    target = findClosest(current, 'right');
+                }
+                break;
+            case 'Enter':
+            case 'OK':
+            case ' ':
+                e.preventDefault();
+                if (current) {
+                    current.click();
+                    // If it's a card, open detail
+                    if (current.classList.contains('movie-card')) {
+                        var favBtn = current.querySelector('.card-fav');
+                        if (document.activeElement === favBtn) {
+                            favBtn.click();
+                        } else {
+                            current.click();
+                        }
+                    }
+                }
+                return;
+            case 'Backspace':
+            case 'Back':
+                e.preventDefault();
+                if (player.isOpen()) player.close();
+                else if (document.getElementById('detailPage').classList.contains('active')) closeDetailPage();
+                else if (document.getElementById('mobileMenu').classList.contains('open')) {
+                    document.getElementById('mobileMenu').classList.remove('open');
+                }
+                return;
+            case 'MediaPlayPause':
+            case 'Play':
+            case 'Pause':
+                e.preventDefault();
+                if (player.isOpen()) {
+                    var video = document.querySelector('.video-iframe');
+                    if (video && video.tagName === 'VIDEO') {
+                        if (video.paused) video.play();
+                        else video.pause();
+                    }
+                }
+                return;
+            case 'MediaStop':
+                e.preventDefault();
+                if (player.isOpen()) player.close();
+                return;
+            case 'ColorRed':
+            case 'ColorGreen':
+            case 'ColorYellow':
+            case 'ColorBlue':
+                e.preventDefault();
+                return;
+            default:
+                return;
+        }
+
+        if (target) {
+            clearFocus();
+            focusElement(target);
+        }
+    });
+
+    // Remove focus class on blur
+    document.addEventListener('blur', function(e) {
+        if (e.target.classList) {
+            e.target.classList.remove('tv-focused');
+        }
+    }, true);
+
+    // Initial focus on first card after load
+    setTimeout(function() {
+        updateFocusableElements();
+        if (tvFocusableElements.length > 0) {
+            focusElement(tvFocusableElements[0]);
+        }
+    }, 5000);
+}
+
 /* ===================== INIT ===================== */
 document.addEventListener('DOMContentLoaded', function() {
     setupNavigation();
     setupSearch();
     setupMobileMenu();
+    setupTVRemote();
     loadHome();
 });
