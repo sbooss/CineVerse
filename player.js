@@ -281,7 +281,14 @@ class VideoPlayer {
         return this.overlay.classList.contains('active');
     }
 
-    open(item, season = 1, episode = 1) {
+    async open(item, season = 1, episode = 1) {
+        if (typeof auth !== 'undefined') {
+            const canPlay = await auth.requireSubscription();
+            if (!canPlay) {
+                window.playAfterAuth = () => this.open(item, season, episode);
+                return;
+            }
+        }
         this.titleEl.textContent = item.title;
         this.overlay.classList.add('active');
         document.body.style.overflow = 'hidden';

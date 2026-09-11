@@ -2,11 +2,19 @@
     "version": 2,
     "builds": [
         {
+            "src": "api/**/*.js",
+            "use": "@vercel/node"
+        },
+        {
             "src": "**/*",
             "use": "@vercel/static"
         }
     ],
     "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "/api/$1"
+        },
         {
             "src": "/(.*)",
             "dest": "/$1"
@@ -15,22 +23,23 @@
     "outputDirectory": ".",
     "headers": [
         {
+            "source": "/api/(.*)",
+            "headers": [
+                { "key": "Access-Control-Allow-Origin", "value": "*" },
+                { "key": "Access-Control-Allow-Methods", "value": "GET, POST, OPTIONS" },
+                { "key": "Access-Control-Allow-Headers", "value": "Content-Type, Authorization" },
+                { "key": "Access-Control-Allow-Credentials", "value": "true" }
+            ]
+        },
+        {
             "source": "/(.*)",
             "headers": [
                 { "key": "X-Content-Type-Options", "value": "nosniff" },
                 { "key": "X-Frame-Options", "value": "DENY" },
                 { "key": "X-XSS-Protection", "value": "1; mode=block" },
-                { "key": "X-Permitted-Cross-Domain-Policies", "value": "none" },
-                { "key": "Cross-Origin-Embedder-Policy", "value": "require-corp" },
-                { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" },
-                { "key": "Cross-Origin-Resource-Policy", "value": "same-origin" },
                 { "key": "Referrer-Policy", "value": "no-referrer" },
-                { "key": "Permissions-Policy", "value": "accelerometer=(), ambient-light-sensor=(), autoplay=(), battery=(), camera=(), cross-origin-isolated=(), display-capture=(), document-domain=(), encrypted-media=(), execution-while-not-rendered=(), execution-while-out-of-viewport=(), fullscreen=(), geolocation=(), gyroscope=(), keyboard-map=(), magnetometer=(), microphone=(), midi=(), navigation-override=(), payment=(), picture-in-picture=(), publickey-credentials-get=(), screen-wake-lock=(), sync-xhr=(), usb=(), web-share=(), xr-spatial-tracking=()" },
-                { "key": "Content-Security-Policy", "value": "default-src 'self' 'unsafe-inline' 'unsafe-eval' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://image.tmdb.org data: blob:; media-src 'self' blob: https:; frame-src *; connect-src 'self' https://api.themoviedb.org; worker-src 'self'; form-action 'self'; base-uri 'self'; frame-ancestors 'none'" },
                 { "key": "Strict-Transport-Security", "value": "max-age=31536000; includeSubDomains; preload" },
-                { "key": "X-DNS-Prefetch-Control", "value": "off" },
-                { "key": "X-Download-Options", "value": "noopen" },
-                { "key": "X-Permitted-Cross-Domain-Policies", "value": "none" }
+                { "key": "Content-Security-Policy", "value": "default-src 'self' 'unsafe-inline' 'unsafe-eval' https:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://cdnjs.cloudflare.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://image.tmdb.org data: blob:; media-src 'self' blob: https:; frame-src *; connect-src 'self' https://api.themoviedb.org https://dofzztjpqedsaazbvzfg.supabase.co; worker-src 'self'; form-action 'self'; base-uri 'self'; frame-ancestors 'none'" }
             ]
         },
         {
@@ -45,13 +54,6 @@
             "headers": [
                 { "key": "Content-Type", "value": "application/javascript" },
                 { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
-            ]
-        },
-        {
-            "source": "/(.*)\\.js$",
-            "headers": [
-                { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" },
-                { "key": "X-Content-Type-Options", "value": "nosniff" }
             ]
         }
     ]

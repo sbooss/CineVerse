@@ -93,7 +93,21 @@
                     <a href="#" class="nav-link" data-category="live"><i class="fas fa-broadcast-tower"></i><span>TV Ao Vivo</span></a>
                     <a href="#" class="nav-link" data-category="favorites"><i class="fas fa-heart"></i><span>Favoritos</span></a>
                 </div>
-                <div class="user-profile" id="userProfile"><i class="fas fa-user-circle"></i></div>
+                <div class="auth-buttons" id="authButtons">
+                    <button class="auth-btn-nav" onclick="auth.showAuthModal()">Entrar</button>
+                </div>
+                <div class="user-menu hidden" id="userMenu">
+                    <div class="user-avatar" id="userAvatar"><i class="fas fa-user-circle"></i></div>
+                    <div class="user-dropdown" id="userDropdown">
+                        <div class="user-info">
+                            <span class="user-name" id="userName"></span>
+                            <span class="user-sub-status" id="userSubStatus"></span>
+                        </div>
+                        <div class="user-dropdown-divider"></div>
+                        <a href="#" class="user-dropdown-item" onclick="event.preventDefault(); auth.closeModal('paywallModal');"><i class="fas fa-crown"></i> Minha Assinatura</a>
+                        <a href="#" class="user-dropdown-item" onclick="event.preventDefault(); auth.logout();"><i class="fas fa-sign-out-alt"></i> Sair</a>
+                    </div>
+                </div>
             </div>
             <button class="mobile-menu-btn" id="mobileMenuBtn"><i class="fas fa-bars"></i></button>
         </div>
@@ -191,10 +205,11 @@
     </footer>
 
     <!-- SCRIPTS -->
-    <script src="config.js?v=7"></script>
-    <script src="tmdb.js?v=7"></script>
-    <script src="player.js?v=7"></script>
-    <script src="app.js?v=7"></script>
+    <script src="config.js?v=8"></script>
+    <script src="tmdb.js?v=8"></script>
+    <script src="auth.js?v=8"></script>
+    <script src="player.js?v=8"></script>
+    <script src="app.js?v=8"></script>
     <script>
         // Register Service Worker
         if ('serviceWorker' in navigator) {

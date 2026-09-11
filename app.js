@@ -639,4 +639,32 @@ document.addEventListener('DOMContentLoaded', function() {
     setupMobileMenu();
     setupTVRemote();
     loadHome();
+
+    if (typeof auth !== 'undefined') {
+        auth.onAuthChange(function(user, subscription, loggedIn) {
+            var authBtns = document.getElementById('authButtons');
+            var userMenu = document.getElementById('userMenu');
+            if (loggedIn && user) {
+                if (authBtns) authBtns.classList.add('hidden');
+                if (userMenu) {
+                    userMenu.classList.remove('hidden');
+                    var nameEl = document.getElementById('userName');
+                    var subEl = document.getElementById('userSubStatus');
+                    if (nameEl) nameEl.textContent = user.name;
+                    if (subEl) {
+                        if (subscription && subscription.status === 'active') {
+                            subEl.textContent = 'Assinatura ativa';
+                            subEl.style.color = '#00d4ff';
+                        } else {
+                            subEl.textContent = 'Sem assinatura';
+                            subEl.style.color = '#ff4444';
+                        }
+                    }
+                }
+            } else {
+                if (authBtns) authBtns.classList.remove('hidden');
+                if (userMenu) userMenu.classList.add('hidden');
+            }
+        });
+    }
 });
