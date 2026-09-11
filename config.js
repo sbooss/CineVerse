@@ -2,34 +2,19 @@ const CONFIG = {
     EMBED: {
         PROVIDERS: [
             {
-                name: 'CineSrc',
-                movie: function(id) { return 'https://cinesrc.st/embed/movie/' + id + '?autoplay=true&controls=true&color=%2300d4ff&quality=1080'; },
-                tv: function(id, s, e) { return 'https://cinesrc.st/embed/tv/' + id + '?s=' + s + '&e=' + e + '&autoplay=true&controls=true&color=%2300d4ff&autonext=true&autoskip=true'; }
+                name: 'MegaEmbed',
+                movie: function(id) { return 'https://mgeb.top/embed/movie/' + id + '?lang=pt'; },
+                tv: function(id, s, e) { return 'https://mgeb.top/embed/tv/' + id + '/' + s + '/' + e + '?lang=pt'; }
             },
             {
-                name: '2Embed',
-                movie: function(id) { return 'https://www.2embed.cc/embed/' + id; },
-                tv: function(id, s, e) { return 'https://www.2embed.cc/embedtv/' + id + '&s=' + s + '&e=' + e; }
-            },
-            {
-                name: 'VidSrc',
-                movie: function(id) { return 'https://vidsrc.in/embed/movie/' + id; },
-                tv: function(id, s, e) { return 'https://vidsrc.in/embed/tv/' + id + '/' + s + '/' + e; }
-            },
-            {
-                name: 'VidFast',
-                movie: function(id) { return 'https://vidfast.vc/movie/' + id; },
-                tv: function(id, s, e) { return 'https://vidfast.vc/tv/' + id + '/' + s + '/' + e; }
-            },
-            {
-                name: 'VidLink',
-                movie: function(id) { return 'https://vidlink.pro/movie/' + id + '?lang=pt'; },
-                tv: function(id, s, e) { return 'https://vidlink.pro/tv/' + id + '/' + s + '/' + e + '?lang=pt'; }
+                name: 'EmbedplayApi',
+                movie: function(id) { return 'https://embedplayapi.top/embed/' + id; },
+                tv: function(id, s, e) { return 'https://embedplayapi.top/embed/' + id + '/' + s + '/' + e; }
             },
             {
                 name: 'MultiEmbed',
-                movie: function(id) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1'; },
-                tv: function(id, s, e) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1&s=' + s + '&e=' + e; }
+                movie: function(id) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1&lang=pt'; },
+                tv: function(id, s, e) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1&s=' + s + '&e=' + e + '&lang=pt'; }
             }
         ]
     },
