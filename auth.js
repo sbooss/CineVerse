@@ -257,13 +257,19 @@ class AuthManager {
             const r = await fetch(`${API_BASE}/subscription/checkout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ plan }) });
             const d = await r.json();
             if (!r.ok) throw new Error(d.error);
-            const subId = d.subscriptionId || d.subscription_id;
-            if (subId) {
-                await fetch(`${API_BASE}/subscription/simulate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ subscription_id: subId }) });
+            if (d.url) {
+                const subId = d.subscriptionId || d.subscription_id;
+                if (subId) {
+                    setTimeout(async function(){
+                        try { await fetch(`${API_BASE}/subscription/simulate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ subscription_id: subId }) }); } catch {}
+                    }, 1000);
+                }
+                window.location.href = d.url;
+            } else {
+                sounds.ok();
+                if(btn){btn.textContent='PAGO!';}
+                setTimeout(function(){window.location.href='/'},1500);
             }
-            sounds.ok();
-            if(btn){btn.textContent='PAGO!';btn.style.background='var(--blue)';}
-            setTimeout(function(){window.location.href='/'},1500);
         } catch (e) {
             if(btn){btn.disabled=false;btn.textContent='ASSINAR';}
             alert(e.message || 'Erro ao processar pagamento');
