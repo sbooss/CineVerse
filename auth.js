@@ -1,5 +1,50 @@
 const API_BASE = window.location.origin + '/api';
 
+class SoundManager {
+    constructor() {
+        this.ctx = null;
+        this.muted = false;
+    }
+    init() {
+        if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    playTone(freq, dur, type, vol) {
+        if (this.muted || !this.ctx) return;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = type || 'sine';
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(vol || 0.15, this.ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + dur);
+        osc.connect(gain).connect(this.ctx.destination);
+        osc.start(); osc.stop(this.ctx.currentTime + dur);
+    }
+    success() {
+        this.init();
+        this.playTone(523.25, 0.15, 'sine', 0.12);
+        setTimeout(() => this.playTone(659.25, 0.15, 'sine', 0.12), 100);
+        setTimeout(() => this.playTone(783.99, 0.25, 'sine', 0.15), 200);
+    }
+    error() {
+        this.init();
+        this.playTone(200, 0.2, 'sawtooth', 0.1);
+        setTimeout(() => this.playTone(150, 0.3, 'sawtooth', 0.08), 150);
+    }
+    click() {
+        this.init();
+        this.playTone(800, 0.05, 'sine', 0.08);
+    }
+    hover() {
+        this.init();
+        this.playTone(600, 0.03, 'sine', 0.05);
+    }
+    toggle() {
+        this.muted = !this.muted;
+    }
+}
+
+const sounds = new SoundManager();
+
 class AuthManager {
     constructor() {
         this.user = null;
@@ -10,7 +55,6 @@ class AuthManager {
     }
 
     onAuthChange(cb) { this.listeners.push(cb); }
-
     notify() { this.listeners.forEach(cb => cb(this.user, this.subscription, this.loggedIn)); }
 
     async check() {
@@ -75,7 +119,7 @@ class AuthManager {
         return !!this.subscription && this.subscription.status === 'active';
     }
 
-    async requireAuth() {
+    requireAuth() {
         if (!this.loggedIn) {
             this.showAuthModal();
             return false;
@@ -83,7 +127,7 @@ class AuthManager {
         return true;
     }
 
-    async requireSubscription() {
+    requireSubscription() {
         if (!this.loggedIn) {
             this.showAuthModal();
             return false;
@@ -131,7 +175,7 @@ class AuthManager {
             <div class="auth-backdrop"></div>
             <div class="auth-container">
                 <button class="auth-close" onclick="auth.closeModal('authModal')">&times;</button>
-                <div class="auth-logo">CINE BOSS</div>
+                <div class="auth-logo">CINE <span class="accent">BOSS</span></div>
                 <div class="auth-tabs">
                     <button class="auth-tab active" data-tab="login">Entrar</button>
                     <button class="auth-tab" data-tab="register">Cadastrar</button>
@@ -169,34 +213,6 @@ class AuthManager {
             </div>
         `;
 
-        const style = document.createElement('style');
-        style.textContent = `
-            .auth-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:99999; align-items:center; justify-content:center; }
-            .auth-backdrop { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.85); backdrop-filter:blur(20px); }
-            .auth-container { position:relative; width:90%; max-width:420px; background:linear-gradient(145deg, #0a0a1a, #12122a); border:1px solid rgba(255,255,255,0.08); border-radius:20px; padding:40px 32px; z-index:1; transform:translateY(30px); opacity:0; transition:all 0.4s cubic-bezier(0.4,0,0.2,1); }
-            .auth-modal.active .auth-container { transform:translateY(0); opacity:1; }
-            .auth-close { position:absolute; top:16px; right:16px; background:none; border:none; color:#666; font-size:28px; cursor:pointer; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:all 0.3s; }
-            .auth-close:hover { color:#fff; background:rgba(255,255,255,0.1); }
-            .auth-logo { font-family:'Orbitron',monospace; font-size:22px; font-weight:800; text-align:center; letter-spacing:3px; background:linear-gradient(135deg,#00d4ff,#d4a853); -webkit-background-clip:text; -webkit-text-fill-color:transparent; margin-bottom:28px; }
-            .auth-tabs { display:flex; gap:4px; margin-bottom:28px; background:rgba(255,255,255,0.03); border-radius:12px; padding:4px; }
-            .auth-tab { flex:1; padding:10px; background:none; border:none; color:#666; font-size:14px; font-weight:600; cursor:pointer; border-radius:10px; transition:all 0.3s; }
-            .auth-tab.active { background:rgba(0,212,255,0.15); color:#00d4ff; }
-            .auth-form { display:none; flex-direction:column; gap:16px; }
-            .auth-form.active { display:flex; }
-            .auth-field input { width:100%; padding:14px 16px; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:10px; color:#fff; font-size:14px; outline:none; transition:all 0.3s; }
-            .auth-field input:focus { border-color:#00d4ff; box-shadow:0 0 20px rgba(0,212,255,0.1); }
-            .auth-field input::placeholder { color:#555; }
-            .auth-check { display:flex; align-items:center; gap:8px; font-size:13px; color:#888; }
-            .auth-check input { accent-color:#00d4ff; }
-            .auth-error { color:#ff4444; font-size:13px; min-height:18px; text-align:center; }
-            .auth-btn { width:100%; padding:14px; background:linear-gradient(135deg,#00d4ff,#7b2fff); border:none; border-radius:10px; color:#fff; font-size:14px; font-weight:700; font-family:'Orbitron',monospace; letter-spacing:1px; cursor:pointer; transition:all 0.3s; }
-            .auth-btn:hover { transform:translateY(-2px); box-shadow:0 8px 25px rgba(0,212,255,0.3); }
-            .auth-btn:disabled { opacity:0.5; cursor:not-allowed; transform:none; }
-            .auth-forgot { text-align:center; font-size:13px; color:#555; cursor:pointer; }
-            .auth-forgot:hover { color:#00d4ff; }
-        `;
-        modal.appendChild(style);
-
         modal.querySelectorAll('.auth-tab').forEach(tab => {
             tab.addEventListener('click', () => {
                 modal.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
@@ -221,10 +237,12 @@ class AuthManager {
                     document.getElementById('loginPassword').value,
                     document.getElementById('rememberMe').checked
                 );
+                sounds.success();
                 this.closeModal('authModal');
                 if (window.playAfterAuth) { window.playAfterAuth(); window.playAfterAuth = null; }
             } catch (err) {
                 errEl.textContent = err.message;
+                sounds.error();
             }
             btn.disabled = false;
             btn.textContent = 'ENTRAR';
@@ -243,13 +261,15 @@ class AuthManager {
                     document.getElementById('regEmail').value,
                     document.getElementById('regPassword').value
                 );
+                sounds.success();
                 modal.querySelectorAll('.auth-tab')[0].click();
                 document.getElementById('loginEmail').value = document.getElementById('regEmail').value;
                 document.getElementById('loginPassword').value = document.getElementById('regPassword').value;
                 document.getElementById('loginError').textContent = 'Conta criada! Faca login.';
-                document.getElementById('loginError').style.color = '#00d4ff';
+                document.getElementById('loginError').style.color = 'var(--accent-blue)';
             } catch (err) {
                 errEl.textContent = err.message;
+                sounds.error();
             }
             btn.disabled = false;
             btn.textContent = 'CADASTRAR';
@@ -268,11 +288,11 @@ class AuthManager {
                 <button class="pw-close" onclick="auth.closeModal('paywallModal')">&times;</button>
                 <div class="pw-icon"><i class="fas fa-lock"></i></div>
                 <h2 class="pw-title">Assinatura Necessaria</h2>
-                <p class="pw-text">Para assistir este conteudo, voce precisa de uma assinatura CINE BOSS ativa.</p>
+                <p class="pw-text">Seu proximo filme esta pronto. Ative seu acesso CINE BOSS para comecar a assistir.</p>
                 <div class="pw-plans">
                     <div class="pw-plan" data-plan="monthly">
-                        <div class="pw-plan-name">MENSAL</div>
-                        <div class="pw-plan-price">R$ 4,99<span>/mes</span></div>
+                        <div class="pw-plan-name">CINE BOSS</div>
+                        <div class="pw-plan-price">R$ 4,99<span>/30 dias</span></div>
                         <ul class="pw-plan-features">
                             <li>Todos os filmes e series</li>
                             <li>Qualidade ate 1080p</li>
@@ -281,8 +301,8 @@ class AuthManager {
                     </div>
                     <div class="pw-plan featured" data-plan="quarterly">
                         <div class="pw-plan-badge">ECONOMIZE 25%</div>
-                        <div class="pw-plan-name">TRIMESTRAL</div>
-                        <div class="pw-plan-price">R$ 14,99<span>/3 meses</span></div>
+                        <div class="pw-plan-name">CINE BOSS</div>
+                        <div class="pw-plan-price">R$ 14,99<span>/90 dias</span></div>
                         <ul class="pw-plan-features">
                             <li>Tudo do mensal</li>
                             <li>Economia de R$ 4,98</li>
@@ -291,40 +311,9 @@ class AuthManager {
                     </div>
                 </div>
                 <button class="pw-pay-btn" id="pwPayBtn">ASSINAR AGORA</button>
-                <div class="pw-secure"><i class="fas fa-shield-halved"></i> Pagamento 100% seguro</div>
+                <div class="pw-secure"><i class="fas fa-shield-halved"></i> Pagamento 100% seguro via Stripe</div>
             </div>
         `;
-
-        const style = document.createElement('style');
-        style.textContent = `
-            .paywall-modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; z-index:99999; align-items:center; justify-content:center; }
-            .pw-backdrop { position:absolute; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); backdrop-filter:blur(30px); }
-            .pw-container { position:relative; width:90%; max-width:500px; background:linear-gradient(145deg,#0a0a1a,#12122a); border:1px solid rgba(255,255,255,0.08); border-radius:24px; padding:40px 32px; z-index:1; text-align:center; transform:scale(0.9); opacity:0; transition:all 0.4s cubic-bezier(0.4,0,0.2,1); }
-            .paywall-modal.active .pw-container { transform:scale(1); opacity:1; }
-            .pw-close { position:absolute; top:16px; right:16px; background:none; border:none; color:#666; font-size:28px; cursor:pointer; width:36px; height:36px; display:flex; align-items:center; justify-content:center; border-radius:50%; transition:all 0.3s; }
-            .pw-close:hover { color:#fff; background:rgba(255,255,255,0.1); }
-            .pw-icon { width:64px; height:64px; margin:0 auto 20px; background:linear-gradient(135deg,#00d4ff,#7b2fff); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:28px; color:#fff; }
-            .pw-title { font-family:'Orbitron',monospace; font-size:22px; font-weight:700; margin-bottom:8px; }
-            .pw-text { color:#888; font-size:14px; margin-bottom:28px; line-height:1.5; }
-            .pw-plans { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:24px; }
-            .pw-plan { background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:20px 16px; cursor:pointer; transition:all 0.3s; text-align:left; position:relative; }
-            .pw-plan:hover { border-color:rgba(0,212,255,0.3); }
-            .pw-plan.selected { border-color:#00d4ff; background:rgba(0,212,255,0.08); }
-            .pw-plan.featured { border-color:rgba(212,168,83,0.3); }
-            .pw-plan-badge { position:absolute; top:-10px; right:12px; background:linear-gradient(135deg,#d4a853,#f0d48a); color:#000; font-size:10px; font-weight:700; padding:3px 8px; border-radius:10px; }
-            .pw-plan-name { font-family:'Orbitron',monospace; font-size:12px; color:#888; margin-bottom:8px; }
-            .pw-plan-price { font-size:24px; font-weight:800; color:#00d4ff; margin-bottom:12px; }
-            .pw-plan-price span { font-size:12px; color:#666; font-weight:400; }
-            .pw-plan-features { list-style:none; }
-            .pw-plan-features li { font-size:12px; color:#888; padding:4px 0; padding-left:16px; position:relative; }
-            .pw-plan-features li::before { content:'✓'; position:absolute; left:0; color:#00d4ff; font-size:10px; }
-            .pw-pay-btn { width:100%; padding:16px; background:linear-gradient(135deg,#00d4ff,#7b2fff); border:none; border-radius:12px; color:#fff; font-size:15px; font-weight:700; font-family:'Orbitron',monospace; letter-spacing:1px; cursor:pointer; transition:all 0.3s; }
-            .pw-pay-btn:hover { transform:translateY(-2px); box-shadow:0 10px 30px rgba(0,212,255,0.3); }
-            .pw-secure { margin-top:16px; font-size:12px; color:#555; }
-            .pw-secure i { color:#00d4ff; margin-right:4px; }
-            @media(max-width:500px) { .pw-plans { grid-template-columns:1fr; } }
-        `;
-        modal.appendChild(style);
 
         let selectedPlan = 'quarterly';
 
@@ -333,6 +322,7 @@ class AuthManager {
                 modal.querySelectorAll('.pw-plan').forEach(p => p.classList.remove('selected'));
                 plan.classList.add('selected');
                 selectedPlan = plan.dataset.plan;
+                sounds.click();
             });
         });
 
@@ -341,32 +331,24 @@ class AuthManager {
         document.getElementById('pwPayBtn').addEventListener('click', async () => {
             const btn = document.getElementById('pwPayBtn');
             btn.disabled = true;
-            btn.textContent = 'PROCESSANDO...';
+            btn.textContent = 'REDIRECIONANDO...';
+            sounds.click();
             try {
-                const createRes = await fetch(`${API_BASE}/subscription/create`, {
+                const res = await fetch(`${API_BASE}/subscription/checkout`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
                     body: JSON.stringify({ plan: selectedPlan })
                 });
-                const createData = await createRes.json();
-                if (!createRes.ok) throw new Error(createData.error);
-
-                const simRes = await fetch(`${API_BASE}/subscription/simulate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({ subscription_id: createData.subscription_id })
-                });
-                const simData = await simRes.json();
-                if (!simRes.ok) throw new Error(simData.error);
-
-                await this.check();
-                this.closeModal('paywallModal');
-                if (window.playAfterAuth) { window.playAfterAuth(); window.playAfterAuth = null; }
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                if (data.url) {
+                    window.location.href = data.url;
+                }
             } catch (err) {
                 btn.textContent = 'ERRO: ' + err.message;
-                setTimeout(() => { btn.textContent = 'ASSINAR AGORA'; btn.disabled = false; }, 2000);
+                sounds.error();
+                setTimeout(() => { btn.textContent = 'ASSINAR AGORA'; btn.disabled = false; }, 2500);
             }
         });
 

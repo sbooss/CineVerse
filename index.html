@@ -42,9 +42,9 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=7">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <link rel="stylesheet" href="style.css?v=9">
 </head>
 <body>
 
@@ -104,6 +104,7 @@
                             <span class="user-sub-status" id="userSubStatus"></span>
                         </div>
                         <div class="user-dropdown-divider"></div>
+                        <a href="/account.html" class="user-dropdown-item"><i class="fas fa-user"></i> Minha Conta</a>
                         <a href="#" class="user-dropdown-item" onclick="event.preventDefault(); auth.closeModal('paywallModal');"><i class="fas fa-crown"></i> Minha Assinatura</a>
                         <a href="#" class="user-dropdown-item" onclick="event.preventDefault(); auth.logout();"><i class="fas fa-sign-out-alt"></i> Sair</a>
                     </div>
@@ -205,11 +206,11 @@
     </footer>
 
     <!-- SCRIPTS -->
-    <script src="config.js?v=8"></script>
-    <script src="tmdb.js?v=8"></script>
-    <script src="auth.js?v=8"></script>
-    <script src="player.js?v=8"></script>
-    <script src="app.js?v=8"></script>
+    <script src="config.js?v=9"></script>
+    <script src="tmdb.js?v=9"></script>
+    <script src="auth.js?v=9"></script>
+    <script src="player.js?v=9"></script>
+    <script src="app.js?v=9"></script>
     <script>
         // Register Service Worker
         if ('serviceWorker' in navigator) {
@@ -297,6 +298,23 @@
 
             // FAILSAFE: if load event never fires or scripts fail, force remove after 4s
             setTimeout(removeBoot, 4000);
+        })();
+
+        // Handle payment success redirect
+        (function() {
+            var params = new URLSearchParams(window.location.search);
+            if (params.get('payment') === 'success') {
+                if (typeof auth !== 'undefined') {
+                    auth.check().then(function() {
+                        showToast('Pagamento confirmado! Assinatura ativada.');
+                    });
+                }
+                window.history.replaceState({}, '', window.location.pathname);
+            }
+            if (params.get('payment') === 'cancelled') {
+                showToast('Pagamento cancelado.');
+                window.history.replaceState({}, '', window.location.pathname);
+            }
         })();
 
         // Global anti-ad blocker - NUCLEAR

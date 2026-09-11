@@ -9,1307 +9,603 @@
     <title>CINE BOSS - Entrar</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        
         :root {
-            --bg-primary: #050508;
-            --bg-secondary: #0a0a12;
-            --neon-blue: #00d4ff;
-            --neon-blue-dim: #0099cc;
-            --neon-purple: #7b2fff;
-            --gold: #d4a853;
-            --gold-light: #f0d48a;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0cc;
-            --text-muted: #5a5a7a;
+            --bg-deep: #050508;
+            --bg-primary: #08080e;
+            --bg-card: #10101c;
+            --bg-elevated: #16162a;
+            --accent-blue: #00a8e0;
+            --accent-blue-bright: #00d4ff;
+            --accent-gold: #c9a54e;
+            --accent-gold-bright: #e0be6a;
+            --text-primary: #e8e8f0;
+            --text-secondary: #8a8aa0;
+            --text-muted: #4a4a60;
+            --border-subtle: rgba(255,255,255,0.04);
+            --border-medium: rgba(255,255,255,0.08);
+            --border-accent: rgba(0,168,224,0.2);
         }
-
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: var(--bg-primary);
+            background: var(--bg-deep);
             color: var(--text-primary);
             overflow: hidden;
-            height: 100vh;
-            width: 100vw;
+            height: 100vh; width: 100vw;
         }
 
         /* ===== CINEMATIC BACKGROUND ===== */
-        .cinematic-bg {
-            position: fixed;
-            inset: 0;
-            z-index: 0;
-            overflow: hidden;
-            perspective: 1000px;
+        .cinema-bg {
+            position: fixed; inset: 0; z-index: 0;
+            overflow: hidden; perspective: 800px;
         }
-
         .bg-gradient {
-            position: absolute;
-            inset: 0;
-            background: 
-                radial-gradient(ellipse at 20% 50%, rgba(0, 212, 255, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 50%, rgba(123, 47, 255, 0.06) 0%, transparent 50%),
-                radial-gradient(ellipse at 50% 100%, rgba(212, 168, 83, 0.04) 0%, transparent 40%),
-                linear-gradient(180deg, rgba(5, 5, 8, 0.3) 0%, rgba(5, 5, 8, 0.7) 50%, rgba(5, 5, 8, 0.95) 100%);
-            z-index: 2;
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse at 20% 50%, rgba(0,168,224,0.06) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 30%, rgba(201,165,78,0.04) 0%, transparent 40%),
+                radial-gradient(ellipse at 50% 80%, rgba(0,0,0,0.8) 0%, transparent 60%);
+            z-index: 5;
         }
-
         .vignette {
-            position: absolute;
-            inset: 0;
-            background: radial-gradient(ellipse at center, transparent 40%, rgba(5, 5, 8, 0.8) 100%);
-            z-index: 3;
+            position: absolute; inset: 0;
+            background: radial-gradient(ellipse at center, transparent 30%, rgba(5,5,8,0.85) 100%);
+            z-index: 6;
+        }
+        .cinema-mask {
+            position: absolute; inset: 0; z-index: 7;
+            pointer-events: none;
+        }
+        .cinema-mask::before {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(90deg, rgba(5,5,8,0.9) 0%, transparent 15%, transparent 85%, rgba(5,5,8,0.9) 100%);
+        }
+        .cinema-mask::after {
+            content: ''; position: absolute; left: 0; right: 0; bottom: 0;
+            height: 40%;
+            background: linear-gradient(0deg, rgba(5,5,8,0.95) 0%, transparent 100%);
         }
 
-        .film-grain {
-            position: absolute;
-            inset: 0;
-            opacity: 0.03;
-            z-index: 4;
-            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-        }
-
-        .carousel-row {
-            position: absolute;
-            display: flex;
-            gap: 12px;
+        /* ===== POSTER ROWS ===== */
+        .poster-row {
+            position: absolute; display: flex; gap: 6px;
             will-change: transform;
         }
-
-        .carousel-row.row-1 { top: 5%; animation: scrollRight 80s linear infinite; }
-        .carousel-row.row-2 { top: 22%; animation: scrollLeft 90s linear infinite; }
-        .carousel-row.row-3 { top: 39%; animation: scrollRight 70s linear infinite; }
-        .carousel-row.row-4 { top: 56%; animation: scrollLeft 85s linear infinite; }
-        .carousel-row.row-5 { top: 73%; animation: scrollRight 75s linear infinite; }
+        .poster-row img {
+            width: 100px; height: 150px;
+            object-fit: cover; border-radius: 4px;
+            opacity: 0.18; filter: brightness(0.5) saturate(0.6);
+            transition: opacity 0.3s;
+        }
+        .poster-row.depth-1 { top: 5%; animation: scrollRight 85s linear infinite; }
+        .poster-row.depth-2 { top: 25%; animation: scrollLeft 95s linear infinite; opacity: 0.7; }
+        .poster-row.depth-2 img { opacity: 0.12; filter: brightness(0.3) saturate(0.4) blur(1px); transform: scale(1.1); }
+        .poster-row.depth-3 { top: 50%; animation: scrollRight 75s linear infinite; }
+        .poster-row.depth-3 img { opacity: 0.22; filter: brightness(0.6) saturate(0.7); }
+        .poster-row.depth-4 { top: 70%; animation: scrollLeft 105s linear infinite; }
+        .poster-row.depth-4 img { opacity: 0.08; filter: brightness(0.25) saturate(0.3) blur(2px); transform: scale(1.2); }
+        .poster-row.depth-5 { top: 85%; animation: scrollRight 90s linear infinite; }
+        .poster-row.depth-5 img { opacity: 0.15; filter: brightness(0.4) saturate(0.5); }
 
         @keyframes scrollRight {
-            from { transform: translateX(0); }
+            from { transform: translateX(-20%); }
             to { transform: translateX(-50%); }
         }
-
         @keyframes scrollLeft {
             from { transform: translateX(-50%); }
-            to { transform: translateX(0); }
+            to { transform: translateX(-20%); }
         }
 
-        .poster-card {
-            flex-shrink: 0;
-            width: 120px;
-            height: 180px;
-            border-radius: 8px;
-            overflow: hidden;
-            position: relative;
-            opacity: 0.15;
-            filter: blur(1px) saturate(0.7);
-            transition: all 0.5s ease;
-            transform-style: preserve-3d;
-        }
-
-        .carousel-row.row-1 .poster-card { opacity: 0.08; filter: blur(2px) saturate(0.5); }
-        .carousel-row.row-2 .poster-card { opacity: 0.12; filter: blur(1.5px) saturate(0.6); }
-        .carousel-row.row-3 .poster-card { opacity: 0.18; filter: blur(0.5px) saturate(0.8); }
-        .carousel-row.row-4 .poster-card { opacity: 0.12; filter: blur(1.5px) saturate(0.6); }
-        .carousel-row.row-5 .poster-card { opacity: 0.08; filter: blur(2px) saturate(0.5); }
-
-        .poster-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        .poster-card::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(180deg, transparent 60%, rgba(5, 5, 8, 0.6) 100%);
-        }
-
-        /* Floating light effects */
+        /* ===== LIGHT ORBS ===== */
         .light-orb {
-            position: absolute;
-            border-radius: 50%;
-            filter: blur(80px);
-            opacity: 0.15;
-            animation: floatOrb 20s ease-in-out infinite;
-            z-index: 1;
+            position: absolute; border-radius: 50%;
+            filter: blur(80px); opacity: 0.15;
+            animation: orbFloat 20s ease-in-out infinite;
+            pointer-events: none;
         }
-
-        .light-orb.orb-1 {
-            width: 400px;
-            height: 400px;
-            background: var(--neon-blue);
-            top: -100px;
-            left: -100px;
-            animation-delay: 0s;
-        }
-
-        .light-orb.orb-2 {
-            width: 350px;
-            height: 350px;
-            background: var(--neon-purple);
-            bottom: -100px;
-            right: -100px;
-            animation-delay: -7s;
-        }
-
-        .light-orb.orb-3 {
-            width: 250px;
-            height: 250px;
-            background: var(--gold);
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            animation-delay: -14s;
-            opacity: 0.08;
-        }
-
-        @keyframes floatOrb {
+        .orb-1 { width: 300px; height: 300px; background: var(--accent-blue); top: 10%; left: 15%; animation-delay: 0s; }
+        .orb-2 { width: 250px; height: 250px; background: var(--accent-gold); top: 60%; right: 10%; animation-delay: -7s; }
+        .orb-3 { width: 200px; height: 200px; background: #7b2fff; bottom: 20%; left: 40%; animation-delay: -13s; }
+        @keyframes orbFloat {
             0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(30px, -20px) scale(1.05); }
-            50% { transform: translate(-20px, 30px) scale(0.95); }
-            75% { transform: translate(20px, 20px) scale(1.02); }
+            33% { transform: translate(30px, -20px) scale(1.1); }
+            66% { transform: translate(-20px, 15px) scale(0.95); }
         }
 
-        /* ===== MAIN CONTAINER ===== */
-        .main-container {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            height: 100vh;
+        /* ===== PARTICLES ===== */
+        .particle {
+            position: absolute; border-radius: 50%;
+            pointer-events: none;
+            animation: particleFloat 12s ease-in-out infinite;
+        }
+        @keyframes particleFloat {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.3; }
+            25% { transform: translateY(-40px) translateX(15px); opacity: 0.6; }
+            50% { transform: translateY(-15px) translateX(-10px); opacity: 0.4; }
+            75% { transform: translateY(-50px) translateX(8px); opacity: 0.5; }
+        }
+
+        /* ===== AUTH CARD ===== */
+        .auth-wrapper {
+            position: fixed; inset: 0; z-index: 10;
+            display: flex; align-items: center; justify-content: center;
             padding: 20px;
         }
-
         .auth-card {
-            width: 100%;
-            max-width: 420px;
-            background: rgba(10, 10, 18, 0.85);
-            backdrop-filter: blur(40px) saturate(150%);
-            -webkit-backdrop-filter: blur(40px) saturate(150%);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 24px;
-            padding: 48px 40px;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 
-                0 0 0 1px rgba(255, 255, 255, 0.03),
-                0 25px 50px -12px rgba(0, 0, 0, 0.5),
-                0 0 100px rgba(0, 212, 255, 0.05);
-            transform-style: preserve-3d;
-            animation: cardAppear 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-            opacity: 0;
+            position: relative; width: 100%; max-width: 400px;
+            background: rgba(12, 12, 22, 0.88);
+            backdrop-filter: blur(40px) saturate(1.4);
+            -webkit-backdrop-filter: blur(40px) saturate(1.4);
+            border: 1px solid var(--border-medium);
+            border-radius: 16px;
+            padding: 36px 28px;
+            z-index: 2;
+            opacity: 0; transform: translateY(30px) scale(0.97);
+            animation: cardAppear 0.6s 0.3s var(--ease-smooth) forwards;
         }
-
+        .auth-card::before {
+            content: ''; position: absolute;
+            top: 0; left: 20%; right: 20%; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--accent-blue), transparent);
+            opacity: 0.5;
+        }
         @keyframes cardAppear {
-            from { opacity: 0; transform: translateY(30px) scale(0.95); }
             to { opacity: 1; transform: translateY(0) scale(1); }
         }
 
-        .auth-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 1px;
-            background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.3), rgba(212, 168, 83, 0.3), transparent);
+        /* ===== LOGO ===== */
+        .auth-logo {
+            text-align: center; margin-bottom: 28px;
         }
-
-        .auth-card::after {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.03) 0%, transparent 50%);
-            pointer-events: none;
-        }
-
-        /* Logo */
-        .logo-section {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .logo-icon {
-            width: 72px;
-            height: 72px;
-            margin: 0 auto 20px;
-            background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(123, 47, 255, 0.1));
-            border: 1px solid rgba(0, 212, 255, 0.2);
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 28px;
-            color: var(--neon-blue);
-            position: relative;
-            animation: logoPulse 3s ease-in-out infinite;
-        }
-
-        .logo-icon::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: 22px;
-            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple), var(--gold));
-            z-index: -1;
-            opacity: 0.3;
-            filter: blur(8px);
-        }
-
-        @keyframes logoPulse {
-            0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 255, 0.2); }
-            50% { box-shadow: 0 0 40px rgba(0, 212, 255, 0.4), 0 0 60px rgba(0, 212, 255, 0.1); }
-        }
-
-        .logo-text {
-            font-family: 'Orbitron', monospace;
-            font-size: 28px;
-            font-weight: 800;
+        .auth-logo-text {
+            font-family: 'Sora', 'Inter', sans-serif;
+            font-size: 24px; font-weight: 800;
             letter-spacing: 3px;
-            background: linear-gradient(135deg, var(--neon-blue), var(--gold-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-shadow: none;
-            margin-bottom: 8px;
+            color: var(--text-primary);
+        }
+        .auth-logo-text .accent { color: var(--accent-blue); }
+        .auth-logo-sub {
+            font-size: 9px; color: var(--text-muted);
+            letter-spacing: 5px; text-transform: uppercase;
+            margin-top: 4px;
         }
 
-        .logo-subtitle {
-            font-size: 12px;
-            color: var(--text-muted);
-            letter-spacing: 4px;
-            text-transform: uppercase;
-        }
-
-        /* Tabs */
+        /* ===== TABS ===== */
         .auth-tabs {
-            display: flex;
-            gap: 4px;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            padding: 4px;
-            margin-bottom: 32px;
-        }
-
-        .auth-tab {
-            flex: 1;
-            padding: 12px;
-            text-align: center;
-            font-size: 14px;
-            font-weight: 600;
-            color: var(--text-muted);
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .auth-tab:hover {
-            color: var(--text-secondary);
-        }
-
-        .auth-tab.active {
-            color: var(--text-primary);
-            background: rgba(0, 212, 255, 0.1);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
-        }
-
-        .auth-tab.active::before {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 30px;
-            height: 2px;
-            background: var(--neon-blue);
-            border-radius: 1px;
-            box-shadow: 0 0 10px var(--neon-blue);
-        }
-
-        /* Form */
-        .auth-form {
-            display: none;
-        }
-
-        .auth-form.active {
-            display: block;
-            animation: formFade 0.4s ease;
-        }
-
-        @keyframes formFade {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        .form-label {
-            display: block;
-            font-size: 12px;
-            font-weight: 600;
-            color: var(--text-muted);
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            margin-bottom: 10px;
-        }
-
-        .input-wrapper {
-            position: relative;
-        }
-
-        .input-icon {
-            position: absolute;
-            left: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 16px;
-            color: var(--text-muted);
-            transition: color 0.3s ease;
-            z-index: 2;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 16px 16px 16px 48px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 15px;
-            font-family: inherit;
-            transition: all 0.3s ease;
-            outline: none;
-        }
-
-        .form-input:focus {
-            border-color: rgba(0, 212, 255, 0.4);
-            background: rgba(0, 212, 255, 0.03);
-            box-shadow: 0 0 20px rgba(0, 212, 255, 0.1), inset 0 0 20px rgba(0, 212, 255, 0.02);
-        }
-
-        .form-input:focus + .input-icon,
-        .form-input:focus ~ .input-icon {
-            color: var(--neon-blue);
-        }
-
-        .form-input::placeholder {
-            color: var(--text-muted);
-        }
-
-        .password-toggle {
-            position: absolute;
-            right: 16px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-size: 16px;
-            color: var(--text-muted);
-            cursor: pointer;
-            z-index: 2;
-            transition: color 0.3s ease;
-        }
-
-        .password-toggle:hover {
-            color: var(--neon-blue);
-        }
-
-        .form-options {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            display: flex; gap: 3px;
             margin-bottom: 24px;
+            background: rgba(255,255,255,0.03);
+            border-radius: 8px; padding: 3px;
         }
-
-        .remember-me {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-
-        .remember-me input[type="checkbox"] {
-            display: none;
-        }
-
-        .checkbox-custom {
-            width: 18px;
-            height: 18px;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            border-radius: 4px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-
-        .remember-me input:checked + .checkbox-custom {
-            background: var(--neon-blue);
-            border-color: var(--neon-blue);
-        }
-
-        .checkbox-custom::after {
-            content: '\f00c';
-            font-family: 'Font Awesome 6 Free';
-            font-weight: 900;
-            font-size: 10px;
-            color: white;
-            opacity: 0;
-            transition: opacity 0.2s ease;
-        }
-
-        .remember-me input:checked + .checkbox-custom::after {
-            opacity: 1;
-        }
-
-        .remember-me span {
-            font-size: 13px;
-            color: var(--text-secondary);
-        }
-
-        .forgot-link {
-            font-size: 13px;
-            color: var(--neon-blue);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .forgot-link:hover {
-            color: var(--gold);
-        }
-
-        /* Submit Button */
-        .submit-btn {
-            width: 100%;
-            padding: 16px;
-            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-size: 15px;
-            font-weight: 700;
-            font-family: 'Orbitron', monospace;
-            letter-spacing: 2px;
-            cursor: pointer;
-            position: relative;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-
-        .submit-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .submit-btn:hover::before {
-            left: 100%;
-        }
-
-        .submit-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3), 0 0 40px rgba(0, 212, 255, 0.1);
-        }
-
-        .submit-btn:active {
-            transform: translateY(0) scale(0.98);
-        }
-
-        .submit-btn:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .submit-btn .btn-text {
-            position: relative;
-            z-index: 2;
-        }
-
-        .submit-btn .btn-loader {
-            display: none;
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-
-        .submit-btn.loading .btn-text { opacity: 0; }
-        .submit-btn.loading .btn-loader { display: block; }
-
-        .spinner {
-            width: 24px;
-            height: 24px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            border-top-color: white;
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-        }
-
-        @keyframes spin {
-            to { transform: rotate(360deg); }
-        }
-
-        /* Error Message */
-        .error-message {
-            display: none;
-            background: rgba(255, 59, 48, 0.1);
-            border: 1px solid rgba(255, 59, 48, 0.3);
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            color: #ff3b30;
-            animation: shake 0.5s ease;
-        }
-
-        .error-message.show {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-5px); }
-            75% { transform: translateX(5px); }
-        }
-
-        /* Success Message */
-        .success-message {
-            display: none;
-            background: rgba(0, 212, 255, 0.1);
-            border: 1px solid rgba(0, 212, 255, 0.3);
-            border-radius: 10px;
-            padding: 12px 16px;
-            margin-bottom: 20px;
-            font-size: 13px;
-            color: var(--neon-blue);
-        }
-
-        .success-message.show {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Footer */
-        .auth-footer {
-            text-align: center;
-            margin-top: 32px;
-            padding-top: 24px;
-            border-top: 1px solid rgba(255, 255, 255, 0.06);
-        }
-
-        .auth-footer p {
-            font-size: 12px;
+        .auth-tab {
+            flex: 1; padding: 10px;
+            background: none; border: none;
             color: var(--text-muted);
+            font-size: 13px; font-weight: 600;
+            cursor: pointer; border-radius: 6px;
+            transition: all 0.2s;
         }
-
-        .auth-footer a {
-            color: var(--neon-blue);
-            text-decoration: none;
+        .auth-tab.active {
+            background: rgba(0,168,224,0.1);
+            color: var(--accent-blue);
         }
+        .auth-tab:hover:not(.active) { color: var(--text-secondary); }
 
-        /* Sound Toggle */
+        /* ===== FORMS ===== */
+        .auth-form { display: none; flex-direction: column; gap: 14px; }
+        .auth-form.active { display: flex; }
+        .auth-field { position: relative; }
+        .auth-field input {
+            width: 100%; padding: 12px 14px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px; color: var(--text-primary);
+            font-size: 13px; outline: none;
+            transition: all 0.2s;
+        }
+        .auth-field input:focus {
+            border-color: var(--border-accent);
+            background: rgba(255,255,255,0.06);
+        }
+        .auth-field input::placeholder { color: var(--text-muted); }
+        .auth-check {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 12px; color: var(--text-muted);
+        }
+        .auth-check input { accent-color: var(--accent-blue); }
+        .auth-error {
+            color: #ff4466; font-size: 12px;
+            min-height: 16px; text-align: center;
+        }
+        .auth-btn {
+            width: 100%; padding: 13px;
+            background: var(--accent-blue);
+            border: none; border-radius: 8px;
+            color: #fff; font-size: 13px; font-weight: 700;
+            letter-spacing: 0.5px; cursor: pointer;
+            transition: all 0.25s;
+            position: relative; overflow: hidden;
+        }
+        .auth-btn:hover {
+            background: #0090c0;
+            box-shadow: 0 0 24px rgba(0,168,224,0.25);
+            transform: translateY(-1px);
+        }
+        .auth-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .auth-btn::after {
+            content: ''; position: absolute;
+            top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+        .auth-btn:hover::after { left: 100%; }
+        .auth-forgot {
+            text-align: center; font-size: 12px;
+            color: var(--text-muted); cursor: pointer;
+            transition: color 0.2s;
+        }
+        .auth-forgot:hover { color: var(--accent-blue); }
+
+        /* ===== SOUND TOGGLE ===== */
         .sound-toggle {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            width: 48px;
-            height: 48px;
-            background: rgba(10, 10, 18, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            position: fixed; top: 16px; right: 16px; z-index: 20;
+            width: 36px; height: 36px;
+            background: rgba(255,255,255,0.04);
+            border: 1px solid var(--border-subtle);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            z-index: 100;
-            transition: all 0.3s ease;
-        }
-
-        .sound-toggle:hover {
-            background: rgba(0, 212, 255, 0.1);
-            border-color: rgba(0, 212, 255, 0.3);
-            color: var(--neon-blue);
-        }
-
-        .sound-toggle.muted {
             color: var(--text-muted);
+            font-size: 14px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
         }
+        .sound-toggle:hover { color: var(--text-primary); background: rgba(255,255,255,0.08); }
+        .sound-toggle.muted { color: var(--accent-gold); }
 
-        /* Particles */
-        .particles {
-            position: fixed;
-            inset: 0;
-            z-index: 1;
-            pointer-events: none;
-            overflow: hidden;
+        /* ===== SUCCESS OVERLAY ===== */
+        .success-overlay {
+            position: fixed; inset: 0; z-index: 100;
+            background: var(--bg-deep);
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.4s;
         }
-
-        .particle {
-            position: absolute;
-            width: 2px;
-            height: 2px;
-            background: var(--neon-blue);
+        .success-overlay.active { opacity: 1; pointer-events: all; }
+        .success-icon {
+            width: 64px; height: 64px;
+            background: rgba(0,168,224,0.1);
             border-radius: 50%;
-            opacity: 0;
-            animation: particleFloat 8s ease-in-out infinite;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; color: var(--accent-blue);
+            margin-bottom: 16px;
+            animation: successPop 0.4s var(--ease-spring);
+        }
+        @keyframes successPop {
+            from { transform: scale(0); } to { transform: scale(1); }
+        }
+        .success-text {
+            font-family: 'Sora', 'Inter', sans-serif;
+            font-size: 18px; font-weight: 700;
+            color: var(--text-primary);
         }
 
-        @keyframes particleFloat {
-            0% { opacity: 0; transform: translateY(100vh) scale(0); }
-            10% { opacity: 0.6; }
-            90% { opacity: 0.6; }
-            100% { opacity: 0; transform: translateY(-100px) scale(1); }
-        }
-
-        /* 3D depth layers */
-        .depth-layer {
-            position: absolute;
-            border-radius: 50%;
-            border: 1px solid rgba(0, 212, 255, 0.05);
-            animation: depthFloat 15s ease-in-out infinite;
-            pointer-events: none;
-        }
-
-        @keyframes depthFloat {
-            0%, 100% { transform: translateZ(0) rotate(0deg); }
-            50% { transform: translateZ(50px) rotate(180deg); }
-        }
-
-        /* Mobile */
-        @media (max-width: 480px) {
-            .auth-card {
-                padding: 36px 24px;
-                border-radius: 20px;
-                margin: 10px;
-            }
-            .logo-text { font-size: 24px; }
-            .logo-icon { width: 60px; height: 60px; font-size: 24px; }
-            .poster-card { width: 80px; height: 120px; }
-        }
-
-        /* Reduced motion */
+        /* ===== REDUCED MOTION ===== */
         @media (prefers-reduced-motion: reduce) {
             *, *::before, *::after {
                 animation-duration: 0.01ms !important;
-                animation-iteration-count: 1 !important;
                 transition-duration: 0.01ms !important;
             }
-            .carousel-row { animation: none !important; }
         }
     </style>
 </head>
 <body>
-    <!-- Cinematic Background -->
-    <div class="cinematic-bg" id="cinematicBg">
-        <div class="bg-gradient"></div>
-        <div class="vignette"></div>
-        <div class="film-grain"></div>
-        
+    <!-- CINEMATIC BACKGROUND -->
+    <div class="cinema-bg">
+        <div class="poster-row depth-1" id="row1"></div>
+        <div class="poster-row depth-2" id="row2"></div>
+        <div class="poster-row depth-3" id="row3"></div>
+        <div class="poster-row depth-4" id="row4"></div>
+        <div class="poster-row depth-5" id="row5"></div>
         <div class="light-orb orb-1"></div>
         <div class="light-orb orb-2"></div>
         <div class="light-orb orb-3"></div>
-        
-        <div class="carousel-row row-1" id="row1"></div>
-        <div class="carousel-row row-2" id="row2"></div>
-        <div class="carousel-row row-3" id="row3"></div>
-        <div class="carousel-row row-4" id="row4"></div>
-        <div class="carousel-row row-5" id="row5"></div>
+        <div class="bg-gradient"></div>
+        <div class="vignette"></div>
+        <div class="cinema-mask"></div>
     </div>
 
-    <!-- Particles -->
-    <div class="particles" id="particles"></div>
+    <!-- SOUND TOGGLE -->
+    <button class="sound-toggle" id="soundToggle" title="Ativar/desativar sons">
+        <i class="fas fa-volume-high"></i>
+    </button>
 
-    <!-- Main Container -->
-    <div class="main-container">
+    <!-- AUTH CARD -->
+    <div class="auth-wrapper">
         <div class="auth-card">
-            <!-- Logo -->
-            <div class="logo-section">
-                <div class="logo-icon">
-                    <i class="fas fa-play"></i>
-                </div>
-                <h1 class="logo-text">CINE BOSS</h1>
-                <p class="logo-subtitle">Premium Streaming</p>
+            <div class="auth-logo">
+                <div class="auth-logo-text">CINE <span class="accent">BOSS</span></div>
+                <div class="auth-logo-sub">STREAMING PREMIUM</div>
             </div>
-
-            <!-- Tabs -->
             <div class="auth-tabs">
-                <div class="auth-tab active" data-tab="login">Entrar</div>
-                <div class="auth-tab" data-tab="register">Cadastrar</div>
+                <button class="auth-tab active" data-tab="login">Entrar</button>
+                <button class="auth-tab" data-tab="register">Cadastrar</button>
             </div>
-
-            <!-- Error/Success Messages -->
-            <div class="error-message" id="errorMessage">
-                <i class="fas fa-exclamation-circle"></i>
-                <span id="errorText"></span>
-            </div>
-            <div class="success-message" id="successMessage">
-                <i class="fas fa-check-circle"></i>
-                <span id="successText"></span>
-            </div>
-
-            <!-- Login Form -->
             <form class="auth-form active" id="loginForm">
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <div class="input-wrapper">
-                        <input type="email" class="form-input" id="loginEmail" placeholder="seu@email.com" required>
-                        <i class="fas fa-envelope input-icon"></i>
-                    </div>
+                <div class="auth-field">
+                    <input type="email" id="loginEmail" placeholder="Email" required autocomplete="email">
                 </div>
-
-                <div class="form-group">
-                    <label class="form-label">Senha</label>
-                    <div class="input-wrapper">
-                        <input type="password" class="form-input" id="loginPassword" placeholder="Sua senha" required>
-                        <i class="fas fa-lock input-icon"></i>
-                        <i class="fas fa-eye password-toggle" id="loginPasswordToggle"></i>
-                    </div>
+                <div class="auth-field">
+                    <input type="password" id="loginPassword" placeholder="Senha" required autocomplete="current-password">
                 </div>
-
-                <div class="form-options">
-                    <label class="remember-me">
-                        <input type="checkbox" id="rememberMe">
-                        <div class="checkbox-custom"></div>
-                        <span>Lembrar sessao</span>
-                    </label>
-                    <a href="#" class="forgot-link" id="forgotPasswordLink">Esqueci a senha</a>
+                <div class="auth-check">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">Lembrar sessao</label>
                 </div>
-
-                <button type="submit" class="submit-btn" id="loginBtn">
-                    <span class="btn-text">ENTRAR</span>
-                    <div class="btn-loader"><div class="spinner"></div></div>
-                </button>
+                <div class="auth-error" id="loginError"></div>
+                <button type="submit" class="auth-btn" id="loginBtn">ENTRAR</button>
+                <div class="auth-forgot" id="forgotPassword">Esqueci minha senha</div>
             </form>
-
-            <!-- Register Form -->
             <form class="auth-form" id="registerForm">
-                <div class="form-group">
-                    <label class="form-label">Nome</label>
-                    <div class="input-wrapper">
-                        <input type="text" class="form-input" id="registerName" placeholder="Seu nome" required>
-                        <i class="fas fa-user input-icon"></i>
-                    </div>
+                <div class="auth-field">
+                    <input type="text" id="regName" placeholder="Nome" required autocomplete="name">
                 </div>
-
-                <div class="form-group">
-                    <label class="form-label">Email</label>
-                    <div class="input-wrapper">
-                        <input type="email" class="form-input" id="registerEmail" placeholder="seu@email.com" required>
-                        <i class="fas fa-envelope input-icon"></i>
-                    </div>
+                <div class="auth-field">
+                    <input type="email" id="regEmail" placeholder="Email" required autocomplete="email">
                 </div>
-
-                <div class="form-group">
-                    <label class="form-label">Senha</label>
-                    <div class="input-wrapper">
-                        <input type="password" class="form-input" id="registerPassword" placeholder="Minimo 6 caracteres" required minlength="6">
-                        <i class="fas fa-lock input-icon"></i>
-                        <i class="fas fa-eye password-toggle" id="registerPasswordToggle"></i>
-                    </div>
+                <div class="auth-field">
+                    <input type="password" id="regPassword" placeholder="Senha (min. 6 caracteres)" required autocomplete="new-password">
                 </div>
-
-                <button type="submit" class="submit-btn" id="registerBtn">
-                    <span class="btn-text">CRIAR CONTA</span>
-                    <div class="btn-loader"><div class="spinner"></div></div>
-                </button>
+                <div class="auth-error" id="regError"></div>
+                <button type="submit" class="auth-btn" id="regBtn">CADASTRAR</button>
             </form>
-
-            <!-- Footer -->
-            <div class="auth-footer">
-                <p>Ao continuar, voce concorda com nossos <a href="#">Termos de Uso</a> e <a href="#">Politica de Privacidade</a>.</p>
-            </div>
         </div>
     </div>
 
-    <!-- Sound Toggle -->
-    <button class="sound-toggle" id="soundToggle">
-        <i class="fas fa-volume-high"></i>
-    </button>
+    <!-- SUCCESS OVERLAY -->
+    <div class="success-overlay" id="successOverlay">
+        <div class="success-icon"><i class="fas fa-check"></i></div>
+        <div class="success-text" id="successText">Bem-vindo ao CINE BOSS</div>
+    </div>
 
     <script>
     (function() {
         'use strict';
+        const API = window.location.origin + '/api';
+        const TMDB_KEY = 'eb9690431d1dd3d86de35def2b1b0a2c';
 
-        // ===== CONFIGURATION =====
-        const API_BASE = window.location.origin + '/api';
-        const TMDB_API_KEY = 'eb9690431d1dd3d86de35def2b1b0a2c';
-        
-        // ===== SOUND SYSTEM =====
-        const SoundManager = {
-            enabled: true,
-            audioContext: null,
-
-            init() {
-                try {
-                    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
-                } catch(e) {
-                    console.log('Web Audio not supported');
-                }
+        /* ===== SOUND SYSTEM ===== */
+        const Sound = {
+            ctx: null, muted: false,
+            init() { if (!this.ctx) this.ctx = new (window.AudioContext || window.webkitAudioContext)(); },
+            tone(freq, dur, type, vol) {
+                if (this.muted || !this.ctx) return;
+                const o = this.ctx.createOscillator(), g = this.ctx.createGain();
+                o.type = type || 'sine'; o.frequency.value = freq;
+                g.gain.setValueAtTime(vol || 0.12, this.ctx.currentTime);
+                g.gain.exponentialRampToValueAtTime(0.001, this.ctx.currentTime + dur);
+                o.connect(g).connect(this.ctx.destination);
+                o.start(); o.stop(this.ctx.currentTime + dur);
             },
-
-            ensureContext() {
-                if (this.audioContext && this.audioContext.state === 'suspended') {
-                    this.audioContext.resume();
-                }
+            success() {
+                this.init();
+                this.tone(523.25, 0.12, 'sine', 0.1);
+                setTimeout(() => this.tone(659.25, 0.12, 'sine', 0.1), 80);
+                setTimeout(() => this.tone(783.99, 0.2, 'sine', 0.13), 160);
             },
-
-            playTone(frequency, duration, type = 'sine', volume = 0.3) {
-                if (!this.enabled || !this.audioContext) return;
-                this.ensureContext();
-                
-                const osc = this.audioContext.createOscillator();
-                const gain = this.audioContext.createGain();
-                
-                osc.type = type;
-                osc.frequency.setValueAtTime(frequency, this.audioContext.currentTime);
-                
-                gain.gain.setValueAtTime(volume, this.audioContext.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + duration);
-                
-                osc.connect(gain);
-                gain.connect(this.audioContext.destination);
-                
-                osc.start(this.audioContext.currentTime);
-                osc.stop(this.audioContext.currentTime + duration);
+            error() {
+                this.init();
+                this.tone(200, 0.2, 'sawtooth', 0.08);
+                setTimeout(() => this.tone(150, 0.25, 'sawtooth', 0.06), 120);
             },
-
-            playChord(frequencies, duration, type = 'sine', volume = 0.2) {
-                frequencies.forEach((freq, i) => {
-                    setTimeout(() => this.playTone(freq, duration, type, volume), i * 50);
-                });
-            },
-
-            coinSound() {
-                // Mario coin-inspired ascending notes (original)
-                this.playTone(987.77, 0.1, 'square', 0.15);
-                setTimeout(() => this.playTone(1318.51, 0.3, 'square', 0.15), 100);
-            },
-
-            pipeSound() {
-                // Pipe/warp descending sweep (original)
-                if (!this.enabled || !this.audioContext) return;
-                this.ensureContext();
-                
-                const osc = this.audioContext.createOscillator();
-                const gain = this.audioContext.createGain();
-                
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(800, this.audioContext.currentTime);
-                osc.frequency.exponentialRampToValueAtTime(200, this.audioContext.currentTime + 0.3);
-                
-                gain.gain.setValueAtTime(0.15, this.audioContext.currentTime);
-                gain.gain.exponentialRampToValueAtTime(0.01, this.audioContext.currentTime + 0.4);
-                
-                osc.connect(gain);
-                gain.connect(this.audioContext.destination);
-                
-                osc.start();
-                osc.stop(this.audioContext.currentTime + 0.4);
-            },
-
-            successSound() {
-                // Success fanfare (original)
-                this.playChord([523.25, 659.25, 783.99], 0.15, 'square', 0.1);
-                setTimeout(() => this.playChord([659.25, 783.99, 1046.50], 0.4, 'square', 0.12), 150);
-            },
-
-            errorSound() {
-                this.playTone(200, 0.15, 'square', 0.1);
-                setTimeout(() => this.playTone(150, 0.2, 'square', 0.1), 150);
-            },
-
-            clickSound() {
-                this.playTone(800, 0.05, 'sine', 0.1);
-            },
-
-            hoverSound() {
-                this.playTone(600, 0.03, 'sine', 0.05);
-            }
+            click() { this.init(); this.tone(800, 0.04, 'sine', 0.06); },
+            toggle() { this.muted = !this.muted; }
         };
 
-        // ===== POSTER LOADER =====
-        const PosterLoader = {
-            cache: [],
-            
-            async loadPopularPosters() {
-                try {
-                    const [moviesRes, tvRes] = await Promise.all([
-                        fetch(`https://api.themoviedb.org/3/movie/popular?api_key=${TMDB_API_KEY}&language=pt-BR&page=1`),
-                        fetch(`https://api.themoviedb.org/3/tv/popular?api_key=${TMDB_API_KEY}&language=pt-BR&page=1`)
-                    ]);
-                    
-                    const movies = await moviesRes.json();
-                    const tv = await tvRes.json();
-                    
-                    const allItems = [...(movies.results || []), ...(tv.results || [])];
-                    this.cache = allItems.filter(item => item.poster_path).map(item => 
-                        `https://image.tmdb.org/t/p/w300${item.poster_path}`
-                    );
-                    
-                    return this.cache;
-                } catch(e) {
-                    console.error('Error loading posters:', e);
-                    return this.getFallbackPosters();
-                }
-            },
-
-            getFallbackPosters() {
-                const colors = ['#1a1a2e', '#16213e', '#0f3460', '#533483', '#2b2d42'];
-                return Array(40).fill(null).map((_, i) => {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = 300;
-                    canvas.height = 450;
-                    const ctx = canvas.getContext('2d');
-                    ctx.fillStyle = colors[i % colors.length];
-                    ctx.fillRect(0, 0, 300, 450);
-                    return canvas.toDataURL();
-                });
-            },
-
-            populateRows(posters) {
-                const rows = ['row1', 'row2', 'row3', 'row4', 'row5'];
-                
-                rows.forEach((rowId, rowIndex) => {
-                    const row = document.getElementById(rowId);
-                    if (!row) return;
-                    
-                    const shuffled = [...posters].sort(() => Math.random() - 0.5);
-                    const duplicated = [...shuffled, ...shuffled];
-                    
-                    row.innerHTML = duplicated.map(src => `
-                        <div class="poster-card">
-                            <img src="${src}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'">
-                        </div>
-                    `).join('');
-                });
-            }
-        };
-
-        // ===== PARTICLES =====
-        const Particles = {
-            container: null,
-            
-            init() {
-                this.container = document.getElementById('particles');
-                this.create(30);
-            },
-
-            create(count) {
-                for (let i = 0; i < count; i++) {
-                    const particle = document.createElement('div');
-                    particle.className = 'particle';
-                    particle.style.left = Math.random() * 100 + '%';
-                    particle.style.animationDelay = Math.random() * 8 + 's';
-                    particle.style.animationDuration = (6 + Math.random() * 6) + 's';
-                    
-                    const colors = ['#00d4ff', '#7b2fff', '#d4a853', '#ffffff'];
-                    particle.style.background = colors[Math.floor(Math.random() * colors.length)];
-                    particle.style.width = (1 + Math.random() * 2) + 'px';
-                    particle.style.height = particle.style.width;
-                    
-                    this.container.appendChild(particle);
-                }
-            }
-        };
-
-        // ===== 3D DEPTH ELEMENTS =====
-        const DepthElements = {
-            init() {
-                const bg = document.getElementById('cinematicBg');
-                for (let i = 0; i < 8; i++) {
-                    const el = document.createElement('div');
-                    el.className = 'depth-layer';
-                    el.style.width = (50 + Math.random() * 150) + 'px';
-                    el.style.height = el.style.width;
-                    el.style.left = Math.random() * 100 + '%';
-                    el.style.top = Math.random() * 100 + '%';
-                    el.style.animationDelay = Math.random() * 15 + 's';
-                    el.style.transform = `translateZ(${-200 + Math.random() * 400}px)`;
-                    bg.appendChild(el);
-                }
-            }
-        };
-
-        // ===== AUTH SYSTEM =====
-        const Auth = {
-            init() {
-                this.bindTabs();
-                this.bindForms();
-                this.bindPasswordToggles();
-                this.bindForgotPassword();
-                this.checkExistingSession();
-            },
-
-            bindTabs() {
-                document.querySelectorAll('.auth-tab').forEach(tab => {
-                    tab.addEventListener('click', () => {
-                        SoundManager.clickSound();
-                        
-                        document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-                        document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-                        
-                        tab.classList.add('active');
-                        const formId = tab.dataset.tab + 'Form';
-                        document.getElementById(formId).classList.add('active');
-                        
-                        this.hideMessages();
-                    });
-                });
-            },
-
-            bindForms() {
-                document.getElementById('loginForm').addEventListener('submit', (e) => this.handleLogin(e));
-                document.getElementById('registerForm').addEventListener('submit', (e) => this.handleRegister(e));
-            },
-
-            bindPasswordToggles() {
-                ['loginPasswordToggle', 'registerPasswordToggle'].forEach(id => {
-                    document.getElementById(id).addEventListener('click', function() {
-                        const input = this.parentElement.querySelector('input');
-                        if (input.type === 'password') {
-                            input.type = 'password';
-                            this.classList.replace('fa-eye', 'fa-eye-slash');
-                        } else {
-                            input.type = 'password';
-                            this.classList.replace('fa-eye-slash', 'fa-eye');
-                        }
-                        SoundManager.clickSound();
-                    });
-                });
-            },
-
-            bindForgotPassword() {
-                document.getElementById('forgotPasswordLink').addEventListener('click', async (e) => {
-                    e.preventDefault();
-                    const email = document.getElementById('loginEmail').value;
-                    
-                    if (!email) {
-                        this.showError('Informe seu email para recuperar a senha');
-                        return;
-                    }
-
-                    try {
-                        const res = await fetch(`${API_BASE}/auth/forgot-password`, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ email })
-                        });
-                        
-                        this.showSuccess('Se o email existir, voce recebera as instrucoes');
-                    } catch(e) {
-                        this.showSuccess('Se o email existir, voce recebera as instrucoes');
-                    }
-                });
-            },
-
-            async checkExistingSession() {
-                try {
-                    const res = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
-                    if (res.ok) {
-                        this.enterPlatform(false);
-                    }
-                } catch(e) {}
-            },
-
-            async handleLogin(e) {
-                e.preventDefault();
-                
-                const email = document.getElementById('loginEmail').value.trim();
-                const password = document.getElementById('loginPassword').value;
-                const remember = document.getElementById('rememberMe').checked;
-
-                if (!email || !password) {
-                    this.showError('Preencha todos os campos');
-                    SoundManager.errorSound();
-                    return;
-                }
-
-                const btn = document.getElementById('loginBtn');
-                btn.classList.add('loading');
-                btn.disabled = true;
-                this.hideMessages();
-
-                try {
-                    const res = await fetch(`${API_BASE}/auth/login`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        credentials: 'include',
-                        body: JSON.stringify({ email, password, remember })
-                    });
-
-                    const data = await res.json();
-
-                    if (!res.ok) {
-                        throw new Error(data.error || 'Erro ao fazer login');
-                    }
-
-                    SoundManager.coinSound();
-                    this.showSuccess('Login realizado com sucesso!');
-                    
-                    setTimeout(() => {
-                        SoundManager.pipeSound();
-                        setTimeout(() => this.enterPlatform(true), 400);
-                    }, 600);
-
-                } catch(error) {
-                    this.showError(error.message);
-                    SoundManager.errorSound();
-                } finally {
-                    btn.classList.remove('loading');
-                    btn.disabled = false;
-                }
-            },
-
-            async handleRegister(e) {
-                e.preventDefault();
-                
-                const name = document.getElementById('registerName').value.trim();
-                const email = document.getElementById('registerEmail').value.trim();
-                const password = document.getElementById('registerPassword').value;
-
-                if (!name || !email || !password) {
-                    this.showError('Preencha todos os campos');
-                    SoundManager.errorSound();
-                    return;
-                }
-
-                if (name.length < 2) {
-                    this.showError('Nome deve ter pelo menos 2 caracteres');
-                    SoundManager.errorSound();
-                    return;
-                }
-
-                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                    this.showError('Email invalido');
-                    SoundManager.errorSound();
-                    return;
-                }
-
-                if (password.length < 6) {
-                    this.showError('Senha deve ter pelo menos 6 caracteres');
-                    SoundManager.errorSound();
-                    return;
-                }
-
-                const btn = document.getElementById('registerBtn');
-                btn.classList.add('loading');
-                btn.disabled = true;
-                this.hideMessages();
-
-                try {
-                    const res = await fetch(`${API_BASE}/auth/register`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        credentials: 'include',
-                        body: JSON.stringify({ name, email, password })
-                    });
-
-                    const data = await res.json();
-
-                    if (!res.ok) {
-                        throw new Error(data.error || 'Erro ao criar conta');
-                    }
-
-                    SoundManager.coinSound();
-                    this.showSuccess('Conta criada com sucesso!');
-                    
-                    setTimeout(() => {
-                        SoundManager.pipeSound();
-                        setTimeout(() => this.enterPlatform(true), 400);
-                    }, 600);
-
-                } catch(error) {
-                    this.showError(error.message);
-                    SoundManager.errorSound();
-                } finally {
-                    btn.classList.remove('loading');
-                    btn.disabled = false;
-                }
-            },
-
-            enterPlatform(isNewLogin) {
-                const card = document.querySelector('.auth-card');
-                card.style.transition = 'all 0.6s cubic-bezier(0.4, 0, 0.2, 1)';
-                card.style.transform = 'scale(0.95) translateY(-20px)';
-                card.style.opacity = '0';
-                
-                document.querySelector('.cinematic-bg').style.transition = 'all 0.8s ease';
-                document.querySelector('.cinematic-bg').style.opacity = '0';
-                
-                setTimeout(() => {
-                    window.location.href = '/';
-                }, 500);
-            },
-
-            showError(msg) {
-                const el = document.getElementById('errorMessage');
-                document.getElementById('errorText').textContent = msg;
-                el.classList.add('show');
-                document.getElementById('successMessage').classList.remove('show');
-            },
-
-            showSuccess(msg) {
-                const el = document.getElementById('successMessage');
-                document.getElementById('successText').textContent = msg;
-                el.classList.add('show');
-                document.getElementById('errorMessage').classList.remove('show');
-            },
-
-            hideMessages() {
-                document.getElementById('errorMessage').classList.remove('show');
-                document.getElementById('successMessage').classList.remove('show');
-            }
-        };
-
-        // ===== SOUND TOGGLE =====
         document.getElementById('soundToggle').addEventListener('click', function() {
-            SoundManager.enabled = !SoundManager.enabled;
+            Sound.toggle();
             this.classList.toggle('muted');
-            const icon = this.querySelector('i');
-            icon.className = SoundManager.enabled ? 'fas fa-volume-high' : 'fas fa-volume-xmark';
-            if (SoundManager.enabled) SoundManager.clickSound();
+            this.querySelector('i').className = Sound.muted ? 'fas fa-volume-xmark' : 'fas fa-volume-high';
         });
 
-        // ===== INIT =====
-        document.addEventListener('click', () => {
-            SoundManager.init();
-        }, { once: true });
+        /* ===== POSTER LOADER ===== */
+        function loadPosters() {
+            fetch(`https://api.themoviedb.org/3/trending/all/week?api_key=${TMDB_KEY}&language=pt-BR`)
+                .then(r => r.json())
+                .then(data => {
+                    const posters = (data.results || [])
+                        .filter(i => i.poster_path)
+                        .map(i => `https://image.tmdb.org/t/p/w200${i.poster_path}`);
+                    if (posters.length === 0) return generateFallback();
+                    const rows = ['row1','row2','row3','row4','row5'];
+                    rows.forEach(id => {
+                        const el = document.getElementById(id);
+                        const shuffled = [...posters].sort(() => Math.random() - 0.5);
+                        el.innerHTML = (shuffled.concat(shuffled)).map(src =>
+                            `<img src="${src}" alt="" loading="lazy">`
+                        ).join('');
+                    });
+                })
+                .catch(() => generateFallback());
+        }
 
-        SoundManager.init();
-        Particles.init();
-        DepthElements.init();
-        Auth.init();
+        function generateFallback() {
+            const colors = ['#006688','#8a7035','#1a1a30','#0a3040','#2a1a08'];
+            const rows = ['row1','row2','row3','row4','row5'];
+            rows.forEach(id => {
+                const el = document.getElementById(id);
+                let html = '';
+                for (let i = 0; i < 15; i++) {
+                    const c = colors[Math.floor(Math.random() * colors.length)];
+                    html += `<div style="width:100px;height:150px;background:${c};border-radius:4px;opacity:0.15;filter:blur(1px)"></div>`;
+                }
+                el.innerHTML = html;
+            });
+        }
 
-        PosterLoader.loadPopularPosters().then(posters => {
-            PosterLoader.populateRows(posters);
+        /* ===== PARTICLES ===== */
+        function createParticles() {
+            const bg = document.querySelector('.cinema-bg');
+            for (let i = 0; i < 20; i++) {
+                const p = document.createElement('div');
+                p.className = 'particle';
+                const size = Math.random() * 3 + 1;
+                const colors = ['rgba(0,168,224,0.4)','rgba(201,165,78,0.3)','rgba(255,255,255,0.3)'];
+                p.style.cssText = `
+                    width:${size}px;height:${size}px;
+                    background:${colors[Math.floor(Math.random()*colors.length)]};
+                    left:${Math.random()*100}%;top:${Math.random()*100}%;
+                    animation-delay:${-Math.random()*12}s;
+                    animation-duration:${8+Math.random()*8}s;
+                `;
+                bg.appendChild(p);
+            }
+        }
+
+        /* ===== TABS ===== */
+        document.querySelectorAll('.auth-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                Sound.click();
+                document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+                this.classList.add('active');
+                document.getElementById(this.dataset.tab + 'Form').classList.add('active');
+            });
         });
 
-        // Hover sounds for interactive elements
-        document.querySelectorAll('.auth-tab, .submit-btn, .forgot-link, .password-toggle').forEach(el => {
-            el.addEventListener('mouseenter', () => SoundManager.hoverSound());
+        /* ===== PASSWORD TOGGLE ===== */
+        document.querySelectorAll('.auth-field input[type="password"]').forEach(input => {
+            const wrap = input.parentElement;
+            const toggle = document.createElement('span');
+            toggle.innerHTML = '<i class="fas fa-eye" style="cursor:pointer;position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:13px"></i>';
+            wrap.style.position = 'relative';
+            wrap.appendChild(toggle);
+            toggle.addEventListener('click', function() {
+                Sound.click();
+                const icon = this.querySelector('i');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    icon.classList.replace('fa-eye', 'fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    icon.classList.replace('fa-eye-slash', 'fa-eye');
+                }
+            });
         });
 
+        /* ===== LOGIN ===== */
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const errEl = document.getElementById('loginError');
+            const btn = document.getElementById('loginBtn');
+            errEl.textContent = '';
+            btn.disabled = true;
+            btn.textContent = 'ENTRANDO...';
+            try {
+                const r = await fetch(`${API}/auth/login`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({
+                        email: document.getElementById('loginEmail').value,
+                        password: document.getElementById('loginPassword').value,
+                        remember: document.getElementById('rememberMe').checked
+                    })
+                });
+                const data = await r.json();
+                if (!r.ok) throw new Error(data.error);
+                Sound.success();
+                showSuccess('Bem-vindo, ' + (data.user.name || 'usuario') + '!');
+                setTimeout(() => window.location.href = '/', 1200);
+            } catch (err) {
+                errEl.textContent = err.message;
+                Sound.error();
+                btn.disabled = false;
+                btn.textContent = 'ENTRAR';
+            }
+        });
+
+        /* ===== REGISTER ===== */
+        document.getElementById('registerForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            const errEl = document.getElementById('regError');
+            const btn = document.getElementById('regBtn');
+            errEl.textContent = '';
+            btn.disabled = true;
+            btn.textContent = 'CADASTRANDO...';
+            try {
+                const name = document.getElementById('regName').value.trim();
+                const email = document.getElementById('regEmail').value.trim();
+                const password = document.getElementById('regPassword').value;
+                if (name.length < 2) throw new Error('Nome deve ter pelo menos 2 caracteres');
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) throw new Error('Email invalido');
+                if (password.length < 6) throw new Error('Senha deve ter pelo menos 6 caracteres');
+                const r = await fetch(`${API}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ name, email, password })
+                });
+                const data = await r.json();
+                if (!r.ok) throw new Error(data.error);
+                Sound.success();
+                showSuccess('Conta criada com sucesso!');
+                setTimeout(() => {
+                    document.querySelectorAll('.auth-tab')[0].click();
+                    document.getElementById('loginEmail').value = email;
+                    document.getElementById('loginPassword').value = password;
+                    document.getElementById('loginError').textContent = 'Conta criada! Faca login.';
+                    document.getElementById('loginError').style.color = 'var(--accent-blue)';
+                }, 1200);
+            } catch (err) {
+                errEl.textContent = err.message;
+                Sound.error();
+                btn.disabled = false;
+                btn.textContent = 'CADASTRAR';
+            }
+        });
+
+        /* ===== FORGOT PASSWORD ===== */
+        document.getElementById('forgotPassword').addEventListener('click', async function() {
+            const email = document.getElementById('loginEmail').value;
+            if (!email) {
+                document.getElementById('loginError').textContent = 'Informe seu email primeiro';
+                return;
+            }
+            try {
+                await fetch(`${API}/auth/forgot-password`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email })
+                });
+                document.getElementById('loginError').textContent = 'Se o email existir, voce recebera as instrucoes.';
+                document.getElementById('loginError').style.color = 'var(--accent-blue)';
+            } catch {
+                document.getElementById('loginError').textContent = 'Erro ao enviar email.';
+            }
+        });
+
+        /* ===== SUCCESS OVERLAY ===== */
+        function showSuccess(text) {
+            document.getElementById('successText').textContent = text;
+            document.getElementById('successOverlay').classList.add('active');
+        }
+
+        /* ===== CHECK EXISTING SESSION ===== */
+        fetch(`${API}/auth/me`, { credentials: 'include' })
+            .then(r => r.json())
+            .then(data => {
+                if (data.loggedIn) window.location.href = '/';
+            })
+            .catch(() => {});
+
+        /* ===== INIT ===== */
+        document.addEventListener('click', () => Sound.init(), { once: true });
+        loadPosters();
+        createParticles();
     })();
     </script>
 </body>

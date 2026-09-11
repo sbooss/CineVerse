@@ -7,505 +7,190 @@
     <title>CINE BOSS - Pagamento</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        
         :root {
-            --bg-primary: #050508;
-            --bg-secondary: #0a0a12;
-            --neon-blue: #00d4ff;
-            --neon-purple: #7b2fff;
-            --gold: #d4a853;
-            --gold-light: #f0d48a;
-            --text-primary: #ffffff;
-            --text-secondary: #b0b0cc;
-            --text-muted: #5a5a7a;
+            --bg-deep: #050508;
+            --bg-elevated: #16162a;
+            --accent-blue: #00a8e0;
+            --accent-gold: #c9a54e;
+            --text-primary: #e8e8f0;
+            --text-secondary: #8a8aa0;
+            --text-muted: #4a4a60;
+            --border-subtle: rgba(255,255,255,0.04);
+            --border-medium: rgba(255,255,255,0.08);
         }
-
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
-            min-height: 100vh;
-        }
-
-        .payment-page {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 40px 20px;
-        }
-
-        .payment-header {
-            text-align: center;
-            margin-bottom: 48px;
-        }
-
-        .payment-logo {
-            font-family: 'Orbitron', monospace;
-            font-size: 24px;
-            font-weight: 800;
-            letter-spacing: 3px;
-            background: linear-gradient(135deg, var(--neon-blue), var(--gold-light));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 16px;
-        }
-
-        .payment-title {
-            font-family: 'Orbitron', monospace;
-            font-size: 28px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .payment-subtitle {
-            color: var(--text-secondary);
-            font-size: 15px;
-        }
-
-        .plans-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
-            margin-bottom: 40px;
-        }
-
-        .plan-card {
-            background: rgba(10, 10, 18, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 20px;
-            padding: 32px;
-            position: relative;
-            overflow: hidden;
-            cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        .plan-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .plan-card:hover {
-            transform: translateY(-4px);
-            border-color: rgba(0, 212, 255, 0.2);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3), 0 0 40px rgba(0, 212, 255, 0.05);
-        }
-
-        .plan-card:hover::before {
-            opacity: 1;
-        }
-
-        .plan-card.selected {
-            border-color: var(--neon-blue);
-            box-shadow: 0 0 30px rgba(0, 212, 255, 0.15);
-        }
-
-        .plan-card.selected::before {
-            opacity: 1;
-        }
-
-        .plan-badge {
-            display: inline-block;
-            background: linear-gradient(135deg, var(--gold), var(--gold-light));
-            color: #000;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            padding: 4px 12px;
-            border-radius: 20px;
-            margin-bottom: 16px;
-        }
-
-        .plan-name {
-            font-family: 'Orbitron', monospace;
-            font-size: 18px;
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .plan-price {
-            font-size: 42px;
-            font-weight: 800;
-            color: var(--neon-blue);
-            margin-bottom: 4px;
-        }
-
-        .plan-price span {
-            font-size: 16px;
-            font-weight: 500;
-            color: var(--text-muted);
-        }
-
-        .plan-duration {
-            color: var(--text-secondary);
-            font-size: 14px;
-            margin-bottom: 24px;
-        }
-
-        .plan-features {
-            list-style: none;
-            margin-bottom: 24px;
-        }
-
-        .plan-features li {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 8px 0;
-            font-size: 14px;
-            color: var(--text-secondary);
-        }
-
-        .plan-features li i {
-            color: var(--neon-blue);
-            font-size: 12px;
-        }
-
-        .select-btn {
-            width: 100%;
-            padding: 14px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .select-btn:hover {
-            background: rgba(0, 212, 255, 0.1);
-            border-color: rgba(0, 212, 255, 0.3);
-        }
-
-        .plan-card.selected .select-btn {
-            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
-            border: none;
-        }
-
-        .payment-section {
-            display: none;
-            background: rgba(10, 10, 18, 0.8);
-            backdrop-filter: blur(20px);
-            border: 1px solid rgba(255, 255, 255, 0.06);
-            border-radius: 20px;
-            padding: 32px;
-            margin-bottom: 32px;
-        }
-
-        .payment-section.active {
-            display: block;
-            animation: slideUp 0.4s ease;
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .section-title {
-            font-family: 'Orbitron', monospace;
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 24px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .section-title i {
-            color: var(--neon-blue);
-        }
-
-        .payment-methods {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-            gap: 12px;
-            margin-bottom: 24px;
-        }
-
-        .payment-method {
-            padding: 16px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 12px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .payment-method:hover {
-            border-color: rgba(0, 212, 255, 0.3);
-            background: rgba(0, 212, 255, 0.05);
-        }
-
-        .payment-method.selected {
-            border-color: var(--neon-blue);
-            background: rgba(0, 212, 255, 0.1);
-        }
-
-        .payment-method i {
-            font-size: 24px;
-            margin-bottom: 8px;
-            display: block;
-            color: var(--text-secondary);
-        }
-
-        .payment-method.selected i {
-            color: var(--neon-blue);
-        }
-
-        .payment-method span {
-            font-size: 12px;
-            color: var(--text-secondary);
-        }
-
-        .pay-btn {
-            width: 100%;
-            padding: 18px;
-            background: linear-gradient(135deg, var(--neon-blue), var(--neon-purple));
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-size: 16px;
-            font-weight: 700;
-            font-family: 'Orbitron', monospace;
-            letter-spacing: 2px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .pay-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
-        }
-
-        .pay-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .pay-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-            transition: left 0.5s ease;
-        }
-
-        .pay-btn:hover::before {
-            left: 100%;
-        }
-
-        .back-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            color: var(--text-secondary);
-            text-decoration: none;
-            font-size: 14px;
-            margin-bottom: 32px;
-            transition: color 0.3s ease;
-        }
-
-        .back-link:hover {
-            color: var(--neon-blue);
-        }
-
-        .security-badge {
-            text-align: center;
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep); color: var(--text-primary);
+            min-height: 100vh; display: flex;
+            align-items: center; justify-content: center;
             padding: 20px;
-            color: var(--text-muted);
-            font-size: 12px;
         }
-
-        .security-badge i {
-            color: var(--neon-blue);
-            margin-right: 6px;
+        .payment-card {
+            width: 100%; max-width: 480px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-medium);
+            border-radius: 16px; padding: 36px 28px;
+            text-align: center;
         }
-
-        @media (max-width: 600px) {
-            .payment-page { padding: 24px 16px; }
-            .payment-title { font-size: 22px; }
-            .plan-price { font-size: 36px; }
-            .plans-grid { grid-template-columns: 1fr; }
+        .payment-logo {
+            font-family: 'Sora', sans-serif;
+            font-size: 20px; font-weight: 800;
+            letter-spacing: 2px; margin-bottom: 24px;
         }
+        .payment-logo .accent { color: var(--accent-blue); }
+        .payment-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 22px; font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .payment-subtitle {
+            font-size: 13px; color: var(--text-muted);
+            margin-bottom: 28px;
+        }
+        .plans { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+        .plan {
+            padding: 18px 14px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-subtle);
+            border-radius: 12px; cursor: pointer;
+            transition: all 0.2s; text-align: left;
+            position: relative;
+        }
+        .plan:hover { border-color: var(--border-medium); }
+        .plan.selected { border-color: var(--accent-blue); background: rgba(0,168,224,0.06); }
+        .plan.featured { border-color: rgba(201,165,78,0.25); }
+        .plan-badge {
+            position: absolute; top: -8px; right: 10px;
+            background: linear-gradient(135deg, #c9a54e, #e0be6a);
+            color: #000; font-size: 9px; font-weight: 700;
+            padding: 2px 8px; border-radius: 8px;
+        }
+        .plan-name {
+            font-family: 'Sora', sans-serif;
+            font-size: 11px; color: var(--text-muted);
+            margin-bottom: 6px; letter-spacing: 0.5px;
+        }
+        .plan-price {
+            font-size: 22px; font-weight: 800;
+            color: var(--accent-blue); margin-bottom: 8px;
+        }
+        .plan-price span { font-size: 11px; color: var(--text-muted); font-weight: 400; }
+        .plan-features { list-style: none; }
+        .plan-features li {
+            font-size: 11px; color: var(--text-muted);
+            padding: 3px 0; padding-left: 14px; position: relative;
+        }
+        .plan-features li::before {
+            content: '\f00c'; font-family: 'Font Awesome 6 Free';
+            font-weight: 900; position: absolute; left: 0;
+            color: var(--accent-blue); font-size: 9px;
+        }
+        .pay-btn {
+            width: 100%; padding: 14px;
+            background: var(--accent-blue);
+            border: none; border-radius: 10px;
+            color: #fff; font-size: 14px; font-weight: 700;
+            letter-spacing: 0.5px; cursor: pointer;
+            transition: all 0.25s;
+        }
+        .pay-btn:hover {
+            background: #0090c0;
+            box-shadow: 0 0 24px rgba(0,168,224,0.25);
+            transform: translateY(-1px);
+        }
+        .pay-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .secure { margin-top: 16px; font-size: 11px; color: var(--text-muted); }
+        .secure i { color: var(--accent-blue); margin-right: 4px; }
+        .error-msg { color: #ff4466; font-size: 12px; margin-top: 12px; min-height: 16px; }
+        @media (max-width: 500px) { .plans { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
-    <div class="payment-page">
-        <a href="/" class="back-link">
-            <i class="fas fa-arrow-left"></i> Voltar a plataforma
-        </a>
-
-        <div class="payment-header">
-            <div class="payment-logo">CINE BOSS</div>
-            <h1 class="payment-title">Escolha seu acesso</h1>
-            <p class="payment-subtitle">Desbloqueie todo o conteudo da plataforma</p>
-        </div>
-
-        <div class="plans-grid">
-            <div class="plan-card" data-plan="monthly">
-                <div class="plan-name">CINE BOSS MENSAL</div>
-                <div class="plan-price">R$ 4,99 <span>/mes</span></div>
-                <div class="plan-duration">30 dias de acesso</div>
+    <div class="payment-card">
+        <div class="payment-logo">CINE <span class="accent">BOSS</span></div>
+        <h1 class="payment-title">Escolha seu plano</h1>
+        <p class="payment-subtitle">Pagamento unico. Sem renovação automatica.</p>
+        <div class="plans">
+            <div class="plan" data-plan="monthly">
+                <div class="plan-name">CINE BOSS</div>
+                <div class="plan-price">R$ 4,99<span>/30 dias</span></div>
                 <ul class="plan-features">
-                    <li><i class="fas fa-check"></i> Acesso ilimitado a todos os filmes</li>
-                    <li><i class="fas fa-check"></i> Acesso ilimitado a todas as series</li>
-                    <li><i class="fas fa-check"></i> Qualidade ate 1080p</li>
-                    <li><i class="fas fa-check"></i> Sem anuncios</li>
+                    <li>Todos os filmes e series</li>
+                    <li>Qualidade ate 1080p</li>
+                    <li>Sem anuncios</li>
                 </ul>
-                <button class="select-btn">Selecionar</button>
             </div>
-
-            <div class="plan-card" data-plan="quarterly">
+            <div class="plan featured selected" data-plan="quarterly">
                 <div class="plan-badge">ECONOMIZE 25%</div>
-                <div class="plan-name">CINE BOSS TRIMESTRAL</div>
-                <div class="plan-price">R$ 14,99 <span>/3 meses</span></div>
-                <div class="plan-duration">90 dias de acesso</div>
+                <div class="plan-name">CINE BOSS</div>
+                <div class="plan-price">R$ 14,99<span>/90 dias</span></div>
                 <ul class="plan-features">
-                    <li><i class="fas fa-check"></i> Tudo do plano mensal</li>
-                    <li><i class="fas fa-check"></i> Economia de R$ 4,98</li>
-                    <li><i class="fas fa-check"></i> Acesso garantido por 3 meses</li>
-                    <li><i class="fas fa-check"></i> Suporte prioritario</li>
+                    <li>Tudo do mensal</li>
+                    <li>Economia de R$ 4,98</li>
+                    <li>Suporte prioritario</li>
                 </ul>
-                <button class="select-btn">Selecionar</button>
             </div>
         </div>
-
-        <div class="payment-section" id="paymentSection">
-            <h2 class="section-title">
-                <i class="fas fa-credit-card"></i>
-                Forma de pagamento
-            </h2>
-
-            <div class="payment-methods">
-                <div class="payment-method selected" data-method="pix">
-                    <i class="fas fa-qrcode"></i>
-                    <span>PIX</span>
-                </div>
-                <div class="payment-method" data-method="card">
-                    <i class="fas fa-credit-card"></i>
-                    <span>Cartao</span>
-                </div>
-                <div class="payment-method" data-method="boleto">
-                    <i class="fas fa-barcode"></i>
-                    <span>Boleto</span>
-                </div>
-            </div>
-
-            <button class="pay-btn" id="payBtn">
-                <span class="btn-text">CONTINUAR PARA PAGAMENTO</span>
-                <div class="btn-loader" style="display:none"><div class="spinner" style="width:24px;height:24px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite"></div></div>
-            </button>
-
-            <div class="security-badge">
-                <i class="fas fa-shield-halved"></i>
-                Pagamento 100% seguro e criptografado
-            </div>
-        </div>
+        <button class="pay-btn" id="payBtn">CONTINUAR PARA PAGAMENTO</button>
+        <div class="secure"><i class="fas fa-shield-halved"></i> Pagamento 100% seguro via Stripe</div>
+        <div class="error-msg" id="errorMsg"></div>
     </div>
-
-    <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 
     <script>
     (function() {
-        const API_BASE = window.location.origin + '/api';
-        let selectedPlan = null;
-        let selectedMethod = 'pix';
+        const API = window.location.origin + '/api';
+        let selectedPlan = 'quarterly';
 
         // Check auth
-        fetch(`${API_BASE}/auth/me`, { credentials: 'include' })
-            .then(r => { if (!r.ok) window.location.href = '/login.html'; })
-            .catch(() => {});
+        fetch(`${API}/auth/me`, { credentials: 'include' })
+            .then(r => r.json())
+            .then(d => { if (!d.loggedIn) window.location.href = '/login.html'; })
+            .catch(() => window.location.href = '/login.html');
 
-        // Check URL params
+        // URL param
         const params = new URLSearchParams(window.location.search);
         const planParam = params.get('plan');
-        if (planParam) {
+        if (planParam === 'monthly' || planParam === 'quarterly') {
             selectedPlan = planParam;
-            document.querySelector(`[data-plan="${planParam}"]`)?.classList.add('selected');
-            document.getElementById('paymentSection').classList.add('active');
+            document.querySelectorAll('.plan').forEach(p => p.classList.remove('selected'));
+            document.querySelector(`[data-plan="${planParam}"]`).classList.add('selected');
         }
 
         // Plan selection
-        document.querySelectorAll('.plan-card').forEach(card => {
-            card.addEventListener('click', () => {
-                document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
-                card.classList.add('selected');
-                selectedPlan = card.dataset.plan;
-                document.getElementById('paymentSection').classList.add('active');
+        document.querySelectorAll('.plan').forEach(plan => {
+            plan.addEventListener('click', function() {
+                document.querySelectorAll('.plan').forEach(p => p.classList.remove('selected'));
+                this.classList.add('selected');
+                selectedPlan = this.dataset.plan;
             });
         });
 
-        // Payment method
-        document.querySelectorAll('.payment-method').forEach(method => {
-            method.addEventListener('click', () => {
-                document.querySelectorAll('.payment-method').forEach(m => m.classList.remove('selected'));
-                method.classList.add('selected');
-                selectedMethod = method.dataset.method;
-            });
-        });
-
-        // Pay
-        document.getElementById('payBtn').addEventListener('click', async () => {
-            if (!selectedPlan) return;
-
-            const btn = document.getElementById('payBtn');
+        // Pay button
+        document.getElementById('payBtn').addEventListener('click', async function() {
+            const btn = this;
             btn.disabled = true;
-            btn.querySelector('.btn-text').style.opacity = '0';
-            btn.querySelector('.btn-loader').style.display = 'block';
-
+            btn.textContent = 'REDIRECIONANDO...';
+            document.getElementById('errorMsg').textContent = '';
             try {
-                const createRes = await fetch(`${API_BASE}/subscription/create`, {
+                const res = await fetch(`${API}/subscription/checkout`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     credentials: 'include',
                     body: JSON.stringify({ plan: selectedPlan })
                 });
-
-                const createData = await createRes.json();
-
-                if (!createRes.ok) throw new Error(createData.error);
-
-                const simRes = await fetch(`${API_BASE}/webhook/simulate`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    credentials: 'include',
-                    body: JSON.stringify({ 
-                        subscription_id: createData.subscription_id,
-                        payment_id: createData.payment_id
-                    })
-                });
-
-                const simData = await simRes.json();
-
-                if (!simRes.ok) throw new Error(simData.error);
-
-                window.location.href = '/?payment=success';
-            } catch(error) {
-                alert(error.message || 'Erro ao processar pagamento');
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error);
+                if (data.url) {
+                    window.location.href = data.url;
+                }
+            } catch (err) {
+                document.getElementById('errorMsg').textContent = err.message || 'Erro ao processar pagamento';
                 btn.disabled = false;
-                btn.querySelector('.btn-text').style.opacity = '1';
-                btn.querySelector('.btn-loader').style.display = 'none';
+                btn.textContent = 'CONTINUAR PARA PAGAMENTO';
             }
         });
     })();

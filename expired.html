@@ -3,83 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CINE BOSS</title>
+    <meta name="theme-color" content="#050508">
+    <title>CINE BOSS - Acesso Expirado</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg-deep: #050508;
+            --bg-elevated: #16162a;
+            --accent-blue: #00a8e0;
+            --accent-gold: #c9a54e;
+            --text-primary: #e8e8f0;
+            --text-secondary: #8a8aa0;
+            --text-muted: #4a4a60;
+            --border-subtle: rgba(255,255,255,0.04);
+            --border-medium: rgba(255,255,255,0.08);
+        }
         body {
             font-family: 'Inter', sans-serif;
-            background: #050508;
-            color: #fff;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background: var(--bg-deep); color: var(--text-primary);
+            min-height: 100vh; display: flex;
+            align-items: center; justify-content: center;
+            padding: 20px;
         }
-        .expired-container {
-            max-width: 500px;
-            padding: 40px;
+        .expired-card {
+            width: 100%; max-width: 400px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-medium);
+            border-radius: 16px; padding: 36px 28px;
             text-align: center;
         }
         .expired-icon {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 24px;
-            background: rgba(255, 59, 48, 0.1);
-            border: 1px solid rgba(255, 59, 48, 0.3);
+            width: 64px; height: 64px;
+            margin: 0 auto 18px;
+            background: rgba(255,68,102,0.08);
             border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 32px;
-            color: #ff3b30;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 28px; color: #ff4466;
         }
         .expired-title {
-            font-family: 'Orbitron', monospace;
-            font-size: 24px;
-            font-weight: 700;
-            margin-bottom: 12px;
+            font-family: 'Sora', sans-serif;
+            font-size: 22px; font-weight: 700;
+            margin-bottom: 8px;
         }
         .expired-text {
-            color: #b0b0cc;
-            font-size: 15px;
-            line-height: 1.6;
-            margin-bottom: 32px;
+            font-size: 13px; color: var(--text-muted);
+            line-height: 1.6; margin-bottom: 24px;
         }
         .renew-btn {
-            display: inline-block;
-            padding: 14px 40px;
-            background: linear-gradient(135deg, #00d4ff, #7b2fff);
-            border: none;
-            border-radius: 12px;
-            color: white;
-            font-size: 15px;
-            font-weight: 700;
-            font-family: 'Orbitron', monospace;
-            letter-spacing: 1px;
-            cursor: pointer;
-            text-decoration: none;
-            transition: all 0.3s ease;
+            width: 100%; padding: 14px;
+            background: var(--accent-blue);
+            border: none; border-radius: 10px;
+            color: #fff; font-size: 14px; font-weight: 700;
+            letter-spacing: 0.5px; cursor: pointer;
+            transition: all 0.25s;
         }
         .renew-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 30px rgba(0, 212, 255, 0.3);
+            background: #0090c0;
+            box-shadow: 0 0 24px rgba(0,168,224,0.25);
+            transform: translateY(-1px);
         }
+        .back-link {
+            display: block; margin-top: 14px;
+            font-size: 12px; color: var(--text-muted);
+            cursor: pointer; transition: color 0.2s;
+        }
+        .back-link:hover { color: var(--accent-blue); }
     </style>
 </head>
 <body>
-    <div class="expired-container">
-        <div class="expired-icon">
-            <i class="fas fa-clock-rotate-left"></i>
-        </div>
-        <h1 class="expired-title">Assinatura Expirada</h1>
-        <p class="expired-text">
-            Sua assinatura CINE BOSS expirou. Para continuar assistindo todo o conteudo da plataforma, renove seu acesso.
-        </p>
+    <div class="expired-card">
+        <div class="expired-icon"><i class="fas fa-clock-rotate-left"></i></div>
+        <h1 class="expired-title">Acesso Expirado</h1>
+        <p class="expired-text">Sua assinatura CINE BOSS expirou. Para continuar assistindo, renove seu acesso.</p>
         <a href="/payment.html" class="renew-btn">RENOVAR ACESSO</a>
+        <a href="/" class="back-link">Voltar para o inicio</a>
     </div>
 </body>
 </html>

@@ -1,5 +1,5 @@
 /* =====================================================
-   CINE BOSS - Premium Streaming App v6
+   CINE BOSS - Premium Streaming App v7
    Uses TMDBAPI class from tmdb.js
    ===================================================== */
 
