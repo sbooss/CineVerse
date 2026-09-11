@@ -58,7 +58,24 @@ const CONFIG = {
             'casalemedia.com', 'criteo.com', 'criteo.net',
             'popads.net', 'popcash.net', 'propellerads.com',
             'clickadu.com', 'monetag.com', 'adsterra.com',
-            'hilltopads.com', 'exoclick.com', 'taboola.com', 'outbrain.com'
+            'hilltopads.com', 'exoclick.com', 'taboola.com', 'outbrain.com',
+            'rubiconproject.com', 'openx.net', 'pubmatic.com', 'adform.com',
+            'serving-sys.com', 'advertising.com', 'mathtag.com', 'turn.com',
+            'bidswitch.net', 'spotxchange.com', 'iphelix.com',
+            'ads.google.com', 'pagead2.googlesyndication.com',
+            'moatads.com', 'quantserve.com', 'scorecardresearch.com',
+            'bluekai.com', 'demdex.net', 'everesttech.net',
+            'krxd.net', 'nexac.com', 'adjug.com', 'advertising.com',
+            'tribalfusion.com', 'mediaplex.com', 'simplifydigital.com',
+            'realmedia.com', '247realmedia.com', 'map.fastly.net',
+            'advertising.com', 'serving-sys.com', 'adnxs.com',
+            'pops.fastly.net', 'cdn STDCALL.net', 'fastly.net',
+            'akanoo.com', 'trkvsg.com', 'adty.com', 'nsgzip.com',
+            'cdnfacebook.net', 'sdkstream.com', 'ad-maven.com',
+            'evadav.com', 'pushprofit.net', 'pushwoosh.com',
+            'richpush.com', 'notifpush.com', 'carpush.net',
+            'pushame.com', 'pushworld.com', 'webpushme.com',
+            'popcashjs.com', 'poptm.com', 'ajsجزاء.com'
         ]
     }
 };

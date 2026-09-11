@@ -4,6 +4,7 @@ class VideoPlayer {
         this.wrapper = document.getElementById('playerWrapper');
         this.titleEl = document.getElementById('playerTitle');
         this.backBtn = document.getElementById('playerBack');
+        this._setupGlobalAntiAds();
         this._setupAntiAds();
         this._setupFullscreenLock();
         this.backBtn.addEventListener('click', () => this.close());
@@ -12,64 +13,78 @@ class VideoPlayer {
         });
     }
 
-    _setupAntiAds() {
-        // Kill window.open entirely
-        const origOpen = window.open;
+    _setupGlobalAntiAds() {
+        if (window._globalAntiAdsSetup) return;
+        window._globalAntiAdsSetup = true;
+
+        // Kill window.open globally and permanently
         window.open = function() { return null; };
         window.open.toString = function() { return 'function open() { [native code] }'; };
-
-        // Block navigation
-        window.addEventListener('beforeunload', (e) => {
-            if (this.isOpen()) {
-                e.preventDefault();
-                e.returnValue = '';
-                return '';
-            }
+        Object.defineProperty(window, 'open', {
+            value: function() { return null; },
+            writable: false,
+            configurable: false
         });
 
-        // Intercept ALL clicks globally - block ads, popups, redirects
+        // Block all navigation attempts
+        window.addEventListener('beforeunload', (e) => {
+            e.preventDefault();
+            e.returnValue = '';
+            return '';
+        });
+
+        // Block location changes
+        const origAssign = window.location.assign;
+        const origReplace = window.location.replace;
+        Object.defineProperty(window, 'location', {
+            get: function() { return window._safeLocation || window.location; },
+            set: function() { return false; }
+        });
+
+        // Block all link clicks globally
         document.addEventListener('click', (e) => {
-            if (!this.isOpen()) return;
             const target = e.target;
 
-            // Block any link navigation
+            // Block ANY link navigation
             const link = target.closest('a');
             if (link) {
                 const href = link.getAttribute('href') || '';
-                const target = link.getAttribute('target') || '';
-                if (target === '_blank' || target === '_top' || href.startsWith('javascript:') || href === '#' || href === '') {
+                const targetAttr = link.getAttribute('target') || '';
+                if (targetAttr === '_blank' || targetAttr === '_top' || href.startsWith('javascript:') || href === '#' || href === '' || !href.startsWith(window.location.origin)) {
                     e.preventDefault();
                     e.stopPropagation();
+                    e.stopImmediatePropagation();
                     return false;
                 }
             }
 
-            // Block onclick handlers with window.open or _blank
+            // Block onclick handlers with window.open
             const onclickEl = target.closest('[onclick]');
             if (onclickEl) {
                 const onclick = onclickEl.getAttribute('onclick') || '';
-                if (onclick.includes('window.open') || onclick.includes('_blank') || onclick.includes('void(0)')) {
+                if (onclick.includes('window.open') || onclick.includes('_blank') || onclick.includes('void(0)') || onclick.includes('popup')) {
                     e.preventDefault();
                     e.stopPropagation();
+                    e.stopImmediatePropagation();
                     return false;
                 }
             }
 
-            // Block elements that look like ad overlays (fixed/absolute positioned, high z-index)
+            // Block elements that look like ad overlays
             const style = window.getComputedStyle(target);
             if ((style.position === 'fixed' || style.position === 'absolute') && parseInt(style.zIndex) > 9000) {
                 if (!target.closest('.player-header') && !target.closest('#playerBack') && !target.closest('.provider-selector') && !target.closest('.provider-list')) {
                     e.preventDefault();
                     e.stopPropagation();
-                    target.remove();
+                    e.stopImmediatePropagation();
+                    try { target.remove(); } catch(ex) {}
                     return false;
                 }
             }
         }, true);
 
-        // MutationObserver - kill any popup elements added to DOM
+        // MutationObserver - kill any popup elements
         const adObserver = new MutationObserver((mutations) => {
-            if (!this.isOpen()) return;
             mutations.forEach((m) => {
                 m.addedNodes.forEach((node) => {
                     if (node.nodeType !== 1) return;
@@ -80,59 +95,62 @@ class VideoPlayer {
                         node.classList.contains('popup') ||
                         node.classList.contains('overlay-ad') ||
                         node.classList.contains('modal-ad') ||
+                        node.classList.contains('backdrop') ||
                         node.id.includes('ad') ||
                         node.id.includes('popup') ||
-                        node.id.includes('interstitial')
+                        node.id.includes('interstitial') ||
+                        node.id.includes('modal')
                     )) {
-                        node.remove();
+                        try { node.remove(); } catch(ex) {}
                         return;
                     }
-                    // Fix links in added nodes
+                    // Fix ALL links in added nodes
                     if (node.tagName === 'A') {
-                        const t = node.getAttribute('target') || '';
-                        if (t === '_blank' || t === '_top') {
-                            node.removeAttribute('target');
-                            node.href = 'javascript:void(0)';
-                        }
+                        node.removeAttribute('target');
+                        node.href = 'javascript:void(0)';
+                        node.onclick = function() { return false; };
                     }
                     if (node.querySelectorAll) {
-                        node.querySelectorAll('a[target="_blank"], a[target="_top"]').forEach(a => {
+                        node.querySelectorAll('a').forEach(a => {
                             a.removeAttribute('target');
                             a.href = 'javascript:void(0)';
+                            a.onclick = function() { return false; };
                         });
                     }
-                    // Remove fixed/absolute elements with high z-index that aren't part of our player
+                    // Remove fixed/absolute elements with high z-index
                     if (node.style) {
-                        const pos = window.getComputedStyle(node).position;
-                        const z = parseInt(window.getComputedStyle(node).zIndex);
-                        if ((pos === 'fixed' || pos === 'absolute') && z > 9000) {
-                            if (!node.classList.contains('player-header') && !node.id.includes('playerBack') && !node.classList.contains('provider-selector') && !node.classList.contains('provider-list')) {
-                                setTimeout(() => node.remove(), 100);
+                        try {
+                            const pos = window.getComputedStyle(node).position;
+                            const z = parseInt(window.getComputedStyle(node).zIndex);
+                            if ((pos === 'fixed' || pos === 'absolute') && z > 9000) {
+                                if (!node.classList.contains('player-header') && !node.id.includes('playerBack') && !node.classList.contains('provider-selector') && !node.classList.contains('provider-list')) {
+                                    setTimeout(() => { try { node.remove(); } catch(ex) {} }, 50);
+                                }
                             }
-                        }
+                        } catch(ex) {}
                     }
                 });
             });
         });
         adObserver.observe(document.body, { childList: true, subtree: true });
 
-        // Block timed popups (setTimeout/setInterval that open windows)
+        // Block timed popups
         const origSetTimeout = window.setTimeout;
         const origSetInterval = window.setInterval;
         window.setTimeout = function(fn, delay) {
-            if (typeof fn === 'string' && (fn.includes('window.open') || fn.includes('popup') || fn.includes('ad'))) {
+            if (typeof fn === 'string' && (fn.includes('window.open') || fn.includes('popup') || fn.includes('ad') || fn.includes('redirect'))) {
                 return 0;
             }
             return origSetTimeout.call(window, fn, delay);
         };
         window.setInterval = function(fn, delay) {
-            if (typeof fn === 'string' && (fn.includes('window.open') || fn.includes('popup') || fn.includes('ad'))) {
+            if (typeof fn === 'string' && (fn.includes('window.open') || fn.includes('popup') || fn.includes('ad') || fn.includes('redirect'))) {
                 return 0;
             }
             return origSetInterval.call(window, fn, delay);
         };
 
-        // Block ad domain requests via fetch/XHR override
+        // Block ad domain requests via fetch/XHR
         const origFetch = window.fetch;
         window.fetch = function(url, opts) {
             if (typeof url === 'string') {
@@ -179,40 +197,57 @@ class VideoPlayer {
             }
             return el;
         };
-    }
 
-    _setupPopupBlocker() {
-        // Additional popup blocking via event delegation
+        // Block middle-click globally
         document.addEventListener('mousedown', (e) => {
-            if (!this.isOpen()) return;
-            const target = e.target;
-            // Block middle-click (often opens in new tab)
             if (e.button === 1) {
-                e.preventDefault();
-                return false;
-            }
-            // Block right-click context menu on player (prevent "open in new tab")
-            if (target.closest('.video-iframe') || target.closest('#playerWrapper')) {
                 e.preventDefault();
                 return false;
             }
         }, true);
 
-        // Prevent new windows via keyboard shortcuts (Ctrl+click, middle-click)
+        // Block Ctrl+click globally
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                return false;
+            }
+        }, true);
+    }
+
+    _setupAntiAds() {
+        // Additional player-specific protections
+        this.overlay.addEventListener('click', (e) => {
+            const target = e.target;
+            // Block clicks on anything that isn't our UI
+            if (!target.closest('.player-header') && !target.closest('#playerBack') && !target.closest('.provider-selector') && !target.closest('.provider-list') && !target.closest('.change-provider-btn') && !target.closest('.provider-btn') && !target.closest('.player-error') && !target.closest('button')) {
+                // If clicking on the overlay background, do nothing
+                if (target === this.overlay || target.classList.contains('player-bg')) {
+                    return;
+                }
+                // Otherwise, prevent and stop propagation
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+            }
+        }, true);
+
+        // Block all keyboard events except Escape
         document.addEventListener('keydown', (e) => {
             if (!this.isOpen()) return;
-            // Block Ctrl+click (open in new tab)
-            if (e.ctrlKey || e.metaKey) {
-                if (e.target.closest('.video-iframe') || e.target.closest('#playerWrapper')) {
-                    e.preventDefault();
-                    return false;
-                }
+            if (e.key === 'Escape') {
+                this.close();
+                return;
+            }
+            // Block all other keys when player is open
+            if (!e.target.closest('.provider-list')) {
+                e.preventDefault();
+                e.stopPropagation();
             }
         }, true);
     }
 
     _setupFullscreenLock() {
-        // Prevent ads from exiting fullscreen
         const lockFullscreen = () => {
             if (!document.fullscreenElement && this.overlay.classList.contains('active')) {
                 try {
@@ -223,12 +258,10 @@ class VideoPlayer {
 
         document.addEventListener('fullscreenchange', () => {
             if (this.isOpen() && !document.fullscreenElement) {
-                // Someone exited fullscreen - re-enter it
                 setTimeout(lockFullscreen, 500);
             }
         });
 
-        // Override exitFullscreen when player is open
         const origExit = document.exitFullscreen.bind(document);
         document.exitFullscreen = () => {
             if (this.isOpen()) return Promise.reject();
@@ -244,12 +277,14 @@ class VideoPlayer {
         this.titleEl.textContent = item.title;
         this.overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
+        document.body.classList.add('player-open');
         this._loadEmbed(item, season, episode);
     }
 
     close() {
         this.overlay.classList.remove('active');
         document.body.style.overflow = '';
+        document.body.classList.remove('player-open');
         this.wrapper.innerHTML = '';
         if (document.fullscreenElement) {
             document.exitFullscreen().catch(() => {});
@@ -268,32 +303,44 @@ class VideoPlayer {
                     <div class="player-error">
                         <i class="fas fa-exclamation-triangle"></i>
                         <p>Nenhum servidor disponivel</p>
-                        <button class="btn-secondary" onclick="player.close()" style="margin-top:15px">
+                        <button class="btn-secondary" id="playerErrorBack" style="margin-top:15px">
                             <i class="fas fa-arrow-left"></i> Voltar
                         </button>
                     </div>`;
+                document.getElementById('playerErrorBack').addEventListener('click', () => this.close());
                 return;
             }
 
             const p = providers[index];
             const url = type === 'tv' ? p.tv(tmdbId, season, episode) : p.movie(tmdbId);
 
+            // Create sandboxed iframe - CRITICAL for preventing popups
             this.wrapper.innerHTML = `
                 <div class="provider-selector">
                     <span class="current-provider">${p.name}</span>
-                    <button class="change-provider-btn" onclick="player.showServers()">
+                    <button class="change-provider-btn" id="changeProviderBtn">
                         <i class="fas fa-exchange-alt"></i> Trocar Server
                     </button>
-                </div>
-                <iframe 
-                    src="${url}" 
-                    frameborder="0" 
-                    allowfullscreen 
-                    allow="autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-                    class="video-iframe"
-                    onload="this.style.opacity=1"
-                    onerror="player._nextProvider()">
-                </iframe>`;
+                </div>`;
+
+            const iframe = document.createElement('iframe');
+            iframe.setAttribute('src', url);
+            iframe.setAttribute('frameborder', '0');
+            iframe.setAttribute('allowfullscreen', 'true');
+            iframe.setAttribute('allow', 'autoplay; encrypted-media; gyroscope; picture-in-picture');
+            iframe.setAttribute('class', 'video-iframe');
+            // SANDBOX - blocks popups, new windows, forms, etc.
+            iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation allow-popups-to-escape-sandbox');
+            iframe.setAttribute('referrerpolicy', 'no-referrer');
+            iframe.setAttribute('loading', 'eager');
+            iframe.style.opacity = '0';
+            iframe.style.transition = 'opacity 0.3s';
+            iframe.onload = function() { this.style.opacity = '1'; };
+            iframe.onerror = function() { player._nextProvider(); };
+
+            this.wrapper.appendChild(iframe);
+
+            document.getElementById('changeProviderBtn').addEventListener('click', () => this.showServers());
 
             currentIndex = index;
             this._currentProviders = providers;
@@ -319,12 +366,22 @@ class VideoPlayer {
         if (!this._currentProviders) return;
         let html = '<div class="provider-list"><h3>Escolha o Server</h3><div class="provider-grid">';
         this._currentProviders.forEach((p, i) => {
-            html += `<button class="provider-btn ${i === this._currentIndex ? 'active' : ''}" onclick="player._switchServer(${i})">${p.name}</button>`;
+            html += `<button class="provider-btn ${i === this._currentIndex ? 'active' : ''}" data-server="${i}">${p.name}</button>`;
         });
         html += '</div></div>';
         const existing = this.wrapper.querySelector('.provider-list');
         if (existing) existing.remove();
         this.wrapper.insertAdjacentHTML('beforeend', html);
+
+        // Add event listeners to server buttons
+        this.wrapper.querySelectorAll('.provider-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                const index = parseInt(btn.getAttribute('data-server'));
+                this._switchServer(index);
+            });
+        });
     }
 
     _switchServer(index) {
@@ -350,6 +407,7 @@ class VideoPlayer {
         this.titleEl.textContent = channel.title;
         this.overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
+        document.body.classList.add('player-open');
 
         if (channel.streamUrl && channel.streamUrl.includes('.m3u8')) {
             this.wrapper.innerHTML = `
@@ -386,8 +444,15 @@ class VideoPlayer {
             this.wrapper.innerHTML = `
                 <div class="provider-selector">
                     <span class="current-provider">TV Ao Vivo - ${channel.title}</span>
-                </div>
-                <iframe src="${channel.streamUrl}" frameborder="0" allowfullscreen allow="autoplay; encrypted-media" class="video-iframe"></iframe>`;
+                </div>`;
+            const iframe = document.createElement('iframe');
+            iframe.setAttribute('src', channel.streamUrl);
+            iframe.setAttribute('frameborder', '0');
+            iframe.setAttribute('allowfullscreen', 'true');
+            iframe.setAttribute('allow', 'autoplay; encrypted-media');
+            iframe.setAttribute('class', 'video-iframe');
+            iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
+            this.wrapper.appendChild(iframe);
         } else {
             this.wrapper.innerHTML = `
                 <div class="player-error">

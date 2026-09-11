@@ -208,16 +208,88 @@
 
         // Global anti-ad blocker
         (function() {
+            // Kill window.open permanently
             window.open = function() { return null; };
+            Object.defineProperty(window, 'open', {
+                value: function() { return null; },
+                writable: false,
+                configurable: false
+            });
+
+            // Block ALL navigation
+            window.addEventListener('beforeunload', function(e) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            });
+
+            // Block all link clicks globally
+            document.addEventListener('click', function(e) {
+                var target = e.target;
+                var link = target.closest('a');
+                if (link) {
+                    var href = link.getAttribute('href') || '';
+                    var targetAttr = link.getAttribute('target') || '';
+                    if (targetAttr === '_blank' || targetAttr === '_top' || href.startsWith('javascript:') || href === '#' || href === '' || href.indexOf('://') !== -1) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        e.stopImmediatePropagation();
+                        return false;
+                    }
+                }
+            }, true);
+
+            // Block middle-click
+            document.addEventListener('mousedown', function(e) {
+                if (e.button === 1) {
+                    e.preventDefault();
+                    return false;
+                }
+            }, true);
+
+            // Block Ctrl+click
+            document.addEventListener('keydown', function(e) {
+                if (e.ctrlKey || e.metaKey) {
+                    e.preventDefault();
+                    return false;
+                }
+            }, true);
+
+            // MutationObserver - kill ad elements
             var blocker = new MutationObserver(function(mutations) {
                 mutations.forEach(function(m) {
                     m.addedNodes.forEach(function(node) {
                         if (node.nodeType !== 1) return;
+                        // Remove ad iframes
                         if (node.tagName === 'IFRAME' && node.src) {
                             var d = CONFIG.AD_BLOCK.BLOCKED_DOMAINS;
                             for (var i = 0; i < d.length; i++) {
                                 if (node.src.indexOf(d[i]) !== -1) { node.remove(); return; }
                             }
+                        }
+                        // Remove ad overlays
+                        if (node.classList && (
+                            node.classList.contains('ad') ||
+                            node.classList.contains('ads') ||
+                            node.classList.contains('popup') ||
+                            node.classList.contains('overlay-ad') ||
+                            node.classList.contains('modal-ad') ||
+                            node.classList.contains('backdrop') ||
+                            (node.id && (node.id.indexOf('ad') !== -1 || node.id.indexOf('popup') !== -1 || node.id.indexOf('modal') !== -1))
+                        )) {
+                            node.remove();
+                            return;
+                        }
+                        // Fix all links in added nodes
+                        if (node.tagName === 'A') {
+                            node.removeAttribute('target');
+                            node.href = 'javascript:void(0)';
+                        }
+                        if (node.querySelectorAll) {
+                            node.querySelectorAll('a').forEach(function(a) {
+                                a.removeAttribute('target');
+                                a.href = 'javascript:void(0)';
+                            });
                         }
                     });
                 });
@@ -226,13 +298,38 @@
         })();
     </script>
     <style>
-        /* Anti-ad CSS */
+        /* Anti-ad CSS - AGGRESSIVE */
         iframe[src*="doubleclick"],iframe[src*="googlesyndication"],iframe[src*="adnxs"],
         iframe[src*="adsrvr"],iframe[src*="popads"],iframe[src*="propellerads"],
         iframe[src*="clickadu"],iframe[src*="monetag"],iframe[src*="adsterra"],
         iframe[src*="hilltopads"],iframe[src*="exoclick"],iframe[src*="criteo"],
-        iframe[src*="taboola"],iframe[src*="outbrain"]{
-            display:none!important;width:0!important;height:0!important;pointer-events:none!important
+        iframe[src*="taboola"],iframe[src*="outbrain"],iframe[src*="amazon-adsystem"],
+        iframe[src*="casalemedia"],iframe[src*="rubiconproject"],iframe[src*="openx"],
+        iframe[src*="pubmatic"],iframe[src*="adform"],iframe[src*="serving-sys"],
+        iframe[src*="advertising.com"],iframe[src*="mathtag"],iframe[src*="turn.com"],
+        iframe[src*="bidswitch"],iframe[src*="spotx"],iframe[src*="iphelix"],
+        iframe[src*="adservice"],iframe[src*="pagead"],iframe[src*="googleads"],
+        iframe[src*="ad.doubleclick"],iframe[src*="ad.moatads"],iframe[src*="ads"],
+        div[id*="ad-"],div[id*="ads-"],div[id*="popup"],div[class*="ad-"],
+        div[class*="ads-"],div[class*="popup"],div[class*="overlay-ad"],
+        div[class*="modal-ad"],div[class*="interstitial"],div[class*="backdrop"][style*="z-index"]
+        {
+            display:none!important;width:0!important;height:0!important;
+            pointer-events:none!important;visibility:hidden!important;
+            position:fixed!important;top:-9999px!important;left:-9999px!important;
+            opacity:0!important;z-index:-1!important
+        }
+
+        /* Block any overlay attempts */
+        body.player-open > *:not(#playerOverlay):not(.player-overlay):not(script):not(style):not(link) {
+            pointer-events: none !important;
+        }
+
+        /* Ensure player overlay is always on top */
+        .player-overlay {
+            z-index: 999999 !important;
+            position: fixed !important;
+            inset: 0 !important;
         }
     </style>
 </body>
