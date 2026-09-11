@@ -1,37 +1,35 @@
-const CACHE_NAME = 'cineboss-v3';
+const CACHE_NAME = 'cineboss-v4';
 const STATIC_ASSETS = [
-    '/CineVerse/',
-    '/CineVerse/index.html',
-    '/CineVerse/style.css',
-    '/CineVerse/config.js',
-    '/CineVerse/tmdb.js',
-    '/CineVerse/player.js',
-    '/CineVerse/app.js',
-    '/CineVerse/auth.js',
-    '/CineVerse/manifest.json',
-    '/CineVerse/icon-72.png',
-    '/CineVerse/icon-96.png',
-    '/CineVerse/icon-128.png',
-    '/CineVerse/icon-144.png',
-    '/CineVerse/icon-152.png',
-    '/CineVerse/icon-192.png',
-    '/CineVerse/icon-384.png',
-    '/CineVerse/icon-512.png'
+    '/',
+    '/index.html',
+    '/style.css',
+    '/config.js',
+    '/tmdb.js',
+    '/player.js',
+    '/app.js',
+    '/auth.js',
+    '/manifest.json',
+    '/icon-72.png',
+    '/icon-96.png',
+    '/icon-128.png',
+    '/icon-144.png',
+    '/icon-152.png',
+    '/icon-192.png',
+    '/icon-384.png',
+    '/icon-512.png'
 ];
 
-const TMDB_CACHE = 'cineboss-tmdb-v3';
-const IMAGE_CACHE = 'cineboss-images-v3';
+const TMDB_CACHE = 'cineboss-tmdb-v4';
+const IMAGE_CACHE = 'cineboss-images-v4';
 
-// Install - cache static assets
 self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME).then((cache) => {
-            return cache.addAll(STATIC_ASSETS);
+            return cache.addAll(STATIC_ASSETS).catch(() => {});
         }).then(() => self.skipWaiting())
     );
 });
 
-// Activate - clean old caches
 self.addEventListener('activate', (event) => {
     event.waitUntil(
         caches.keys().then((keys) => {
@@ -43,11 +41,9 @@ self.addEventListener('activate', (event) => {
     );
 });
 
-// Fetch - network first for API, cache first for assets
 self.addEventListener('fetch', (event) => {
     const url = new URL(event.request.url);
 
-    // TMDB API - network first, cache fallback
     if (url.hostname === 'api.themoviedb.org') {
         event.respondWith(
             fetch(event.request).then((response) => {
@@ -59,7 +55,6 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Images - cache first, network fallback
     if (url.hostname === 'image.tmdb.org' || url.pathname.includes('.jpg') || url.pathname.includes('.png') || url.pathname.includes('.webp')) {
         event.respondWith(
             caches.match(event.request).then((cached) => {
@@ -74,7 +69,6 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Fonts - cache first
     if (url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com' || url.hostname === 'cdnjs.cloudflare.com') {
         event.respondWith(
             caches.match(event.request).then((cached) => {
@@ -89,8 +83,9 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Static assets - cache first
-    if (STATIC_ASSETS.some((asset) => url.pathname.endsWith(asset.replace('/CineVerse/', '')))) {
+    if (event.request.method !== 'GET') return;
+
+    if (STATIC_ASSETS.some((asset) => url.pathname === asset || url.pathname === asset.replace(/^\//, ''))) {
         event.respondWith(
             caches.match(event.request).then((cached) => {
                 if (cached) return cached;
@@ -104,20 +99,18 @@ self.addEventListener('fetch', (event) => {
         return;
     }
 
-    // Everything else - network first
     event.respondWith(
         fetch(event.request).catch(() => caches.match(event.request))
     );
 });
 
-// Handle push notifications (future)
 self.addEventListener('push', (event) => {
     if (event.data) {
         const data = event.data.json();
         self.registration.showNotification(data.title, {
             body: data.body,
-            icon: '/CineVerse/icon-192.png',
-            badge: '/CineVerse/icon-72.png',
+            icon: '/icon-192.png',
+            badge: '/icon-72.png',
             vibrate: [200, 100, 200]
         });
     }
