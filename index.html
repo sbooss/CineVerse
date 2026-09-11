@@ -44,9 +44,20 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=36">
+    <link rel="stylesheet" href="style.css?v=37">
 </head>
 <body>
+
+    <!-- CINEMATIC POSTER BACKGROUND -->
+    <div class="cinema-bg" id="cinemaBg">
+        <div class="poster-row p1" id="p1"></div>
+        <div class="poster-row p2" id="p2"></div>
+        <div class="poster-row p3" id="p3"></div>
+        <div class="poster-row p4" id="p4"></div>
+        <div class="poster-row p5" id="p5"></div>
+        <div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+        <div class="bg-overlay"></div><div class="vignette"></div>
+    </div>
 
     <!-- BOOT SCREEN -->
     <div id="boot-screen">
@@ -211,8 +222,30 @@
     <script src="tmdb.js?v=36"></script>
     <script src="auth.js?v=36"></script>
     <script src="player.js?v=36"></script>
-    <script src="app.js?v=36"></script>
+    <script src="app.js?v=37"></script>
     <script>
+        // CINEMATIC POSTER BACKGROUND
+        (function(){
+            var TMDB='eb9690431d1dd3d86de35def2b1b0a2c';
+            fetch('https://api.themoviedb.org/3/trending/all/week?api_key='+TMDB+'&language=pt-BR')
+            .then(function(r){return r.json()}).then(function(d){
+                var p=(d.results||[]).filter(function(i){return i.poster_path}).map(function(i){return'https://image.tmdb.org/t/p/w200'+i.poster_path});
+                if(!p.length)return;
+                ['p1','p2','p3','p4','p5'].forEach(function(id){
+                    var el=document.getElementById(id);if(!el)return;
+                    var s=p.slice().sort(function(){return Math.random()-.5});
+                    el.innerHTML=s.concat(s).map(function(s){return'<img src="'+s+'" alt="" loading="lazy">'}).join('');
+                });
+            }).catch(function(){});
+            var bg=document.getElementById('cinemaBg');
+            if(bg){for(var i=0;i<15;i++){
+                var p=document.createElement('div');
+                var sz=Math.random()*3+1;var c=['rgba(0,168,224,.3)','rgba(201,165,78,.2)','rgba(255,255,255,.2)'];
+                p.style.cssText='position:absolute;border-radius:50%;pointer-events:none;animation:pFloat 10s ease-in-out infinite;width:'+sz+'px;height:'+sz+'px;background:'+c[Math.floor(Math.random()*c.length)]+';left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;animation-delay:'+(-Math.random()*10)+'s;animation-duration:'+(8+Math.random()*6)+'s';
+                bg.appendChild(p);
+            }}
+        })();
+
         // FORCE UNREGISTER old service workers (they block clicks!)
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
