@@ -27,9 +27,9 @@ const CONFIG = {
                 tv: function(id, s, e) { return 'https://vidlink.pro/tv/' + id + '/' + s + '/' + e + '?lang=pt'; }
             },
             {
-                name: 'EmbedMaster',
-                movie: function(id) { return 'https://embedmaster.com/embed/' + id; },
-                tv: function(id, s, e) { return 'https://embedmaster.com/embed/' + id + '&s=' + s + '&e=' + e; }
+                name: 'MultiEmbed',
+                movie: function(id) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1'; },
+                tv: function(id, s, e) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1&s=' + s + '&e=' + e; }
             }
         ]
     },

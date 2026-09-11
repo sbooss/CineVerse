@@ -46,10 +46,17 @@ function createCard(item) {
         : '<div class="poster-placeholder"><i class="fas fa-film"></i></div>';
     var year = item.releaseDate ? item.releaseDate.substring(0, 4) : '';
     var rating = item.rating ? (typeof item.rating === 'number' ? item.rating.toFixed(1) : item.rating) : '0';
+    var lang = item.originalLanguage || 'en';
+    var langBadge = '';
+    if (lang === 'pt') {
+        langBadge = '<div class="card-dub card-lang-pt"><i class="fas fa-language"></i> PT</div>';
+    } else {
+        langBadge = '<div class="card-dub card-lang-dub"><i class="fas fa-language"></i> DUB</div>';
+    }
     card.innerHTML =
         '<div class="card-poster">' + posterHTML +
             '<div class="card-rating"><i class="fas fa-star"></i> ' + rating + '</div>' +
-            '<div class="card-dub"><i class="fas fa-language"></i> DUB</div>' +
+            langBadge +
             '<button class="card-fav ' + (fav ? 'active' : '') + '"><i class="fas fa-heart"></i></button>' +
             '<div class="card-play"><div class="card-play-icon"><i class="fas fa-play"></i></div></div>' +
         '</div>' +
@@ -142,10 +149,17 @@ function openDetailPage(item) {
         : '<div class="poster-placeholder"><i class="fas fa-film"></i></div>';
     var rating = item.rating ? (typeof item.rating === 'number' ? item.rating.toFixed(1) : item.rating) : '0';
     var year = item.releaseDate ? item.releaseDate.substring(0, 4) : '';
+    var lang = item.originalLanguage || 'en';
+    var langBadgeHTML = '';
+    if (lang === 'pt') {
+        langBadgeHTML = '<span class="detail-badge dub dub-pt"><i class="fas fa-language"></i> ORIGINAL PT</span>';
+    } else {
+        langBadgeHTML = '<span class="detail-badge dub dub-dub"><i class="fas fa-language"></i> DUBLADO PT-BR</span>';
+    }
     badges.innerHTML =
         '<span class="detail-badge rating"><i class="fas fa-star"></i> ' + rating + '</span>' +
         '<span class="detail-badge year">' + year + '</span>' +
-        '<span class="detail-badge dub"><i class="fas fa-language"></i> DUBLADO PT-BR</span>' +
+        langBadgeHTML +
         (item.runtime ? '<span class="detail-badge duration"><i class="fas fa-clock"></i> ' + formatRuntime(item.runtime) + '</span>' : '');
     titleEl.textContent = item.title;
     meta.innerHTML = '';
