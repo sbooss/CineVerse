@@ -284,15 +284,12 @@
             setTimeout(removeBoot, 4000);
         })();
 
-        // Global anti-ad blocker
+        // Global anti-ad blocker - NUCLEAR
         (function() {
-            // Kill window.open permanently
-            window.open = function() { return null; };
-            Object.defineProperty(window, 'open', {
-                value: function() { return null; },
-                writable: false,
-                configurable: false
-            });
+            // Kill window.open - ABSOLUTE
+            var deadFn = function() { return null; };
+            window.open = deadFn;
+            Object.defineProperty(window, 'open', { value: deadFn, writable: false, configurable: false });
 
             // Block ALL navigation
             window.addEventListener('beforeunload', function(e) {
@@ -301,19 +298,40 @@
                 return '';
             });
 
-            // Block all link clicks globally
+            // Block location changes
+            try {
+                window.location.assign = function() { return false; };
+                window.location.replace = function() { return false; };
+            } catch(ex) {}
+
+            // Block ALL link clicks - ABSOLUTE
             document.addEventListener('click', function(e) {
                 var target = e.target;
+
+                // Block ANY link
                 var link = target.closest('a');
                 if (link) {
-                    var href = link.getAttribute('href') || '';
-                    var targetAttr = link.getAttribute('target') || '';
-                    if (targetAttr === '_blank' || targetAttr === '_top' || href.startsWith('javascript:') || href === '#' || href === '' || href.indexOf('://') !== -1) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        e.stopImmediatePropagation();
-                        return false;
-                    }
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    return false;
+                }
+
+                // Block onclick handlers
+                var onclickEl = target.closest('[onclick]');
+                if (onclickEl) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    return false;
+                }
+
+                // Block data-href/data-url
+                if (target.dataset && (target.dataset.href || target.dataset.url)) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.stopImmediatePropagation();
+                    return false;
                 }
             }, true);
 
@@ -333,32 +351,42 @@
                 }
             }, true);
 
-            // MutationObserver - kill ad elements
+            // Block context menu
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            }, true);
+
+            // Block drag
+            document.addEventListener('dragstart', function(e) {
+                e.preventDefault();
+                return false;
+            }, true);
+
+            // MutationObserver - NUCLEAR
             var blocker = new MutationObserver(function(mutations) {
                 mutations.forEach(function(m) {
                     m.addedNodes.forEach(function(node) {
                         if (node.nodeType !== 1) return;
-                        // Remove ad iframes
-                        if (node.tagName === 'IFRAME' && node.src) {
-                            var d = CONFIG.AD_BLOCK.BLOCKED_DOMAINS;
-                            for (var i = 0; i < d.length; i++) {
-                                if (node.src.indexOf(d[i]) !== -1) { node.remove(); return; }
+                        // Remove ALL iframes except video
+                        if (node.tagName === 'IFRAME') {
+                            if (!node.classList.contains('video-iframe')) {
+                                node.remove();
                             }
-                        }
-                        // Remove ad overlays
-                        if (node.classList && (
-                            node.classList.contains('ad') ||
-                            node.classList.contains('ads') ||
-                            node.classList.contains('popup') ||
-                            node.classList.contains('overlay-ad') ||
-                            node.classList.contains('modal-ad') ||
-                            node.classList.contains('backdrop') ||
-                            (node.id && (node.id.indexOf('ad') !== -1 || node.id.indexOf('popup') !== -1 || node.id.indexOf('modal') !== -1))
-                        )) {
-                            node.remove();
                             return;
                         }
-                        // Fix all links in added nodes
+                        // Remove ad elements
+                        if (node.classList) {
+                            var classes = Array.from(node.classList).join(' ').toLowerCase();
+                            var id = (node.id || '').toLowerCase();
+                            if (classes.indexOf('ad') !== -1 || classes.indexOf('popup') !== -1 ||
+                                classes.indexOf('modal') !== -1 || classes.indexOf('overlay') !== -1 ||
+                                id.indexOf('ad') !== -1 || id.indexOf('popup') !== -1) {
+                                node.remove();
+                                return;
+                            }
+                        }
+                        // Fix all links
                         if (node.tagName === 'A') {
                             node.removeAttribute('target');
                             node.href = 'javascript:void(0)';

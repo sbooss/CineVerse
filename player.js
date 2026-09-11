@@ -7,6 +7,7 @@ class VideoPlayer {
         this._setupGlobalAntiAds();
         this._setupAntiAds();
         this._setupFullscreenLock();
+        this._setupIframeMessageBlocker();
         this.backBtn.addEventListener('click', () => this.close());
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isOpen()) this.close();
@@ -17,16 +18,22 @@ class VideoPlayer {
         if (window._globalAntiAdsSetup) return;
         window._globalAntiAdsSetup = true;
 
-        // Kill window.open globally and permanently
-        window.open = function() { return null; };
+        // Kill window.open globally and permanently - ABSOLUTE BLOCK
+        const deadFn = function() { return null; };
+        window.open = deadFn;
         window.open.toString = function() { return 'function open() { [native code] }'; };
-        Object.defineProperty(window, 'open', {
-            value: function() { return null; },
-            writable: false,
-            configurable: false
-        });
+        Object.defineProperty(window, 'open', { value: deadFn, writable: false, configurable: false });
 
-        // Block all navigation attempts
+        // Also block on all frames
+        try {
+            if (window.frames && window.frames.length > 0) {
+                for (let i = 0; i < window.frames.length; i++) {
+                    try { window.frames[i].window.open = deadFn; } catch(ex) {}
+                }
+            }
+        } catch(ex) {}
+
+        // Block ALL navigation - ABSOLUTE
         window.addEventListener('beforeunload', (e) => {
             e.preventDefault();
             e.returnValue = '';
@@ -34,75 +41,88 @@ class VideoPlayer {
         });
 
         // Block location changes
-        const origAssign = window.location.assign;
-        const origReplace = window.location.replace;
-        Object.defineProperty(window, 'location', {
-            get: function() { return window._safeLocation || window.location; },
-            set: function() { return false; }
-        });
+        try {
+            const origAssign = window.location.assign.bind(window.location);
+            const origReplace = window.location.replace.bind(window.location);
+            window.location.assign = function() { return false; };
+            window.location.replace = function() { return false; };
+        } catch(ex) {}
 
-        // Block all link clicks globally
+        // Block ALL clicks on ANY links - ABSOLUTE
         document.addEventListener('click', (e) => {
             const target = e.target;
 
-            // Block ANY link navigation
+            // Block ANY link
             const link = target.closest('a');
             if (link) {
-                const href = link.getAttribute('href') || '';
-                const targetAttr = link.getAttribute('target') || '';
-                if (targetAttr === '_blank' || targetAttr === '_top' || href.startsWith('javascript:') || href === '#' || href === '' || !href.startsWith(window.location.origin)) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    return false;
-                }
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                return false;
             }
 
-            // Block onclick handlers with window.open
+            // Block onclick handlers
             const onclickEl = target.closest('[onclick]');
             if (onclickEl) {
-                const onclick = onclickEl.getAttribute('onclick') || '';
-                if (onclick.includes('window.open') || onclick.includes('_blank') || onclick.includes('void(0)') || onclick.includes('popup')) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    return false;
-                }
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                return false;
             }
 
-            // Block elements that look like ad overlays
+            // Block ANY element with data-href or data-url
+            if (target.dataset && (target.dataset.href || target.dataset.url)) {
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                return false;
+            }
+
+            // Block ad overlays
             const style = window.getComputedStyle(target);
             if ((style.position === 'fixed' || style.position === 'absolute') && parseInt(style.zIndex) > 9000) {
-                if (!target.closest('.player-header') && !target.closest('#playerBack') && !target.closest('.provider-selector') && !target.closest('.provider-list')) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    try { target.remove(); } catch(ex) {}
-                    return false;
-                }
+                e.preventDefault();
+                e.stopPropagation();
+                e.stopImmediatePropagation();
+                try { target.remove(); } catch(ex) {}
+                return false;
             }
         }, true);
 
-        // MutationObserver - kill any popup elements
+        // MutationObserver - NUCLEAR OPTION - remove ALL non-player elements
         const adObserver = new MutationObserver((mutations) => {
             mutations.forEach((m) => {
                 m.addedNodes.forEach((node) => {
                     if (node.nodeType !== 1) return;
-                    // Remove ad overlays
-                    if (node.classList && (
-                        node.classList.contains('ad') ||
-                        node.classList.contains('ads') ||
-                        node.classList.contains('popup') ||
-                        node.classList.contains('overlay-ad') ||
-                        node.classList.contains('modal-ad') ||
-                        node.classList.contains('backdrop') ||
-                        node.id.includes('ad') ||
-                        node.id.includes('popup') ||
-                        node.id.includes('interstitial') ||
-                        node.id.includes('modal')
-                    )) {
-                        try { node.remove(); } catch(ex) {}
+                    // Remove ALL iframes except our video
+                    if (node.tagName === 'IFRAME') {
+                        if (!node.classList.contains('video-iframe')) {
+                            try { node.remove(); } catch(ex) {}
+                        }
                         return;
+                    }
+                    // Remove ALL elements with ad-related classes/ids
+                    if (node.classList) {
+                        const classes = Array.from(node.classList).join(' ').toLowerCase();
+                        const id = (node.id || '').toLowerCase();
+                        if (classes.includes('ad') || classes.includes('popup') || classes.includes('modal') ||
+                            classes.includes('overlay') || classes.includes('backdrop') || classes.includes('interstitial') ||
+                            id.includes('ad') || id.includes('popup') || id.includes('modal')) {
+                            try { node.remove(); } catch(ex) {}
+                            return;
+                        }
+                    }
+                    // Remove fixed/absolute elements with high z-index
+                    if (node.style) {
+                        try {
+                            const pos = window.getComputedStyle(node).position;
+                            const z = parseInt(window.getComputedStyle(node).zIndex);
+                            if ((pos === 'fixed' || pos === 'absolute') && z > 9000) {
+                                if (!node.classList.contains('player-header') && !node.id.includes('playerBack') && !node.classList.contains('provider-selector') && !node.classList.contains('provider-list')) {
+                                    setTimeout(() => { try { node.remove(); } catch(ex) {} }, 50);
+                                }
+                            }
+                        } catch(ex) {}
                     }
                     // Fix ALL links in added nodes
                     if (node.tagName === 'A') {
@@ -117,86 +137,25 @@ class VideoPlayer {
                             a.onclick = function() { return false; };
                         });
                     }
-                    // Remove fixed/absolute elements with high z-index
-                    if (node.style) {
-                        try {
-                            const pos = window.getComputedStyle(node).position;
-                            const z = parseInt(window.getComputedStyle(node).zIndex);
-                            if ((pos === 'fixed' || pos === 'absolute') && z > 9000) {
-                                if (!node.classList.contains('player-header') && !node.id.includes('playerBack') && !node.classList.contains('provider-selector') && !node.classList.contains('provider-list')) {
-                                    setTimeout(() => { try { node.remove(); } catch(ex) {} }, 50);
-                                }
-                            }
-                        } catch(ex) {}
-                    }
                 });
             });
         });
         adObserver.observe(document.body, { childList: true, subtree: true });
+        adObserver.observe(document.documentElement, { childList: true, subtree: true });
 
-        // Block timed popups
-        const origSetTimeout = window.setTimeout;
-        const origSetInterval = window.setInterval;
-        window.setTimeout = function(fn, delay) {
-            if (typeof fn === 'string' && (fn.includes('window.open') || fn.includes('popup') || fn.includes('ad') || fn.includes('redirect'))) {
-                return 0;
+        // Block ALL keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            // Block Ctrl+A, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+Z, Ctrl+S, Ctrl+P
+            if (e.ctrlKey || e.metaKey) {
+                e.preventDefault();
+                return false;
             }
-            return origSetTimeout.call(window, fn, delay);
-        };
-        window.setInterval = function(fn, delay) {
-            if (typeof fn === 'string' && (fn.includes('window.open') || fn.includes('popup') || fn.includes('ad') || fn.includes('redirect'))) {
-                return 0;
+            // Block F1-F12
+            if (e.key >= 'F1' && e.key <= 'F12') {
+                e.preventDefault();
+                return false;
             }
-            return origSetInterval.call(window, fn, delay);
-        };
-
-        // Block ad domain requests via fetch/XHR
-        const origFetch = window.fetch;
-        window.fetch = function(url, opts) {
-            if (typeof url === 'string') {
-                const blocked = CONFIG.AD_BLOCK.BLOCKED_DOMAINS;
-                for (let i = 0; i < blocked.length; i++) {
-                    if (url.includes(blocked[i])) {
-                        return Promise.reject(new Error('Blocked'));
-                    }
-                }
-            }
-            return origFetch.call(window, url, opts);
-        };
-
-        const origXHROpen = XMLHttpRequest.prototype.open;
-        XMLHttpRequest.prototype.open = function(method, url) {
-            if (typeof url === 'string') {
-                const blocked = CONFIG.AD_BLOCK.BLOCKED_DOMAINS;
-                for (let i = 0; i < blocked.length; i++) {
-                    if (url.includes(blocked[i])) {
-                        return;
-                    }
-                }
-            }
-            return origXHROpen.apply(this, arguments);
-        };
-
-        // Block creating new iframes that aren't video
-        const origCreateElement = document.createElement.bind(document);
-        document.createElement = function(tag) {
-            const el = origCreateElement(tag);
-            if (tag.toLowerCase() === 'iframe') {
-                const origSetAttr = el.setAttribute.bind(el);
-                el.setAttribute = function(name, value) {
-                    if (name === 'src' && typeof value === 'string') {
-                        const blocked = CONFIG.AD_BLOCK.BLOCKED_DOMAINS;
-                        for (let i = 0; i < blocked.length; i++) {
-                            if (value.includes(blocked[i])) {
-                                value = 'about:blank';
-                            }
-                        }
-                    }
-                    return origSetAttr(name, value);
-                };
-            }
-            return el;
-        };
+        }, true);
 
         // Block middle-click globally
         document.addEventListener('mousedown', (e) => {
@@ -206,44 +165,93 @@ class VideoPlayer {
             }
         }, true);
 
-        // Block Ctrl+click globally
-        document.addEventListener('keydown', (e) => {
-            if (e.ctrlKey || e.metaKey) {
-                e.preventDefault();
-                return false;
+        // Block drag (prevent dragging to new tab)
+        document.addEventListener('dragstart', (e) => {
+            e.preventDefault();
+            return false;
+        }, true);
+
+        // Block context menu globally
+        document.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            return false;
+        }, true);
+    }
+
+    _setupIframeMessageBlocker() {
+        // Block postMessage from iframe trying to open windows
+        window.addEventListener('message', (e) => {
+            if (!this.isOpen()) return;
+            const data = e.data;
+            if (typeof data === 'string') {
+                const lower = data.toLowerCase();
+                if (lower.includes('open') || lower.includes('popup') || lower.includes('redirect') ||
+                    lower.includes('navigate') || lower.includes('location')) {
+                    e.stopImmediatePropagation();
+                    return false;
+                }
+            }
+            if (typeof data === 'object' && data) {
+                if (data.type && (data.type.includes('open') || data.type.includes('popup') || data.type.includes('navigate'))) {
+                    e.stopImmediatePropagation();
+                    return false;
+                }
             }
         }, true);
     }
 
     _setupAntiAds() {
-        // Additional player-specific protections
+        // Block ALL clicks inside player overlay - ONLY allow our UI buttons
         this.overlay.addEventListener('click', (e) => {
             const target = e.target;
-            // Block clicks on anything that isn't our UI
-            if (!target.closest('.player-header') && !target.closest('#playerBack') && !target.closest('.provider-selector') && !target.closest('.provider-list') && !target.closest('.change-provider-btn') && !target.closest('.provider-btn') && !target.closest('.player-error') && !target.closest('button')) {
-                // If clicking on the overlay background, do nothing
-                if (target === this.overlay || target.classList.contains('player-bg')) {
-                    return;
-                }
-                // Otherwise, prevent and stop propagation
+
+            // Allow clicks on our specific UI elements
+            const isOurUI = target.closest('#playerBack') ||
+                           target.closest('.change-provider-btn') ||
+                           target.closest('.provider-btn') ||
+                           target.closest('#playerErrorBack') ||
+                           target.closest('#changeProviderBtn');
+
+            if (!isOurUI) {
                 e.preventDefault();
                 e.stopPropagation();
                 e.stopImmediatePropagation();
+
+                // Remove any ad overlay that was clicked
+                const style = window.getComputedStyle(target);
+                if ((style.position === 'fixed' || style.position === 'absolute') && parseInt(style.zIndex) > 9000) {
+                    try { target.remove(); } catch(ex) {}
+                }
+                return false;
             }
         }, true);
 
-        // Block all keyboard events except Escape
+        // Block ALL touch events on non-UI elements
+        this.overlay.addEventListener('touchstart', (e) => {
+            const target = e.target;
+            const isOurUI = target.closest('#playerBack') ||
+                           target.closest('.change-provider-btn') ||
+                           target.closest('.provider-btn') ||
+                           target.closest('#playerErrorBack');
+
+            if (!isOurUI) {
+                e.preventDefault();
+                return false;
+            }
+        }, { passive: false, capture: true });
+
+        // Block ALL keyboard except Escape
         document.addEventListener('keydown', (e) => {
             if (!this.isOpen()) return;
             if (e.key === 'Escape') {
                 this.close();
                 return;
             }
-            // Block all other keys when player is open
-            if (!e.target.closest('.provider-list')) {
-                e.preventDefault();
-                e.stopPropagation();
-            }
+            // Block EVERYTHING else
+            e.preventDefault();
+            e.stopPropagation();
+            e.stopImmediatePropagation();
+            return false;
         }, true);
     }
 
@@ -285,6 +293,9 @@ class VideoPlayer {
         this.overlay.classList.remove('active');
         document.body.style.overflow = '';
         document.body.classList.remove('player-open');
+        // Remove ALL iframes
+        const iframes = this.wrapper.querySelectorAll('iframe');
+        iframes.forEach(f => { try { f.src = 'about:blank'; f.remove(); } catch(ex) {} });
         this.wrapper.innerHTML = '';
         if (document.fullscreenElement) {
             document.exitFullscreen().catch(() => {});
@@ -314,7 +325,6 @@ class VideoPlayer {
             const p = providers[index];
             const url = type === 'tv' ? p.tv(tmdbId, season, episode) : p.movie(tmdbId);
 
-            // Create sandboxed iframe - CRITICAL for preventing popups
             this.wrapper.innerHTML = `
                 <div class="provider-selector">
                     <span class="current-provider">${p.name}</span>
@@ -329,8 +339,14 @@ class VideoPlayer {
             iframe.setAttribute('allowfullscreen', 'true');
             iframe.setAttribute('allow', 'autoplay; encrypted-media; gyroscope; picture-in-picture');
             iframe.setAttribute('class', 'video-iframe');
-            // SANDBOX - blocks popups, new windows, forms, etc.
-            iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation allow-popups-to-escape-sandbox');
+
+            // STRICTEST POSSIBLE SANDBOX - NO POPUPS, NO NEW WINDOWS
+            // allow-scripts: needed for video player
+            // allow-same-origin: needed for cookie/storage
+            // allow-presentation: needed for picture-in-picture
+            // NO allow-popups - COMPLETELY BLOCKS POPUPS
+            iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-presentation');
+
             iframe.setAttribute('referrerpolicy', 'no-referrer');
             iframe.setAttribute('loading', 'eager');
             iframe.style.opacity = '0';
@@ -378,7 +394,6 @@ class VideoPlayer {
         if (existing) existing.remove();
         this.wrapper.insertAdjacentHTML('beforeend', html);
 
-        // Add event listeners to server buttons
         this.wrapper.querySelectorAll('.provider-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
