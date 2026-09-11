@@ -1,13 +1,28 @@
+# Dependencies
 node_modules/
+
+# Environment variables
 .env
-*.log
+.env.local
+.env.production
+
+# Database
+*.db
+*.db-shm
+*.db-wal
+
+# Test files
+*-test*.js
+test-*.js
+setup-*.js
+create-tables*.js
+pg-*.js
+try-*.js
+start-server.bat
+
+# Vercel
+.vercel/
+
+# OS
 .DS_Store
 Thumbs.db
-server.js
-server.py
-start.bat
-start_server.ps1
-database.js
-server.log
-server_err.log
-.vercel/
