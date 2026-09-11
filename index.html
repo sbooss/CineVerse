@@ -213,9 +213,15 @@
     <script src="player.js?v=36"></script>
     <script src="app.js?v=36"></script>
     <script>
-        // Register Service Worker
+        // FORCE UNREGISTER old service workers (they block clicks!)
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js').catch(function(){});
+            navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                registrations.forEach(function(registration) { registration.unregister(); });
+            });
+            caches.keys().then(function(names) {
+                names.forEach(function(name) { caches.delete(name); });
+            });
+            navigator.serviceWorker.register('sw.js?v=' + Date.now()).catch(function(){});
         }
 
         // PWA Install Prompt
