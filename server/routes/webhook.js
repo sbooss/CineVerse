@@ -1,118 +1,114 @@
 const express = require('express');
+const { v4: uuidv4 } = require('uuid');
 const db = require('../database');
+const { authMiddleware } = require('../middleware/auth');
 
 const router = express.Router();
 
-router.post('/mercadopago', (req, res) => {
+router.post('/mercadopago', async (req, res) => {
     try {
-        const { type, data } = req.body;
+        const { data } = req.body;
 
-        if (type === 'payment') {
-            const paymentId = data?.id;
-            
-            if (paymentId) {
-                processPayment(paymentId);
+        if (!data || !data.id) {
+            return res.status(400).json({ error: 'Webhook invalido' });
+        }
+
+        const payments = await db.query('payments', {
+            select: '*',
+            filter: `id=eq.${data.id}`
+        });
+
+        if (!payments || payments.length === 0) {
+            return res.status(404).json({ error: 'Pagamento nao encontrado' });
+        }
+
+        const payment = payments[0];
+
+        if (data.status === 'approved') {
+            await db.update('payments', {
+                status: 'completed',
+                paid_at: new Date().toISOString(),
+                external_id: data.external_id || null
+            }, `id=eq.${payment.id}`);
+
+            const subscriptions = await db.query('subscriptions', {
+                select: '*',
+                filter: `id=eq.${payment.subscription_id}`
+            });
+
+            if (subscriptions && subscriptions.length > 0) {
+                const subscription = subscriptions[0];
+                const planInfo = getPlanInfo(subscription.plan);
+                const expiresAt = new Date(Date.now() + planInfo.days * 24 * 60 * 60 * 1000);
+
+                await db.update('subscriptions', {
+                    status: 'active',
+                    activated_at: new Date().toISOString(),
+                    expires_at: expiresAt.toISOString(),
+                    updated_at: new Date().toISOString()
+                }, `id=eq.${subscription.id}`);
             }
         }
 
-        res.sendStatus(200);
+        res.json({ received: true });
     } catch (error) {
         console.error('Webhook error:', error);
-        res.sendStatus(500);
+        res.status(500).json({ error: 'Erro ao processar webhook' });
     }
 });
 
-async function processPayment(paymentId) {
-    try {
-        const payment = db.prepare(`
-            SELECT p.*, s.plan, s.id as sub_id
-            FROM payments p
-            JOIN subscriptions s ON p.subscription_id = s.id
-            WHERE p.gateway_payment_id = ? OR p.id = ?
-        `).get(paymentId, paymentId);
-
-        if (!payment) {
-            console.log('Payment not found:', paymentId);
-            return;
-        }
-
-        const mockStatus = 'approved';
-
-        if (mockStatus === 'approved') {
-            const PLANS = {
-                monthly: 30,
-                quarterly: 90
-            };
-
-            const duration = PLANS[payment.plan] || 30;
-            const now = new Date();
-            const expiresAt = new Date(now.getTime() + duration * 24 * 60 * 60 * 1000);
-
-            db.prepare(`
-                UPDATE subscriptions 
-                SET status = 'active', 
-                    started_at = datetime('now'), 
-                    expires_at = datetime(?, 'utc')
-                WHERE id = ?
-            `).run(expiresAt.toISOString(), payment.subscription_id);
-
-            db.prepare(`
-                UPDATE payments SET status = 'approved', gateway_payment_id = ? WHERE id = ?
-            `).run(paymentId, payment.id);
-
-            console.log('Payment approved and subscription activated:', payment.subscription_id);
-        }
-    } catch (error) {
-        console.error('Process payment error:', error);
-    }
+function getPlanInfo(plan) {
+    const plans = {
+        monthly: { name: 'CINE BOSS MENSAL', price: 4.99, days: 30 },
+        quarterly: { name: 'CINE BOSS TRIMESTRAL', price: 14.99, days: 90 }
+    };
+    return plans[plan] || plans.monthly;
 }
 
-router.post('/simulate', (req, res) => {
+router.post('/simulate', authMiddleware, async (req, res) => {
     try {
         const { subscription_id, payment_id } = req.body;
 
         if (!subscription_id) {
-            return res.status(400).json({ error: 'Subscription ID required' });
+            return res.status(400).json({ error: 'ID da assinatura invalido' });
         }
 
-        const subscription = db.prepare('SELECT * FROM subscriptions WHERE id = ?').get(subscription_id);
-        
-        if (!subscription) {
-            return res.status(404).json({ error: 'Subscription not found' });
+        const subscriptions = await db.query('subscriptions', {
+            select: '*',
+            filter: `id=eq.${subscription_id} AND user_id=eq.${req.user.id}`
+        });
+
+        if (!subscriptions || subscriptions.length === 0) {
+            return res.status(404).json({ error: 'Assinatura nao encontrada' });
         }
 
-        const PLANS = {
-            monthly: 30,
-            quarterly: 90
-        };
+        const subscription = subscriptions[0];
+        const planInfo = getPlanInfo(subscription.plan);
+        const expiresAt = new Date(Date.now() + planInfo.days * 24 * 60 * 60 * 1000);
 
-        const duration = PLANS[subscription.plan] || 30;
-        const now = new Date();
-        const expiresAt = new Date(now.getTime() + duration * 24 * 60 * 60 * 1000);
-
-        db.prepare(`
-            UPDATE subscriptions 
-            SET status = 'active', 
-                started_at = datetime('now'), 
-                expires_at = datetime(?, 'utc'),
-                payment_id = ?
-            WHERE id = ?
-        `).run(expiresAt.toISOString(), payment_id || null, subscription_id);
+        await db.update('subscriptions', {
+            status: 'active',
+            activated_at: new Date().toISOString(),
+            expires_at: expiresAt.toISOString(),
+            updated_at: new Date().toISOString()
+        }, `id=eq.${subscription_id}`);
 
         if (payment_id) {
-            db.prepare(`
-                UPDATE payments SET status = 'approved' WHERE id = ?
-            `).run(payment_id);
+            await db.update('payments', {
+                status: 'completed',
+                paid_at: new Date().toISOString()
+            }, `id=eq.${payment_id}`);
         }
+
+        const [updatedSub] = await db.query('subscriptions', {
+            select: '*',
+            filter: `id=eq.${subscription_id}`
+        });
 
         res.json({
             success: true,
             message: 'Pagamento simulado com sucesso',
-            subscription: {
-                ...subscription,
-                status: 'active',
-                expires_at: expiresAt.toISOString()
-            }
+            subscription: updatedSub
         });
     } catch (error) {
         console.error('Simulate payment error:', error);

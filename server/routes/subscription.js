@@ -6,71 +6,36 @@ const { authMiddleware, subscriptionMiddleware } = require('../middleware/auth')
 const router = express.Router();
 
 const PLANS = {
-    monthly: {
-        id: 'monthly',
-        name: 'CINE BOSS MENSAL',
-        price: 4.99,
-        duration: 30,
-        description: '30 dias de acesso'
-    },
-    quarterly: {
-        id: 'quarterly',
-        name: 'CINE BOSS TRIMESTRAL',
-        price: 14.99,
-        duration: 90,
-        description: '90 dias de acesso'
-    }
+    monthly: { name: 'CINE BOSS MENSAL', price: 4.99, days: 30 },
+    quarterly: { name: 'CINE BOSS TRIMESTRAL', price: 14.99, days: 90 }
 };
 
 router.get('/plans', (req, res) => {
     res.json({ plans: PLANS });
 });
 
-router.get('/status', authMiddleware, (req, res) => {
+router.get('/status', authMiddleware, async (req, res) => {
     try {
-        const subscription = db.prepare(`
-            SELECT * FROM subscriptions 
-            WHERE user_id = ? AND status = 'active' AND expires_at > datetime('now')
-            ORDER BY expires_at DESC LIMIT 1
-        `).get(req.user.id);
+        const subscriptions = await db.query('subscriptions', {
+            select: '*',
+            filter: `user_id=eq.${req.user.id} AND status=eq.active AND expires_at=gt.${new Date().toISOString()}`,
+            order: 'expires_at.desc',
+            limit: '1'
+        });
 
-        const expiredSubscription = db.prepare(`
-            SELECT * FROM subscriptions 
-            WHERE user_id = ? AND status = 'expired'
-            ORDER BY expires_at DESC LIMIT 1
-        `).get(req.user.id);
+        const subscription = subscriptions && subscriptions.length > 0 ? subscriptions[0] : null;
 
-        if (subscription) {
-            const expiresAt = new Date(subscription.expires_at);
-            const now = new Date();
-            const daysRemaining = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
-            
-            return res.json({
-                hasActive: true,
-                subscription: {
-                    ...subscription,
-                    days_remaining: daysRemaining,
-                    expires_at_formatted: expiresAt.toLocaleDateString('pt-BR')
-                }
-            });
-        }
-
-        if (expiredSubscription) {
-            return res.json({
-                hasActive: false,
-                expired: true,
-                subscription: expiredSubscription
-            });
-        }
-
-        res.json({ hasActive: false, expired: false, subscription: null });
+        res.json({
+            hasSubscription: !!subscription,
+            subscription: subscription || null,
+            canPlay: !!subscription
+        });
     } catch (error) {
-        console.error('Subscription status error:', error);
         res.status(500).json({ error: 'Erro ao verificar assinatura' });
     }
 });
 
-router.post('/create', authMiddleware, (req, res) => {
+router.post('/create', authMiddleware, async (req, res) => {
     try {
         const { plan } = req.body;
 
@@ -78,92 +43,104 @@ router.post('/create', authMiddleware, (req, res) => {
             return res.status(400).json({ error: 'Plano invalido' });
         }
 
-        const selectedPlan = PLANS[plan];
+        const planInfo = PLANS[plan];
+        const expiresAt = new Date(Date.now() + planInfo.days * 24 * 60 * 60 * 1000);
 
-        const existingActive = db.prepare(`
-            SELECT id FROM subscriptions 
-            WHERE user_id = ? AND status = 'active' AND expires_at > datetime('now')
-        `).get(req.user.id);
+        const existingSub = await db.query('subscriptions', {
+            select: 'id',
+            filter: `user_id=eq.${req.user.id} AND status=eq.active AND expires_at=gt.${new Date().toISOString()}`
+        });
 
-        if (existingActive) {
+        if (existingSub && existingSub.length > 0) {
             return res.status(400).json({ error: 'Voce ja possui uma assinatura ativa' });
         }
 
-        const subscriptionId = uuidv4();
-        
-        db.prepare(`
-            INSERT INTO subscriptions (id, user_id, plan, status, amount) 
-            VALUES (?, ?, ?, 'pending', ?)
-        `).run(subscriptionId, req.user.id, plan, selectedPlan.price);
-
         const paymentId = uuidv4();
-        
-        db.prepare(`
-            INSERT INTO payments (id, user_id, subscription_id, gateway, amount, status) 
-            VALUES (?, ?, ?, 'mercadopago', ?, 'pending')
-        `).run(paymentId, req.user.id, subscriptionId, selectedPlan.price);
+
+        const [subscription] = await db.insert('subscriptions', {
+            id: uuidv4(),
+            user_id: req.user.id,
+            plan: plan,
+            status: 'pending',
+            payment_id: paymentId,
+            payment_method: null,
+            amount: planInfo.price,
+            expires_at: expiresAt.toISOString(),
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        });
+
+        await db.insert('payments', {
+            id: paymentId,
+            subscription_id: subscription.id,
+            user_id: req.user.id,
+            amount: planInfo.price,
+            status: 'pending',
+            method: null,
+            created_at: new Date().toISOString()
+        });
 
         res.json({
             success: true,
-            subscription_id: subscriptionId,
+            subscription_id: subscription.id,
             payment_id: paymentId,
-            plan: selectedPlan,
-            redirect_url: `/payment.html?sub=${subscriptionId}&plan=${plan}`
+            plan: planInfo,
+            expires_at: expiresAt
         });
     } catch (error) {
         console.error('Create subscription error:', error);
-        res.status(500).json({ error: ao criar assinatura' });
+        res.status(500).json({ error: 'Erro ao criar assinatura' });
     }
 });
 
-router.post('/activate', authMiddleware, (req, res) => {
+router.post('/activate', authMiddleware, async (req, res) => {
     try {
         const { subscription_id, payment_id } = req.body;
 
         if (!subscription_id) {
-            return res.status(400).json({ error: 'ID da assinatura necessario' });
+            return res.status(400).json({ error: 'ID da assinatura invalido' });
         }
 
-        const subscription = db.prepare(`
-            SELECT * FROM subscriptions WHERE id = ? AND user_id = ?
-        `).get(subscription_id, req.user.id);
+        const subscriptions = await db.query('subscriptions', {
+            select: '*',
+            filter: `id=eq.${subscription_id} AND user_id=eq.${req.user.id}`
+        });
 
-        if (!subscription) {
+        if (!subscriptions || subscriptions.length === 0) {
             return res.status(404).json({ error: 'Assinatura nao encontrada' });
         }
+
+        const subscription = subscriptions[0];
 
         if (subscription.status === 'active') {
             return res.json({ success: true, message: 'Assinatura ja ativa' });
         }
 
-        const selectedPlan = PLANS[subscription.plan];
-        const now = new Date();
-        const expiresAt = new Date(now.getTime() + selectedPlan.duration * 24 * 60 * 60 * 1000);
+        const planInfo = PLANS[subscription.plan];
+        const expiresAt = new Date(Date.now() + planInfo.days * 24 * 60 * 60 * 1000);
 
-        db.prepare(`
-            UPDATE subscriptions 
-            SET status = 'active', 
-                started_at = datetime('now'), 
-                expires_at = datetime(?, 'utc'),
-                payment_id = ?
-            WHERE id = ?
-        `).run(expiresAt.toISOString(), payment_id || null, subscription_id);
+        await db.update('subscriptions', {
+            status: 'active',
+            activated_at: new Date().toISOString(),
+            expires_at: expiresAt.toISOString(),
+            updated_at: new Date().toISOString()
+        }, `id=eq.${subscription_id}`);
 
         if (payment_id) {
-            db.prepare(`
-                UPDATE payments SET status = 'approved' WHERE id = ?
-            `).run(payment_id);
+            await db.update('payments', {
+                status: 'completed',
+                paid_at: new Date().toISOString()
+            }, `id=eq.${payment_id}`);
         }
+
+        const [updatedSub] = await db.query('subscriptions', {
+            select: '*',
+            filter: `id=eq.${subscription_id}`
+        });
 
         res.json({
             success: true,
-            subscription: {
-                ...subscription,
-                status: 'active',
-                started_at: now.toISOString(),
-                expires_at: expiresAt.toISOString(),
-                days_remaining: selectedPlan.duration
-            }
+            subscription: updatedSub
         });
     } catch (error) {
         console.error('Activate subscription error:', error);
@@ -171,28 +148,34 @@ router.post('/activate', authMiddleware, (req, res) => {
     }
 });
 
-router.get('/check-play', authMiddleware, (req, res) => {
+router.get('/check-play', authMiddleware, async (req, res) => {
     try {
-        const subscription = db.prepare(`
-            SELECT * FROM subscriptions 
-            WHERE user_id = ? AND status = 'active' AND expires_at > datetime('now')
-            ORDER BY expires_at DESC LIMIT 1
-        `).get(req.user.id);
+        const subscriptions = await db.query('subscriptions', {
+            select: '*',
+            filter: `user_id=eq.${req.user.id} AND status=eq.active AND expires_at=gt.${new Date().toISOString()}`,
+            order: 'expires_at.desc',
+            limit: '1'
+        });
 
-        if (subscription) {
-            const expiresAt = new Date(subscription.expires_at);
-            const now = new Date();
-            const daysRemaining = Math.ceil((expiresAt - now) / (1000 * 60 * 60 * 24));
-            
-            return res.json({
-                canPlay: true,
-                days_remaining: daysRemaining
+        const subscription = subscriptions && subscriptions.length > 0 ? subscriptions[0] : null;
+
+        if (!subscription) {
+            return res.status(403).json({ 
+                canPlay: false,
+                error: 'Assinatura necessaria',
+                message: 'Voce precisa de uma assinatura ativa para assistir conteudo'
             });
         }
 
-        res.json({ canPlay: false });
+        res.json({
+            canPlay: true,
+            subscription: {
+                plan: subscription.plan,
+                expires_at: subscription.expires_at
+            }
+        });
     } catch (error) {
-        res.status(500).json({ error: 'Erro ao verificar acesso' });
+        res.status(500).json({ error: 'Erro ao verificar permissao' });
     }
 });
 

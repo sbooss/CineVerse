@@ -40,29 +40,36 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ error: 'Senha deve ter pelo menos 6 caracteres' });
         }
 
-        const existingUser = db.prepare('SELECT id FROM users WHERE email = ?').get(email.toLowerCase());
-        if (existingUser) {
+        const existingUser = await db.query('users', {
+            select: 'id',
+            filter: `email=eq.${email.toLowerCase()}`
+        });
+
+        if (existingUser && existingUser.length > 0) {
             return res.status(409).json({ error: 'Email ja cadastrado' });
         }
 
         const userId = uuidv4();
         const passwordHash = await bcrypt.hash(password, 12);
 
-        db.prepare('INSERT INTO users (id, name, email, password_hash) VALUES (?, ?, ?, ?)').run(
-            userId,
-            name.trim(),
-            email.toLowerCase(),
-            passwordHash
-        );
+        await db.insert('users', {
+            id: userId,
+            name: name.trim(),
+            email: email.toLowerCase(),
+            password_hash: passwordHash,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+        });
 
         const token = jwt.sign({ userId }, JWT_SECRET, { expiresIn: '30d' });
         const sessionId = uuidv4();
         
-        db.prepare('INSERT INTO sessions (id, user_id, token, expires_at) VALUES (?, ?, ?, datetime("now", "+30 days"))').run(
-            sessionId,
-            userId,
-            token
-        );
+        await db.insert('sessions', {
+            id: sessionId,
+            user_id: userId,
+            token: token,
+            expires_at: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString()
+        });
 
         res.cookie('token', token, {
             httpOnly: true,
@@ -101,7 +108,12 @@ router.post('/login', async (req, res) => {
             });
         }
 
-        const user = db.prepare('SELECT * FROM users WHERE email = ?').get(email.toLowerCase());
+        const users = await db.query('users', {
+            select: '*',
+            filter: `email=eq.${email.toLowerCase()}`
+        });
+
+        const user = users && users.length > 0 ? users[0] : null;
         
         if (!user) {
             loginAttempts.set(email.toLowerCase(), { 
@@ -127,12 +139,12 @@ router.post('/login', async (req, res) => {
         const token = jwt.sign({ userId: user.id }, JWT_SECRET, { expiresIn: `${expiryDays}d` });
         const sessionId = uuidv4();
         
-        db.prepare('INSERT INTO sessions (id, user_id, token, expires_at) VALUES (?, ?, ?, datetime("now", ?))').run(
-            sessionId,
-            user.id,
-            token,
-            `+${expiryDays} days`
-        );
+        await db.insert('sessions', {
+            id: sessionId,
+            user_id: user.id,
+            token: token,
+            expires_at: new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000).toISOString()
+        });
 
         res.cookie('token', token, {
             httpOnly: true,
@@ -141,11 +153,14 @@ router.post('/login', async (req, res) => {
             maxAge: expiryDays * 24 * 60 * 60 * 1000
         });
 
-        const subscription = db.prepare(`
-            SELECT * FROM subscriptions 
-            WHERE user_id = ? AND status = 'active' AND expires_at > datetime('now')
-            ORDER BY expires_at DESC LIMIT 1
-        `).get(user.id);
+        const subscriptions = await db.query('subscriptions', {
+            select: '*',
+            filter: `user_id=eq.${user.id} AND status=eq.active AND expires_at=gt.${new Date().toISOString()}`,
+            order: 'expires_at.desc',
+            limit: '1'
+        });
+
+        const subscription = subscriptions && subscriptions.length > 0 ? subscriptions[0] : null;
 
         res.json({
             success: true,
@@ -155,7 +170,7 @@ router.post('/login', async (req, res) => {
                 email: user.email,
                 created_at: user.created_at
             },
-            subscription: subscription || null,
+            subscription: subscription,
             token
         });
     } catch (error) {
@@ -164,9 +179,9 @@ router.post('/login', async (req, res) => {
     }
 });
 
-router.post('/logout', authMiddleware, (req, res) => {
+router.post('/logout', authMiddleware, async (req, res) => {
     try {
-        db.prepare('DELETE FROM sessions WHERE token = ?').run(req.token);
+        await db.delete('sessions', `token=eq.${req.token}`);
         res.clearCookie('token');
         res.json({ success: true });
     } catch (error) {
@@ -174,22 +189,28 @@ router.post('/logout', authMiddleware, (req, res) => {
     }
 });
 
-router.get('/me', authMiddleware, (req, res) => {
+router.get('/me', authMiddleware, async (req, res) => {
     try {
-        const subscription = db.prepare(`
-            SELECT * FROM subscriptions 
-            WHERE user_id = ? AND status = 'active' AND expires_at > datetime('now')
-            ORDER BY expires_at DESC LIMIT 1
-        `).get(req.user.id);
+        const subscriptions = await db.query('subscriptions', {
+            select: '*',
+            filter: `user_id=eq.${req.user.id} AND status=eq.active AND expires_at=gt.${new Date().toISOString()}`,
+            order: 'expires_at.desc',
+            limit: '1'
+        });
 
-        const allSubscriptions = db.prepare(`
-            SELECT * FROM subscriptions WHERE user_id = ? ORDER BY created_at DESC LIMIT 5
-        `).all(req.user.id);
+        const subscription = subscriptions && subscriptions.length > 0 ? subscriptions[0] : null;
+
+        const allSubscriptions = await db.query('subscriptions', {
+            select: '*',
+            filter: `user_id=eq.${req.user.id}`,
+            order: 'created_at.desc',
+            limit: '5'
+        });
 
         res.json({
             user: req.user,
-            subscription: subscription || null,
-            subscriptions: allSubscriptions
+            subscription: subscription,
+            subscriptions: allSubscriptions || []
         });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao buscar dados' });
@@ -204,13 +225,18 @@ router.post('/forgot-password', async (req, res) => {
             return res.status(400).json({ error: 'Email invalido' });
         }
 
-        const user = db.prepare('SELECT id, name FROM users WHERE email = ?').get(email.toLowerCase());
+        const users = await db.query('users', {
+            select: 'id, name',
+            filter: `email=eq.${email.toLowerCase()}`
+        });
+
+        const user = users && users.length > 0 ? users[0] : null;
         
         if (user) {
             await emailService.sendPasswordReset(email, user.name);
         }
 
-        res.json({ success: true, message: 'Se o email existira, voce recebera as instrucoes' });
+        res.json({ success: true, message: 'Se o email existir, voce recebera as instrucoes' });
     } catch (error) {
         res.status(500).json({ error: 'Erro ao processar solicitacao' });
     }
