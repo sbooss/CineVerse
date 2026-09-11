@@ -2,9 +2,9 @@ const CONFIG = {
     EMBED: {
         PROVIDERS: [
             {
-                name: 'MyEmbed',
-                movie: function(id) { return 'https://myembed.biz/filme/' + id; },
-                tv: function(id, s, e) { return 'https://myembed.biz/serie/' + id + '/' + s + '/' + e; }
+                name: 'APIPlayer',
+                movie: function(id) { return 'https://apiplayer.ru/embed/movie/' + id + '?autoplay=1&lang=pt&color=00d4ff'; },
+                tv: function(id, s, e) { return 'https://apiplayer.ru/embed/tv/' + id + '?autoplay=1&lang=pt&color=00d4ff&s=' + s + '&e=' + e; }
             }
         ]
     },

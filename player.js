@@ -328,7 +328,7 @@ class VideoPlayer {
             // Simple header with provider name only
             this.wrapper.innerHTML = `
                 <div class="provider-selector">
-                    <span class="current-provider"><i class="fas fa-play-circle"></i> ${p.name} - Dublado PT-BR</span>
+                    <span class="current-provider"><i class="fas fa-play-circle"></i> ${p.name} - Dublado PT-BR 4K</span>
                 </div>`;
 
             const iframe = document.createElement('iframe');
