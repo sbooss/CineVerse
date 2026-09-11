@@ -236,6 +236,14 @@ input { font-family: inherit; }
     background: #0090c0;
     box-shadow: var(--shadow-glow-blue);
 }
+.auth-btn-nav.gold {
+    background: linear-gradient(135deg, var(--accent-gold), #e0be6a);
+    color: #0a0a12;
+}
+.auth-btn-nav.gold:hover {
+    background: linear-gradient(135deg, #d4b05a, #eac876);
+    box-shadow: 0 4px 16px rgba(201, 165, 78, 0.3);
+}
 
 .user-menu { position: relative; }
 .user-avatar {

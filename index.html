@@ -94,7 +94,8 @@
                     <a href="#" class="nav-link" data-category="favorites"><i class="fas fa-heart"></i><span>Favoritos</span></a>
                 </div>
                 <div class="auth-buttons" id="authButtons">
-                    <button class="auth-btn-nav" onclick="auth.showAuthModal()">Entrar</button>
+                    <button class="auth-btn-nav" onclick="auth.showLogin()">Entrar</button>
+                    <button class="auth-btn-nav gold" onclick="auth.showRegister()">Cadastrar</button>
                 </div>
                 <div class="user-menu hidden" id="userMenu">
                     <div class="user-avatar" id="userAvatar"><i class="fas fa-user-circle"></i></div>
@@ -317,425 +318,37 @@
             }
         })();
 
-        // Global anti-ad blocker - NUCLEAR
+        // Popup/redirect blocker - SAFE
         (function() {
-            // Kill window.open - ABSOLUTE
-            var deadFn = function() { return null; };
-            window.open = deadFn;
-            Object.defineProperty(window, 'open', { value: deadFn, writable: false, configurable: false });
-
-            // Block ALL navigation
-            window.addEventListener('beforeunload', function(e) {
-                e.preventDefault();
-                e.returnValue = '';
-                return '';
-            });
-
-            // Block location changes
-            try {
-                window.location.assign = function() { return false; };
-                window.location.replace = function() { return false; };
-            } catch(ex) {}
-
-            // Block ALL link clicks - ABSOLUTE
-            document.addEventListener('click', function(e) {
-                var target = e.target;
-
-                // Block ANY link
-                var link = target.closest('a');
-                if (link) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    return false;
-                }
-
-                // Block onclick handlers
-                var onclickEl = target.closest('[onclick]');
-                if (onclickEl) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    return false;
-                }
-
-                // Block data-href/data-url
-                if (target.dataset && (target.dataset.href || target.dataset.url)) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    e.stopImmediatePropagation();
-                    return false;
-                }
-            }, true);
-
-            // Block middle-click
-            document.addEventListener('mousedown', function(e) {
-                if (e.button === 1) {
-                    e.preventDefault();
-                    return false;
-                }
-            }, true);
-
-            // Block Ctrl+click
-            document.addEventListener('keydown', function(e) {
-                if (e.ctrlKey || e.metaKey) {
-                    e.preventDefault();
-                    return false;
-                }
-            }, true);
-
-            // Block context menu
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                return false;
-            }, true);
-
-            // Block drag
-            document.addEventListener('dragstart', function(e) {
-                e.preventDefault();
-                return false;
-            }, true);
-
-            // MutationObserver - NUCLEAR
-            var blocker = new MutationObserver(function(mutations) {
-                mutations.forEach(function(m) {
-                    m.addedNodes.forEach(function(node) {
-                        if (node.nodeType !== 1) return;
-                        // Remove ALL iframes except video
-                        if (node.tagName === 'IFRAME') {
-                            if (!node.classList.contains('video-iframe')) {
-                                node.remove();
-                            }
-                            return;
-                        }
-                        // Remove ad elements
-                        if (node.classList) {
-                            var classes = Array.from(node.classList).join(' ').toLowerCase();
-                            var id = (node.id || '').toLowerCase();
-                            if (classes.indexOf('ad') !== -1 || classes.indexOf('popup') !== -1 ||
-                                classes.indexOf('modal') !== -1 || classes.indexOf('overlay') !== -1 ||
-                                id.indexOf('ad') !== -1 || id.indexOf('popup') !== -1) {
-                                node.remove();
-                                return;
-                            }
-                        }
-                        // Fix all links
-                        if (node.tagName === 'A') {
-                            node.removeAttribute('target');
-                            node.href = 'javascript:void(0)';
-                        }
-                        if (node.querySelectorAll) {
-                            node.querySelectorAll('a').forEach(function(a) {
-                                a.removeAttribute('target');
-                                a.href = 'javascript:void(0)';
-                            });
-                        }
-                    });
-                });
-            });
-            blocker.observe(document.documentElement, { childList: true, subtree: true });
+            window.open = function() { return null; };
+            Object.defineProperty(window, 'open', { value: function() { return null; }, writable: false, configurable: false });
         })();
     </script>
     <style>
-        /* Anti-ad CSS - AGGRESSIVE */
         iframe[src*="doubleclick"],iframe[src*="googlesyndication"],iframe[src*="adnxs"],
         iframe[src*="adsrvr"],iframe[src*="popads"],iframe[src*="propellerads"],
         iframe[src*="clickadu"],iframe[src*="monetag"],iframe[src*="adsterra"],
-        iframe[src*="hilltopads"],iframe[src*="exoclick"],iframe[src*="criteo"],
-        iframe[src*="taboola"],iframe[src*="outbrain"],iframe[src*="amazon-adsystem"],
-        iframe[src*="casalemedia"],iframe[src*="rubiconproject"],iframe[src*="openx"],
-        iframe[src*="pubmatic"],iframe[src*="adform"],iframe[src*="serving-sys"],
-        iframe[src*="advertising.com"],iframe[src*="mathtag"],iframe[src*="turn.com"],
-        iframe[src*="bidswitch"],iframe[src*="spotx"],iframe[src*="iphelix"],
-        iframe[src*="adservice"],iframe[src*="pagead"],iframe[src*="googleads"],
-        iframe[src*="ad.doubleclick"],iframe[src*="ad.moatads"],iframe[src*="ads"],
-        div[id*="ad-"],div[id*="ads-"],div[id*="popup"],div[class*="ad-"],
-        div[class*="ads-"],div[class*="popup"],div[class*="overlay-ad"],
-        div[class*="modal-ad"],div[class*="interstitial"],div[class*="backdrop"][style*="z-index"]
-        {
-            display:none!important;width:0!important;height:0!important;
-            pointer-events:none!important;visibility:hidden!important;
-            position:fixed!important;top:-9999px!important;left:-9999px!important;
-            opacity:0!important;z-index:-1!important
-        }
-
-        /* Block any overlay attempts */
-        body.player-open > *:not(#playerOverlay):not(.player-overlay):not(script):not(style):not(link) {
-            pointer-events: none !important;
-        }
-
-        /* Ensure player overlay is always on top */
-        .player-overlay {
-            z-index: 999999 !important;
-            position: fixed !important;
-            inset: 0 !important;
-        }
-
-        /* Anti-copy protection */
-        * {
-            -webkit-user-select: none !important;
-            -moz-user-select: none !important;
-            -ms-user-select: none !important;
-            user-select: none !important;
-        }
-        input, textarea {
-            -webkit-user-select: text !important;
-            user-select: text !important;
-        }
+        iframe[src*="amazon-adsystem"],iframe[src*="casalemedia"],iframe[src*="rubiconproject"],
+        iframe[src*="openx"],iframe[src*="pubmatic"],iframe[src*="pagead"],iframe[src*="googleads"]
+        {display:none!important;width:0!important;height:0!important;pointer-events:none!important;visibility:hidden!important;position:fixed!important;top:-9999px!important;left:-9999px!important;opacity:0!important;z-index:-1!important}
+        .player-overlay{z-index:999999!important;position:fixed!important;inset:0!important}
+        *{-webkit-user-select:none!important;-moz-user-select:none!important;-ms-user-select:none!important;user-select:none!important}
+        input,textarea{-webkit-user-select:text!important;user-select:text!important}
     </style>
 
-    <!-- SECURITY: Anti-devtools, Anti-debug, Anti-clone -->
+    <!-- SECURITY -->
     <script>
     (function() {
-        'use strict';
-
-        // ===================== ANTI-DEVTOOLS =====================
-        var devtools = {
-            open: false,
-            orientation: null
-        };
-
-        var threshold = 160;
-
-        setInterval(function() {
-            var widthThreshold = window.outerWidth - window.innerWidth > threshold;
-            var heightThreshold = window.outerHeight - window.innerHeight > threshold;
-
-            if (widthThreshold || heightThreshold) {
-                if (!devtools.open) {
-                    devtools.open = true;
-                    // Redirect to blank page when devtools opens
-                    document.body.innerHTML = '';
-                    document.head.innerHTML = '';
-                    window.location.href = 'about:blank';
-                }
-            } else {
-                devtools.open = false;
-            }
-        }, 1000);
-
-        // ===================== ANTI-DEBUGGER =====================
-        // Detect debugger
-        var startTime = new Date().getTime();
-        debugger;
-        var endTime = new Date().getTime();
-        if (endTime - startTime > 100) {
-            document.body.innerHTML = '';
-            window.location.href = 'about:blank';
-        }
-
-        // Continuous debugger detection
-        (function() {
-            var handler = setInterval(function() {
-                var start = performance.now();
-                debugger;
-                var end = performance.now();
-                if (end - start > 50) {
-                    document.body.innerHTML = '';
-                    document.head.innerHTML = '';
-                    clearInterval(handler);
-                }
-            }, 1000);
-        })();
-
-        // ===================== ANTI-COPY =====================
-        // Block right-click
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-            return false;
-        }, true);
-
-        // Block keyboard shortcuts
+        // Block print screen
         document.addEventListener('keydown', function(e) {
-            // Block F12
-            if (e.key === 'F12') {
+            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i'))) {
                 e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+Shift+I (DevTools)
-            if (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+Shift+J (Console)
-            if (e.ctrlKey && e.shiftKey && (e.key === 'J' || e.key === 'j')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+Shift+C (Inspector)
-            if (e.ctrlKey && e.shiftKey && (e.key === 'C' || e.key === 'c')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+U (View Source)
-            if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+S (Save)
-            if (e.ctrlKey && (e.key === 'S' || e.key === 's')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+A (Select All)
-            if (e.ctrlKey && (e.key === 'A' || e.key === 'a')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+C (Copy)
-            if (e.ctrlKey && (e.key === 'C' || e.key === 'c')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+V (Paste)
-            if (e.ctrlKey && (e.key === 'V' || e.key === 'v')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+X (Cut)
-            if (e.ctrlKey && (e.key === 'X' || e.key === 'x')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+P (Print)
-            if (e.ctrlKey && (e.key === 'P' || e.key === 'p')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+G (Find)
-            if (e.ctrlKey && (e.key === 'G' || e.key === 'g')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+F (Find)
-            if (e.ctrlKey && (e.key === 'F' || e.key === 'f')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+H (History)
-            if (e.ctrlKey && (e.key === 'H' || e.key === 'h')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+J (Downloads)
-            if (e.ctrlKey && (e.key === 'J' || e.key === 'j')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+L (Address bar)
-            if (e.ctrlKey && (e.key === 'L' || e.key === 'l')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+N (New window)
-            if (e.ctrlKey && (e.key === 'N' || e.key === 'n')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+T (New tab)
-            if (e.ctrlKey && (e.key === 'T' || e.key === 't')) {
-                e.preventDefault();
-                return false;
-            }
-            // Block Ctrl+W (Close tab)
-            if (e.ctrlKey && (e.key === 'W' || e.key === 'w')) {
-                e.preventDefault();
-                return false;
             }
         }, true);
-
+        // Block context menu
+        document.addEventListener('contextmenu', function(e) { e.preventDefault(); }, true);
         // Block drag
-        document.addEventListener('dragstart', function(e) {
-            e.preventDefault();
-            return false;
-        }, true);
-
-        // ===================== ANTI-SCREENSHOT =====================
-        // CSS protection for screenshots
-        var style = document.createElement('style');
-        style.textContent = '
-            @media print {
-                body * { visibility: hidden !important; }
-                body::before {
-                    content: "CINE BOSS - Acesso Nao Autorizado" !important;
-                    position: fixed !important;
-                    top: 50% !important;
-                    left: 50% !important;
-                    transform: translate(-50%, -50%) !important;
-                    font-size: 24px !important;
-                    color: red !important;
-                    z-index: 9999999 !important;
-                }
-            }
-        ';
-        document.head.appendChild(style);
-
-        // ===================== WATERMARK =====================
-        function createWatermark() {
-            var canvas = document.createElement('canvas');
-            canvas.width = 300;
-            canvas.height = 200;
-            var ctx = canvas.getContext('2d');
-            ctx.fillStyle = 'rgba(0, 212, 255, 0.03)';
-            ctx.font = '12px Arial';
-            ctx.fillText('CINE BOSS', 10, 30);
-            ctx.fillText('Propriedade de Boss William', 10, 50);
-            ctx.fillText('Copia nao autorizada proibida', 10, 70);
-            return canvas.toDataURL();
-        }
-
-        // Apply watermark to body
-        setInterval(function() {
-            if (!document.querySelector('.watermark-overlay')) {
-                var watermark = document.createElement('div');
-                watermark.className = 'watermark-overlay';
-                watermark.style.cssText = 'position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999998;background-image:url(' + createWatermark() + ');opacity:0.3;';
-                document.body.appendChild(watermark);
-            }
-        }, 5000);
-
-        // ===================== ANTI-IFRAME =====================
-        // Prevent site from being embedded in iframes
-        if (window.self !== window.top) {
-            document.body.innerHTML = '';
-            document.head.innerHTML = '';
-            window.top.location.href = window.self.location.href;
-        }
-
-        // ===================== CONSOLE PROTECTION =====================
-        // Overwrite console methods
-        var noop = function() {};
-        var methods = ['log', 'warn', 'error', 'info', 'debug', 'trace', 'dir', 'dirxml', 'group', 'groupEnd', 'groupCollapsed', 'clear', 'count', 'countReset', 'assert', 'profile', 'profileEnd', 'table', 'time', 'timeEnd', 'timeLog', 'timeStamp', 'exception'];
-        methods.forEach(function(method) {
-            console[method] = noop;
-        });
-
-        // Console warning message
-        console.log('%c CINE BOSS - Acesso Nao Autorizado ', 'background: red; color: white; font-size: 20px; font-weight: bold;');
-        console.log('%c Este codigo e protegido. Copia nao autorizada e proibida. ', 'color: red; font-size: 14px;');
-
-        // ===================== DEBUGGER DETECTION =====================
-        // Anti-debugging via toString
-        var origToString = Function.prototype.toString;
-        Function.prototype.toString = function() {
-            if (this === console.log) {
-                return 'function log() { [native code] }';
-            }
-            return origToString.call(this);
-        };
-
-        // ===================== INTEGRITY CHECK =====================
-        // Verify critical functions haven't been tampered with
-        setInterval(function() {
-            if (typeof window.open !== 'function') {
-                window.open = function() { return null; };
-            }
-            if (window.open.toString().indexOf('[native code]') === -1) {
-                document.body.innerHTML = '';
-                window.location.href = 'about:blank';
-            }
-        }, 1000);
-
+        document.addEventListener('dragstart', function(e) { e.preventDefault(); }, true);
     })();
     </script>
 </body>

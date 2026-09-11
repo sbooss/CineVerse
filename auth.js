@@ -64,6 +64,7 @@ class AuthManager {
         return true;
     }
 
+    showAuthModal() { this._showAuth('register'); }
     showLogin() { this._showAuth('login'); }
     showRegister() { this._showAuth('register'); }
 
