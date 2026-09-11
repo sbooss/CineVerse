@@ -2,11 +2,22 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>CINE BOSS - Streaming</title>
     <meta name="description" content="CINE BOSS - A melhor plataforma de streaming. Filmes, Series, Animes e TV Ao Vivo em Portugues.">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <link rel="stylesheet" href="style.css?v=4">
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="X-Frame-Options" content="DENY">
+    <meta name="theme-color" content="#050508">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CINE BOSS">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="CINE BOSS">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="stylesheet" href="style.css?v=5">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Orbitron:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -147,23 +158,75 @@
         </div>
     </footer>
 
-    <script src="config.js?v=4"></script>
-    <script src="tmdb.js?v=4"></script>
-    <script src="player.js?v=4"></script>
-    <script src="app.js?v=4"></script>
+    <script src="config.js?v=5"></script>
+    <script src="tmdb.js?v=5"></script>
+    <script src="player.js?v=5"></script>
+    <script src="app.js?v=5"></script>
     <script>
-        window.addEventListener('load', function() {
-            setTimeout(function() {
-                var boot = document.getElementById('boot-screen');
-                if (boot) {
-                    boot.classList.add('fade-out');
-                    setTimeout(function() { boot.remove(); }, 700);
-                }
-                document.getElementById('mainNav').style.display = '';
-                document.getElementById('mainContent').style.display = '';
-                document.getElementById('mainFooter').style.display = '';
-            }, 2400);
-        });
+        // Service Worker for PWA
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js').catch(() => {});
+        }
+
+        // Global ad blocker - runs before anything else
+        (function() {
+            // Override window.open globally
+            window.open = function() { return null; };
+            
+            // Block ad domains via MutationObserver
+            const blocker = new MutationObserver(function(mutations) {
+                mutations.forEach(function(m) {
+                    m.addedNodes.forEach(function(node) {
+                        if (node.nodeType !== 1) return;
+                        // Remove ad overlays
+                        if (node.style) {
+                            var s = window.getComputedStyle(node);
+                            if ((s.position === 'fixed' || s.position === 'absolute') && parseInt(s.zIndex) > 9000) {
+                                if (!node.closest('#playerOverlay') && !node.closest('.player-header') && !node.id.includes('playerBack') && !node.classList.contains('provider-selector') && !node.classList.contains('provider-list')) {
+                                    node.remove();
+                                }
+                            }
+                        }
+                        // Remove iframes from ad domains
+                        if (node.tagName === 'IFRAME' && node.src) {
+                            var domains = CONFIG.AD_BLOCK.BLOCKED_DOMAINS;
+                            for (var i = 0; i < domains.length; i++) {
+                                if (node.src.includes(domains[i])) {
+                                    node.remove();
+                                    return;
+                                }
+                            }
+                        }
+                    });
+                });
+            });
+            blocker.observe(document.documentElement, { childList: true, subtree: true });
+        })();
     </script>
+    <style>
+        /* Anti-ad CSS - hide popup overlays */
+        [class*="ad-overlay"], [class*="popup-overlay"], [class*="interstitial"],
+        [id*="ad-container"], [id*="popup-container"], [class*="modal-ad"],
+        iframe[src*="doubleclick"], iframe[src*="googlesyndication"],
+        iframe[src*="adnxs"], iframe[src*="adsrvr"], iframe[src*="popads"],
+        iframe[src*="propellerads"], iframe[src*="clickadu"], iframe[src*="monetag"],
+        iframe[src*="adsterra"], iframe[src*="hilltopads"], iframe[src*="exoclick"],
+        div[class*="ad-banner"], div[id*="ad-banner"], div[class*="sponsor"],
+        iframe[src*="ad."], iframe[src*="ads."], iframe[src*="track"],
+        iframe[style*="position:fixed"][style*="z-index:9"], 
+        iframe[style*="position:fixed"][style*="z-index:999"],
+        iframe[style*="position:fixed"][style*="z-index:9999"] {
+            display: none !important; visibility: hidden !important;
+            width: 0 !important; height: 0 !important;
+            position: absolute !important; left: -9999px !important;
+            pointer-events: none !important;
+        }
+        /* Block known ad popup patterns */
+        body > div[style*="position: fixed"][style*="z-index: 9999"],
+        body > div[style*="position: fixed"][style*="z-index: 99999"],
+        body > div[style*="position: fixed"][style*="z-index: 999999"] {
+            display: none !important;
+        }
+    </style>
 </body>
 </html>

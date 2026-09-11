@@ -4,60 +4,237 @@ class VideoPlayer {
         this.wrapper = document.getElementById('playerWrapper');
         this.titleEl = document.getElementById('playerTitle');
         this.backBtn = document.getElementById('playerBack');
+        this._setupAntiAds();
         this._setupPopupBlocker();
+        this._setupFullscreenLock();
         this.backBtn.addEventListener('click', () => this.close());
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isOpen()) this.close();
         });
     }
 
-    _setupPopupBlocker() {
+    _setupAntiAds() {
+        // Kill window.open entirely
+        const origOpen = window.open;
         window.open = function() { return null; };
+        window.open.toString = function() { return 'function open() { [native code] }'; };
+
+        // Block navigation
         window.addEventListener('beforeunload', (e) => {
             if (this.isOpen()) {
                 e.preventDefault();
                 e.returnValue = '';
+                return '';
             }
         });
+
+        // Intercept ALL clicks globally - block ads, popups, redirects
         document.addEventListener('click', (e) => {
             if (!this.isOpen()) return;
-            const link = e.target.closest('a');
+            const target = e.target;
+
+            // Block any link navigation
+            const link = target.closest('a');
             if (link) {
                 const href = link.getAttribute('href') || '';
                 const target = link.getAttribute('target') || '';
-                if (target === '_blank' || target === '_top' || href.startsWith('javascript:') || href === '#') {
+                if (target === '_blank' || target === '_top' || href.startsWith('javascript:') || href === '#' || href === '') {
                     e.preventDefault();
                     e.stopPropagation();
                     return false;
                 }
             }
-            if (e.target.closest('[onclick]')) {
-                const onclick = e.target.closest('[onclick]').getAttribute('onclick') || '';
-                if (onclick.includes('window.open') || onclick.includes('_blank')) {
+
+            // Block onclick handlers with window.open or _blank
+            const onclickEl = target.closest('[onclick]');
+            if (onclickEl) {
+                const onclick = onclickEl.getAttribute('onclick') || '';
+                if (onclick.includes('window.open') || onclick.includes('_blank') || onclick.includes('void(0)')) {
                     e.preventDefault();
                     e.stopPropagation();
+                    return false;
+                }
+            }
+
+            // Block elements that look like ad overlays (fixed/absolute positioned, high z-index)
+            const style = window.getComputedStyle(target);
+            if ((style.position === 'fixed' || style.position === 'absolute') && parseInt(style.zIndex) > 9000) {
+                if (!target.closest('.player-header') && !target.closest('#playerBack') && !target.closest('.provider-selector') && !target.closest('.provider-list')) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    target.remove();
                     return false;
                 }
             }
         }, true);
-        const observer = new MutationObserver((mutations) => {
+
+        // MutationObserver - kill any popup elements added to DOM
+        const adObserver = new MutationObserver((mutations) => {
             if (!this.isOpen()) return;
-            mutations.forEach((mutation) => {
-                mutation.addedNodes.forEach((node) => {
-                    if (node.nodeType === 1) {
-                        if (node.tagName === 'A' && (node.target === '_blank' || node.target === '_top')) {
+            mutations.forEach((m) => {
+                m.addedNodes.forEach((node) => {
+                    if (node.nodeType !== 1) return;
+                    // Remove ad overlays
+                    if (node.classList && (
+                        node.classList.contains('ad') ||
+                        node.classList.contains('ads') ||
+                        node.classList.contains('popup') ||
+                        node.classList.contains('overlay-ad') ||
+                        node.classList.contains('modal-ad') ||
+                        node.id.includes('ad') ||
+                        node.id.includes('popup') ||
+                        node.id.includes('interstitial')
+                    )) {
+                        node.remove();
+                        return;
+                    }
+                    // Fix links in added nodes
+                    if (node.tagName === 'A') {
+                        const t = node.getAttribute('target') || '';
+                        if (t === '_blank' || t === '_top') {
                             node.removeAttribute('target');
                             node.href = 'javascript:void(0)';
                         }
-                        node.querySelectorAll && node.querySelectorAll('a[target="_blank"], a[target="_top"]').forEach(a => {
+                    }
+                    if (node.querySelectorAll) {
+                        node.querySelectorAll('a[target="_blank"], a[target="_top"]').forEach(a => {
                             a.removeAttribute('target');
                             a.href = 'javascript:void(0)';
                         });
                     }
+                    // Remove fixed/absolute elements with high z-index that aren't part of our player
+                    if (node.style) {
+                        const pos = window.getComputedStyle(node).position;
+                        const z = parseInt(window.getComputedStyle(node).zIndex);
+                        if ((pos === 'fixed' || pos === 'absolute') && z > 9000) {
+                            if (!node.classList.contains('player-header') && !node.id.includes('playerBack') && !node.classList.contains('provider-selector') && !node.classList.contains('provider-list')) {
+                                setTimeout(() => node.remove(), 100);
+                            }
+                        }
+                    }
                 });
             });
         });
-        observer.observe(document.body, { childList: true, subtree: true });
+        adObserver.observe(document.body, { childList: true, subtree: true });
+
+        // Block timed popups (setTimeout/setInterval that open windows)
+        const origSetTimeout = window.setTimeout;
+        const origSetInterval = window.setInterval;
+        window.setTimeout = function(fn, delay) {
+            if (typeof fn === 'string' && (fn.includes('window.open') || fn.includes('popup') || fn.includes('ad'))) {
+                return 0;
+            }
+            return origSetTimeout.call(window, fn, delay);
+        };
+        window.setInterval = function(fn, delay) {
+            if (typeof fn === 'string' && (fn.includes('window.open') || fn.includes('popup') || fn.includes('ad'))) {
+                return 0;
+            }
+            return origSetInterval.call(window, fn, delay);
+        };
+
+        // Block ad domain requests via fetch/XHR override
+        const origFetch = window.fetch;
+        window.fetch = function(url, opts) {
+            if (typeof url === 'string') {
+                const blocked = CONFIG.AD_BLOCK.BLOCKED_DOMAINS;
+                for (let i = 0; i < blocked.length; i++) {
+                    if (url.includes(blocked[i])) {
+                        return Promise.reject(new Error('Blocked'));
+                    }
+                }
+            }
+            return origFetch.call(window, url, opts);
+        };
+
+        const origXHROpen = XMLHttpRequest.prototype.open;
+        XMLHttpRequest.prototype.open = function(method, url) {
+            if (typeof url === 'string') {
+                const blocked = CONFIG.AD_BLOCK.BLOCKED_DOMAINS;
+                for (let i = 0; i < blocked.length; i++) {
+                    if (url.includes(blocked[i])) {
+                        return;
+                    }
+                }
+            }
+            return origXHROpen.apply(this, arguments);
+        };
+
+        // Block creating new iframes that aren't video
+        const origCreateElement = document.createElement.bind(document);
+        document.createElement = function(tag) {
+            const el = origCreateElement(tag);
+            if (tag.toLowerCase() === 'iframe') {
+                const origSetAttr = el.setAttribute.bind(el);
+                el.setAttribute = function(name, value) {
+                    if (name === 'src' && typeof value === 'string') {
+                        const blocked = CONFIG.AD_BLOCK.BLOCKED_DOMAINS;
+                        for (let i = 0; i < blocked.length; i++) {
+                            if (value.includes(blocked[i])) {
+                                value = 'about:blank';
+                            }
+                        }
+                    }
+                    return origSetAttr(name, value);
+                };
+            }
+            return el;
+        };
+    }
+
+    _setupPopupBlocker() {
+        // Additional popup blocking via event delegation
+        document.addEventListener('mousedown', (e) => {
+            if (!this.isOpen()) return;
+            const target = e.target;
+            // Block middle-click (often opens in new tab)
+            if (e.button === 1) {
+                e.preventDefault();
+                return false;
+            }
+            // Block right-click context menu on player (prevent "open in new tab")
+            if (target.closest('.video-iframe') || target.closest('#playerWrapper')) {
+                e.preventDefault();
+                return false;
+            }
+        }, true);
+
+        // Prevent new windows via keyboard shortcuts (Ctrl+click, middle-click)
+        document.addEventListener('keydown', (e) => {
+            if (!this.isOpen()) return;
+            // Block Ctrl+click (open in new tab)
+            if (e.ctrlKey || e.metaKey) {
+                if (e.target.closest('.video-iframe') || e.target.closest('#playerWrapper')) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        }, true);
+    }
+
+    _setupFullscreenLock() {
+        // Prevent ads from exiting fullscreen
+        const lockFullscreen = () => {
+            if (!document.fullscreenElement && this.overlay.classList.contains('active')) {
+                try {
+                    this.overlay.requestFullscreen().catch(() => {});
+                } catch(e) {}
+            }
+        };
+
+        document.addEventListener('fullscreenchange', () => {
+            if (this.isOpen() && !document.fullscreenElement) {
+                // Someone exited fullscreen - re-enter it
+                setTimeout(lockFullscreen, 500);
+            }
+        });
+
+        // Override exitFullscreen when player is open
+        const origExit = document.exitFullscreen.bind(document);
+        document.exitFullscreen = () => {
+            if (this.isOpen()) return Promise.reject();
+            return origExit();
+        };
     }
 
     isOpen() {
@@ -75,6 +252,9 @@ class VideoPlayer {
         this.overlay.classList.remove('active');
         document.body.style.overflow = '';
         this.wrapper.innerHTML = '';
+        if (document.fullscreenElement) {
+            document.exitFullscreen().catch(() => {});
+        }
     }
 
     _loadEmbed(item, season, episode) {

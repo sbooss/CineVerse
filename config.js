@@ -2,14 +2,19 @@ const CONFIG = {
     EMBED: {
         PROVIDERS: [
             {
-                name: 'EmbedMovies',
-                movie: (id) => `https://myembed.biz/filme/${id}`,
-                tv: (id, s, e) => `https://myembed.biz/serie/${id}/${s}/${e}`
+                name: 'CineSrc',
+                movie: (id) => `https://cinesrc.st/embed/movie/${id}?autoplay=true&controls=true&color=%2300d4ff&quality=1080`,
+                tv: (id, s, e) => `https://cinesrc.st/embed/tv/${id}?s=${s}&e=${e}&autoplay=true&controls=true&color=%2300d4ff&autonext=true&autoskip=true`
             },
             {
-                name: 'VidLink',
-                movie: (id) => `https://vidlink.pro/movie/${id}?lang=pt`,
-                tv: (id, s, e) => `https://vidlink.pro/tv/${id}/${s}/${e}?lang=pt`
+                name: 'VidSrc',
+                movie: (id) => `https://vidsrc.in/embed/movie/${id}`,
+                tv: (id, s, e) => `https://vidsrc.in/embed/tv/${id}/${s}/${e}`
+            },
+            {
+                name: 'VidSync',
+                movie: (id) => `https://vidsync.xyz/embed/movie/${id}?autoPlay=true&theme=00d4ff`,
+                tv: (id, s, e) => `https://vidsync.xyz/embed/tv/${id}/${s}/${e}?autoPlay=true&autoNext=true&nextButton=true&theme=00d4ff`
             },
             {
                 name: 'VidFast',
@@ -17,9 +22,9 @@ const CONFIG = {
                 tv: (id, s, e) => `https://vidfast.vc/tv/${id}/${s}/${e}`
             },
             {
-                name: 'SuperEmbed',
-                movie: (id) => `https://multiembed.mov/?video_id=${id}&tmdb=1&lang=pt`,
-                tv: (id, s, e) => `https://multiembed.mov/?video_id=${id}&tmdb=1&s=${s}&e=${e}&lang=pt`
+                name: 'VidLink',
+                movie: (id) => `https://vidlink.pro/movie/${id}?lang=pt`,
+                tv: (id, s, e) => `https://vidlink.pro/tv/${id}/${s}/${e}?lang=pt`
             }
         ]
     },
@@ -70,6 +75,26 @@ const CONFIG = {
             { name: 'Euronews', stream: 'https://euronews-euronews-english-2-us.plex.wurl.tv/playlist.m3u8' },
             { name: 'CGTN', stream: 'https://english.cctv.com/live/cctv_English/index.m3u8' },
             { name: 'TRT World', stream: 'https://tv-trtworld.medya.trt.com.tr/master.m3u8' }
+        ]
+    },
+    AD_BLOCK: {
+        BLOCKED_DOMAINS: [
+            'doubleclick.net', 'googlesyndication.com', 'googleadservices.com',
+            'adservice.google.com', 'pagead2.googlesyndication.com',
+            'adnxs.com', 'adsrvr.org', 'adroll.com', 'amazon-adsystem.com',
+            'casalemedia.com', 'contextweb.com', 'dotomi.com', 'doubleclick.com',
+            'feedburner.com', 'juicyads.com', 'media.net', 'moatads.com',
+            'outbrain.com', 'taboola.com', 'criteo.com', 'criteo.net',
+            'popads.net', 'popcash.net', 'propellerads.com', 'ExoClick.com',
+            'hilltopads.com', 'clickadu.com', 'monetag.com', 'adsterra.com',
+            'trafficjunky.com', 'exo.com', 'bangbrosvideos.com', 'adultadworld.com',
+            'ad.score', 'serving-sys.com', 'smaato.net', 'inmobi.com',
+            'unity3d.com/ads', 'applovin.com', 'ironsrc.com', 'fyber.com',
+            'startapp.com', 'leadbolt.com', 'airpush.com', 'mopub.com'
+        ],
+        BLOCKED_SCRIPTS: [
+            'popunder', 'popup', 'clickunder', 'interstitial',
+            'survey-popp', 'anti-adblock', 'adbtc', 'coin-hive'
         ]
     }
 };
