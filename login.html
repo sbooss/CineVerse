@@ -70,26 +70,6 @@
         .brand-line{width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent);opacity:0;transition:all .8s .5s ease;margin-top:24px}
         .brand-center.show .brand-line{opacity:1}
 
-        /* ===== FEATURED HERO ===== */
-        .hero-section{position:fixed;top:0;left:0;right:0;bottom:0;z-index:1;pointer-events:none;opacity:0;transition:opacity 1s ease}
-        .hero-section.show{opacity:1}
-        .hero-content{position:absolute;top:50%;left:5%;transform:translateY(-50%);width:320px;max-width:40vw;pointer-events:all}
-        .hero-poster{width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,0.8),0 0 40px rgba(0,168,224,0.1);position:relative}
-        .hero-info{position:absolute;bottom:0;left:0;right:0;padding:30px 20px;background:linear-gradient(transparent,rgba(5,5,8,0.98));border-radius:0 0 12px 12px}
-        .hero-badge{display:inline-block;font-size:9px;font-weight:700;letter-spacing:1px;padding:3px 8px;background:var(--gold);color:#0a0a12;border-radius:4px;margin-bottom:6px;font-family:'Sora',sans-serif;text-transform:uppercase}
-        .hero-title{font-family:'Sora',sans-serif;font-size:clamp(14px,2.2vw,20px);font-weight:800;color:#fff;margin-bottom:4px;line-height:1.2}
-        .hero-meta{display:flex;align-items:center;gap:8px;font-size:11px;color:var(--txt2);margin-bottom:8px}
-        .hero-meta .rating{color:var(--gold);font-weight:700}
-        .hero-desc{font-size:11px;color:var(--txt3);display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;line-height:1.4;margin-bottom:10px}
-        .hero-btn{width:100%;padding:10px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .25s;font-family:'Inter',sans-serif;background:linear-gradient(135deg,var(--blue),#0090c0);color:#fff;letter-spacing:.5px}
-        .hero-btn:hover{box-shadow:0 4px 20px rgba(0,168,224,0.4);transform:translateY(-1px)}
-        .hero-label{position:absolute;top:0;left:0;right:0;text-align:center;font-family:'Sora',sans-serif;font-size:10px;font-weight:700;letter-spacing:4px;color:var(--gold);text-transform:uppercase;padding-top:2px;opacity:0;transition:opacity .5s}
-        .hero-section.show .hero-label{opacity:.7}
-        .hero-scroll{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);display:flex;gap:4px;pointer-events:none;opacity:0;transition:opacity .5s}
-        .hero-section.show .hero-scroll{opacity:.5}
-        .hero-scroll-dot{width:6px;height:6px;border-radius:50%;background:var(--blue);transition:all .3s}
-        .hero-scroll-dot.active{background:var(--gold);transform:scale(1.3)}
-
         /* ===== AUTH CARD ===== */
         .auth-area{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .5s ease}
         .auth-area.show{opacity:1}
@@ -136,8 +116,6 @@
         .plan-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px 14px;position:relative;cursor:pointer;transition:all .25s;max-width:100%;box-sizing:border-box}
         .plan-card:hover{border-color:rgba(0,168,224,0.3);background:rgba(0,168,224,0.03)}
         .plan-card.selected{border-color:var(--blue);background:rgba(0,168,224,0.06)}
-        .plan-card.popular{border-color:rgba(201,165,78,0.3)}
-        .plan-card.popular::before{content:'MAIS POPULAR';position:absolute;top:-8px;right:12px;background:var(--gold);color:#0a0a12;font-size:8px;font-weight:700;padding:2px 7px;border-radius:6px;letter-spacing:.5px}
         .plan-name{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--txt);letter-spacing:.5px;margin-bottom:2px}
         .plan-period{font-size:10px;color:var(--txt3);margin-bottom:8px}
         .plan-price{font-family:'Sora',sans-serif;font-size:24px;font-weight:800;color:#fff;margin-bottom:10px}
@@ -165,12 +143,6 @@
         @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
         .success-txt{font-family:'Sora',sans-serif;font-size:17px;font-weight:700}
         @media(max-width:640px){
-            .hero-content{width:180px;left:2%;top:auto;bottom:10px;transform:none}
-            .hero-poster{aspect-ratio:2/3}
-            .hero-info{padding:16px 12px}
-            .hero-title{font-size:13px}
-            .hero-desc{display:none}
-            .hero-btn{font-size:10px;padding:8px}
             .auth-card-inner{padding:28px 22px}
             .brand-main{letter-spacing:4px}
             .brand-sub{letter-spacing:5px}
@@ -202,28 +174,6 @@
         <div class="brand-main">CINE <span class="accent">BOSS</span></div>
         <div class="brand-sub">Filmes e Series</div>
         <div class="brand-line"></div>
-    </div>
-
-    <!-- FEATURED HERO -->
-    <div class="hero-section" id="heroSection">
-        <div class="hero-label">Filme em Destaque da Semana</div>
-        <div class="hero-content" id="heroContent">
-            <div class="hero-poster" id="heroPoster" style="background:rgba(255,255,255,0.03);display:flex;align-items:center;justify-content:center">
-                <i class="fas fa-film" style="font-size:40px;color:rgba(255,255,255,0.1)"></i>
-            </div>
-            <div class="hero-info">
-                <div class="hero-badge">Em Destaque</div>
-                <div class="hero-title" id="heroTitle">Carregando...</div>
-                <div class="hero-meta">
-                    <span class="rating" id="heroRating">-</span>
-                    <span id="heroYear">-</span>
-                    <span id="heroGenre">-</span>
-                </div>
-                <div class="hero-desc" id="heroDesc">Carregando...</div>
-                <button class="hero-btn" id="heroBtn" onclick="auth._selectPlan('monthly')">ASSINE AGORA</button>
-            </div>
-        </div>
-        <div class="hero-scroll" id="heroScroll"></div>
     </div>
 
     <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> Voltar</a>
@@ -341,20 +291,7 @@
                     var s=p.slice().sort(function(){return Math.random()-.5});
                     el.innerHTML=s.concat(s).map(function(s){return'<img src="'+s+'" alt="" loading="lazy">'}).join('');
                 });
-                /* Feature hero */
-                if(d.results&&d.results.length>0){
-                    var featured=d.results.sort(function(){return Math.random()-.5})[0];
-                    if(featured.poster_path){
-                        document.getElementById('heroPoster').innerHTML='<img src="https://image.tmdb.org/t/p/w500'+featured.poster_path+'" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:12px" loading="lazy">';
-                        document.getElementById('heroTitle').textContent=featured.title||featured.name||'Desconhecido';
-                        document.getElementById('heroRating').textContent=featured.vote_average?featured.vote_average.toFixed(1)+'/10':'-';
-                        document.getElementById('heroYear').textContent=featured.release_date?featured.release_date.substring(0,4):(featured.first_air_date?featured.first_air_date.substring(0,4):'-');
-                        var genres=featured.genre_ids?featured.genre_ids.slice(0,2).join(', '):'-';
-                        document.getElementById('heroGenre').textContent=genres;
-                        document.getElementById('heroDesc').textContent=featured.overview||'Sem descricao disponivel.';
-                    }
-                }
-            }).catch(function(){});
+                }).catch(function(){});
         }
 
         function particles(){
@@ -382,14 +319,8 @@
                 document.getElementById('brandCenter').classList.remove('show');
             },5200);
             setTimeout(function(){
-                document.getElementById('heroSection').classList.add('show');
-                /* Dots for hero */
-                var scroll=document.getElementById('heroScroll');
-                for(var i=0;i<5;i++){var d=document.createElement('div');d.className='hero-scroll-dot'+(i===0?' active':'');scroll.appendChild(d)}
-            },5600);
-            setTimeout(function(){
                 document.getElementById('authArea').classList.add('show');
-            },6200);
+            },5600);
         }
 
         /* ===== TABS ===== */
