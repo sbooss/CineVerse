@@ -70,15 +70,15 @@ input { font-family: inherit; }
 .cinema-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
 .poster-row{position:absolute;display:flex;gap:6px;will-change:transform}
 .poster-row img{width:110px;height:165px;object-fit:cover;border-radius:4px;filter:brightness(.35) saturate(.5)}
-.poster-row.p1{top:1%;animation:scrollR 90s linear infinite}
+.poster-row.p1{top:1%;animation:scrollR 600s linear infinite}
 .poster-row.p1 img{opacity:.18}
-.poster-row.p2{top:21%;animation:scrollL 110s linear infinite}
+.poster-row.p2{top:21%;animation:scrollL 700s linear infinite}
 .poster-row.p2 img{opacity:.1;filter:brightness(.2) saturate(.3) blur(1.5px);transform:scale(1.1)}
-.poster-row.p3{top:43%;animation:scrollR 75s linear infinite}
+.poster-row.p3{top:43%;animation:scrollR 500s linear infinite}
 .poster-row.p3 img{opacity:.2;filter:brightness(.4) saturate(.6)}
-.poster-row.p4{top:63%;animation:scrollL 120s linear infinite}
+.poster-row.p4{top:63%;animation:scrollL 750s linear infinite}
 .poster-row.p4 img{opacity:.07;filter:brightness(.15) saturate(.2) blur(2.5px);transform:scale(1.15)}
-.poster-row.p5{top:82%;animation:scrollR 95s linear infinite}
+.poster-row.p5{top:82%;animation:scrollR 650s linear infinite}
 .poster-row.p5 img{opacity:.13;filter:brightness(.3) saturate(.4)}
 @keyframes scrollR{from{transform:translateX(-20%)}to{transform:translateX(-50%)}}
 @keyframes scrollL{from{transform:translateX(-50%)}to{transform:translateX(-20%)}}

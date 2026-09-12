@@ -17,16 +17,15 @@
         :root{--bg:#050508;--blue:#00a8e0;--gold:#c9a54e;--txt:#e8e8f0;--txt2:#8a8aa0;--txt3:#4a4a60;--brd:rgba(255,255,255,0.06)}
         body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;width:100vw;overflow-x:hidden}
 
-        /* ===== POSTER BACKGROUND ===== */
         .cinema-bg{position:fixed;inset:0;z-index:0;overflow:hidden}
         .poster-row{position:absolute;display:flex;gap:6px;will-change:transform}
-        .poster-row img{width:110px;height:165px;object-fit:cover;border-radius:4px;filter:brightness(.4) saturate(.5);transition:filter .3s}
+        .poster-row img{width:110px;height:165px;object-fit:cover;border-radius:4px;filter:brightness(.35) saturate(.5)}
         .poster-row img:hover{filter:brightness(.7) saturate(.8) scale(1.05);z-index:1}
-        .poster-row.r1{top:0%;animation:scrollR 600s linear infinite}.poster-row.r1 img{opacity:.10}
-        .poster-row.r2{top:18%;animation:scrollL 700s linear infinite}.poster-row.r2 img{opacity:.07;filter:brightness(.3) saturate(.4)}
-        .poster-row.r3{top:36%;animation:scrollR 550s linear infinite}.poster-row.r3 img{opacity:.12;filter:brightness(.4) saturate(.5)}
-        .poster-row.r4{top:54%;animation:scrollL 750s linear infinite}.poster-row.r4 img{opacity:.06;filter:brightness(.25) saturate(.35)}
-        .poster-row.r5{top:72%;animation:scrollR 650s linear infinite}.poster-row.r5 img{opacity:.08;filter:brightness(.3) saturate(.4)}
+        .poster-row.r1{top:1%;animation:scrollR 800s linear infinite}.poster-row.r1 img{opacity:.10}
+        .poster-row.r2{top:19%;animation:scrollL 900s linear infinite}.poster-row.r2 img{opacity:.06;filter:brightness(.2) saturate(.3) blur(1px)}
+        .poster-row.r3{top:38%;animation:scrollR 700s linear infinite}.poster-row.r3 img{opacity:.11;filter:brightness(.35) saturate(.5)}
+        .poster-row.r4{top:57%;animation:scrollL 950s linear infinite}.poster-row.r4 img{opacity:.05;filter:brightness(.15) saturate(.2) blur(2px)}
+        .poster-row.r5{top:76%;animation:scrollR 850s linear infinite}.poster-row.r5 img{opacity:.08;filter:brightness(.25) saturate(.35)}
         @keyframes scrollR{from{transform:translateX(-20%)}to{transform:translateX(-50%)}}
         @keyframes scrollL{from{transform:translateX(-50%)}to{transform:translateX(-20%)}}
         .bg-overlay{position:absolute;inset:0;z-index:2;pointer-events:none}
@@ -43,7 +42,6 @@
         .particle{position:absolute;border-radius:50%;pointer-events:none;animation:pFloat 12s ease-in-out infinite}
         @keyframes pFloat{0%,100%{transform:translateY(0);opacity:.2}50%{transform:translateY(-20px);opacity:.35}}
 
-        /* ===== BOOT SCREEN ===== */
         .boot{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s ease,visibility .8s ease}
         .boot.out{opacity:0;visibility:hidden;pointer-events:none}
         .boot-ring{position:relative;width:60px;height:60px;margin-bottom:24px}
@@ -59,7 +57,6 @@
         .boot-bar-fill{height:100%;width:0;background:linear-gradient(90deg,var(--blue),var(--gold));border-radius:2px;animation:bootLoad 2.2s ease forwards}
         @keyframes bootLoad{0%{width:0}50%{width:70%}100%{width:100%}}
 
-        /* ===== BRAND REVEAL ===== */
         .brand-center{position:fixed;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;pointer-events:none;opacity:0;transition:opacity .6s ease}
         .brand-center.show{opacity:1}
         .brand-main{font-family:'Sora',sans-serif;font-size:clamp(48px,9vw,90px);font-weight:800;letter-spacing:8px;color:var(--txt);opacity:0;transform:translateY(40px) scale(0.95);transition:all 1s cubic-bezier(.4,0,.2,1);text-align:center;text-shadow:0 0 60px rgba(0,168,224,0.15)}
@@ -70,7 +67,6 @@
         .brand-line{width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--blue),transparent);opacity:0;transition:all .8s .5s ease;margin-top:24px}
         .brand-center.show .brand-line{opacity:1}
 
-        /* ===== AUTH CARD ===== */
         .auth-area{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .5s ease}
         .auth-area.show{opacity:1}
         .auth-card{position:relative;width:100%;max-width:480px;background:rgba(8,8,14,0.88);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border:1px solid var(--brd);border-radius:16px;overflow:hidden;transform:translateY(40px) scale(0.96);transition:all .6s cubic-bezier(.4,0,.2,1)}
@@ -108,7 +104,6 @@
         .auth-switch span{color:var(--blue);cursor:pointer;font-weight:600}
         .auth-switch span:hover{text-decoration:underline}
 
-        /* ===== PAYMENT PANEL ===== */
         .payment-panel{display:none;flex-direction:column;gap:14px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.04)}
         .payment-panel.active{display:flex}
         .payment-panel-title{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:2px;text-align:center}
@@ -116,7 +111,6 @@
         .plans-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
         .plan-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px 14px;position:relative;cursor:pointer;transition:all .25s;box-sizing:border-box}
         .plan-card:hover{border-color:rgba(0,168,224,0.3);background:rgba(0,168,224,0.03)}
-        .plan-card.selected{border-color:var(--blue);background:rgba(0,168,224,0.06)}
         .plan-card.popular{border-color:rgba(0,168,224,0.3);background:rgba(0,168,224,0.04)}
         .plan-card.popular::before{content:'MAIS POPULAR';position:absolute;top:-8px;right:12px;background:var(--blue);color:#fff;font-size:8px;font-weight:700;padding:2px 7px;border-radius:6px;letter-spacing:.5px}
         .plan-name{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--txt);letter-spacing:.5px;margin-bottom:2px}
@@ -146,13 +140,12 @@
         .success-icon{width:56px;height:56px;background:rgba(0,168,224,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--blue);margin-bottom:14px;animation:pop .35s cubic-bezier(.34,1.56,.64,1)}
         @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
         .success-txt{font-family:'Sora',sans-serif;font-size:17px;font-weight:700}
-        .redirecting{text-align:center;font-size:11px;color:var(--txt3);margin-top:8px;display:none}
-        .redirecting.show{display:block}
+        .user-welcome{text-align:center;margin-bottom:16px;padding:12px;background:rgba(0,168,224,0.06);border-radius:10px;border:1px solid rgba(0,168,224,0.15)}
+        .user-welcome-name{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:var(--blue)}
+        .user-welcome-sub{font-size:10px;color:var(--txt3);margin-top:2px}
         @media(max-width:640px){
             .auth-card-inner{padding:28px 22px}
             .plans-grid{grid-template-columns:1fr}
-            .brand-main{letter-spacing:4px}
-            .brand-sub{letter-spacing:5px}
         }
         @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
     </style>
@@ -168,7 +161,6 @@
         <div class="bg-overlay"></div><div class="vignette"></div>
     </div>
 
-    <!-- BOOT SCREEN -->
     <div class="boot" id="bootScreen">
         <div class="boot-ring"><i class="fas fa-play"></i></div>
         <div class="boot-brand">CINE <span class="accent">BOSS</span></div>
@@ -176,7 +168,6 @@
         <div class="boot-bar"><div class="boot-bar-fill"></div></div>
     </div>
 
-    <!-- BRAND REVEAL -->
     <div class="brand-center" id="brandCenter">
         <div class="brand-main">CINE <span class="accent">BOSS</span></div>
         <div class="brand-sub">Filmes e Series</div>
@@ -193,31 +184,38 @@
                     <div class="auth-logo-icon"><i class="fas fa-play"></i></div>
                     <div class="auth-logo-text">CINE <span class="accent">BOSS</span></div>
                 </div>
-                <div class="auth-tabs">
-                    <button class="tab active" data-f="registerF">Criar conta</button>
-                    <button class="tab" data-f="loginF">Entrar</button>
-                </div>
-                <form class="auth-form active" id="registerF">
-                    <div class="field"><label>Nome completo</label><input type="text" id="rName" placeholder="Seu nome" required autocomplete="name"></div>
-                    <div class="field"><label>Email</label><input type="email" id="rEmail" placeholder="seu@email.com" required autocomplete="email"></div>
-                    <div class="field"><label>Senha</label><input type="password" id="rPass" placeholder="Minimo 6 caracteres" required autocomplete="new-password"></div>
-                    <div class="auth-error" id="rErr"></div>
-                    <button type="submit" class="auth-submit gold" id="rBtn">CRIAR MINHA CONTA</button>
-                    <p class="auth-switch">Ja tem conta? <span data-tab="1">Entrar</span></p>
-                </form>
-                <form class="auth-form" id="loginF">
-                    <div class="field"><label>Email</label><input type="email" id="lEmail" placeholder="seu@email.com" required autocomplete="email"></div>
-                    <div class="field"><label>Senha</label><input type="password" id="lPass" placeholder="Sua senha" required autocomplete="current-password"></div>
-                    <div class="auth-row">
-                        <label class="auth-check"><input type="checkbox" id="lRemember" checked> Lembrar</label>
-                        <span class="auth-forgot" id="forgotBtn">Esqueci a senha</span>
-                    </div>
-                    <div class="auth-error" id="lErr"></div>
-                    <button type="submit" class="auth-submit blue" id="lBtn">ENTRAR</button>
-                    <p class="auth-switch">Nao tem conta? <span data-tab="0">Cadastre-se</span></p>
-                </form>
 
-                <!-- PAYMENT PANEL -->
+                <div class="user-welcome" id="userWelcome" style="display:none">
+                    <div class="user-welcome-name" id="welcomeName"></div>
+                    <div class="user-welcome-sub">Voce ja esta conectado</div>
+                </div>
+
+                <div id="authForms">
+                    <div class="auth-tabs">
+                        <button class="tab active" data-f="registerF">Criar conta</button>
+                        <button class="tab" data-f="loginF">Entrar</button>
+                    </div>
+                    <form class="auth-form active" id="registerF">
+                        <div class="field"><label>Nome completo</label><input type="text" id="rName" placeholder="Seu nome" required autocomplete="name"></div>
+                        <div class="field"><label>Email</label><input type="email" id="rEmail" placeholder="seu@email.com" required autocomplete="email"></div>
+                        <div class="field"><label>Senha</label><input type="password" id="rPass" placeholder="Minimo 6 caracteres" required autocomplete="new-password"></div>
+                        <div class="auth-error" id="rErr"></div>
+                        <button type="submit" class="auth-submit gold" id="rBtn">CRIAR MINHA CONTA</button>
+                        <p class="auth-switch">Ja tem conta? <span data-tab="1">Entrar</span></p>
+                    </form>
+                    <form class="auth-form" id="loginF">
+                        <div class="field"><label>Email</label><input type="email" id="lEmail" placeholder="seu@email.com" required autocomplete="email"></div>
+                        <div class="field"><label>Senha</label><input type="password" id="lPass" placeholder="Sua senha" required autocomplete="current-password"></div>
+                        <div class="auth-row">
+                            <label class="auth-check"><input type="checkbox" id="lRemember" checked> Lembrar</label>
+                            <span class="auth-forgot" id="forgotBtn">Esqueci a senha</span>
+                        </div>
+                        <div class="auth-error" id="lErr"></div>
+                        <button type="submit" class="auth-submit blue" id="lBtn">ENTRAR</button>
+                        <p class="auth-switch">Nao tem conta? <span data-tab="0">Cadastre-se</span></p>
+                    </form>
+                </div>
+
                 <div class="payment-panel" id="paymentPanel">
                     <div class="payment-panel-title">Escolha seu plano</div>
                     <div class="payment-panel-desc">Pagamento unico via Mercado Pago. Sem renovacao automatica.</div>
@@ -247,9 +245,8 @@
                         </div>
                     </div>
                     <div class="plan-footer"><i class="fas fa-shield-halved"></i>Pagamento unico. Sem renovacao automatica.</div>
+                    <button class="auth-submit blue" style="margin-top:8px" onclick="window.location.href='/'">CONTINUAR ASSISTINDO <i class="fas fa-arrow-right" style="margin-left:6px"></i></button>
                 </div>
-
-                <div class="redirecting" id="redirecting">Redirecionando...</div>
             </div>
         </div>
     </div>
@@ -263,8 +260,8 @@
     (function(){
         var API=window.location.origin+'/api';
         var TMDB='eb9690431d1dd3d86de35def2b1b0a2c';
+        var isAlreadyLogged=false;
 
-        /* ===== SOUNDS ===== */
         var S={ctx:null,m:false,
             init:function(){if(!this.ctx)this.ctx=new(window.AudioContext||window.webkitAudioContext)()},
             tone:function(f,d,tp,v){
@@ -276,34 +273,19 @@
                 o.connect(g).connect(this.ctx.destination);o.start();o.stop(this.ctx.currentTime+d);
             },
             click:function(){this.init();this.tone(1200,.03,'sine',.08);this.tone(800,.05,'sine',.05)},
-            ok:function(){
-                this.init();
-                this.tone(523,.15,'sine',.1);
-                setTimeout(function(){S.tone(659,.12,'sine',.1)},100);
-                setTimeout(function(){S.tone(784,.12,'sine',.12)},200);
-                setTimeout(function(){S.tone(1047,.25,'sine',.08)},320);
-            },
+            ok:function(){this.init();this.tone(523,.15,'sine',.1);setTimeout(function(){S.tone(659,.12,'sine',.1)},100);setTimeout(function(){S.tone(784,.12,'sine',.12)},200);setTimeout(function(){S.tone(1047,.25,'sine',.08)},320)},
             err:function(){this.init();this.tone(300,.2,'sawtooth',.07);setTimeout(function(){S.tone(220,.25,'sawtooth',.05)},120)},
-            brand:function(){
-                this.init();
-                this.tone(220,.6,'sine',.06);
-                this.tone(330,.5,'sine',.04);
-                setTimeout(function(){S.tone(440,.4,'sine',.05)},200);
-                setTimeout(function(){S.tone(660,.3,'sine',.04)},400);
-                setTimeout(function(){S.tone(880,.5,'sine',.03)},600);
-            },
+            brand:function(){this.init();this.tone(220,.6,'sine',.06);this.tone(330,.5,'sine',.04);setTimeout(function(){S.tone(440,.4,'sine',.05)},200);setTimeout(function(){S.tone(660,.3,'sine',.04)},400);setTimeout(function(){S.tone(880,.5,'sine',.03)},600)},
             boot:function(){this.init();this.tone(440,.3,'sine',.04);setTimeout(function(){S.tone(550,.2,'sine',.03)},300)},
             pay:function(){this.init();this.tone(440,.1,'sine',.08);setTimeout(function(){S.tone(554,.1,'sine',.08)},80);setTimeout(function(){S.tone(659,.15,'sine',.1)},160)}
         };
 
         document.getElementById('sndBtn').addEventListener('click',function(){
-            S.m=!S.m;
-            this.classList.toggle('muted');
+            S.m=!S.m;this.classList.toggle('muted');
             this.querySelector('i').className=S.m?'fas fa-volume-xmark':'fas fa-volume-high';
             if(!S.m){S.init();S.click();}
         });
 
-        /* ===== POSTERS ===== */
         function loadPosters(){
             fetch('https://api.themoviedb.org/3/trending/all/week?api_key='+TMDB+'&language=pt-BR')
             .then(function(r){return r.json()}).then(function(d){
@@ -319,16 +301,15 @@
 
         function particles(){
             var bg=document.querySelector('.cinema-bg');
-            for(var i=0;i<14;i++){
+            for(var i=0;i<10;i++){
                 var p=document.createElement('div');p.className='particle';
-                var sz=Math.random()*2.5+1;
-                var c=['rgba(0,168,224,.2)','rgba(201,165,78,.15)','rgba(255,255,255,.15)'];
-                p.style.cssText='width:'+sz+'px;height:'+sz+'px;background:'+c[Math.floor(Math.random()*c.length)]+';left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;animation-delay:'+(-Math.random()*12)+'s;animation-duration:'+(10+Math.random()*8)+'s';
+                var sz=Math.random()*2+1;
+                var c=['rgba(0,168,224,.15)','rgba(201,165,78,.1)','rgba(255,255,255,.1)'];
+                p.style.cssText='width:'+sz+'px;height:'+sz+'px;background:'+c[Math.floor(Math.random()*c.length)]+';left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;animation-delay:'+(-Math.random()*15)+'s;animation-duration:'+(12+Math.random()*10)+'s';
                 bg.appendChild(p);
             }
         }
 
-        /* ===== PLAN SELECTION ===== */
         window.selectPlan = function(plan){
             S.click();
             var btn = document.getElementById(plan==='monthly'?'planMonthBtn':'planQtrBtn');
@@ -357,27 +338,24 @@
             });
         };
 
-        /* ===== SEQUENCE ===== */
-        var bootDone=false;
         function startSequence(){
             S.init();S.boot();
-            setTimeout(function(){
-                document.getElementById('bootScreen').classList.add('out');
-                S.brand();
-            },2400);
-            setTimeout(function(){
-                document.getElementById('brandCenter').classList.add('show');
-            },2800);
-            setTimeout(function(){
-                document.getElementById('brandCenter').classList.remove('show');
-            },5200);
+            setTimeout(function(){document.getElementById('bootScreen').classList.add('out');S.brand();},2400);
+            setTimeout(function(){document.getElementById('brandCenter').classList.add('show');},2800);
+            setTimeout(function(){document.getElementById('brandCenter').classList.remove('show');},5200);
             setTimeout(function(){
                 document.getElementById('authArea').classList.add('show');
-                bootDone=true;
+                if(!isAlreadyLogged){
+                    document.getElementById('authForms').style.display='block';
+                }
             },5600);
         }
 
-        /* ===== TABS ===== */
+        function showAuthImmediate(){
+            document.getElementById('bootScreen').classList.add('out');
+            document.getElementById('authArea').classList.add('show');
+        }
+
         document.querySelectorAll('.tab').forEach(function(t){t.addEventListener('click',function(){
             S.click();
             document.querySelectorAll('.tab').forEach(function(x){x.classList.remove('active')});
@@ -387,11 +365,9 @@
             document.getElementById('paymentPanel').classList.remove('active');
         })});
         document.querySelectorAll('.auth-switch span').forEach(function(s){s.addEventListener('click',function(){
-            var i=parseInt(this.dataset.tab);
-            document.querySelectorAll('.tab')[i].click();
+            var i=parseInt(this.dataset.tab);document.querySelectorAll('.tab')[i].click();
         })});
 
-        /* ===== LOGIN ===== */
         document.getElementById('loginF').addEventListener('submit',function(e){
             e.preventDefault();var err=document.getElementById('lErr');var btn=document.getElementById('lBtn');
             err.textContent='';btn.disabled=true;btn.textContent='ENTRANDO...';
@@ -406,6 +382,9 @@
                     showOk('Bem-vindo, '+(r.data.user.name||'')+'!');
                     setTimeout(function(){
                         document.getElementById('okScreen').classList.remove('on');
+                        document.getElementById('authForms').style.display='none';
+                        var uw=document.getElementById('userWelcome');uw.style.display='block';
+                        document.getElementById('welcomeName').textContent=r.data.user.name||r.data.user.email;
                         document.getElementById('paymentPanel').classList.add('active');
                         S.pay();
                     },1200);
@@ -415,7 +394,6 @@
             .catch(function(e){err.textContent=e.message;S.err();btn.disabled=false;btn.textContent='ENTRAR'});
         });
 
-        /* ===== REGISTER ===== */
         document.getElementById('registerF').addEventListener('submit',function(e){
             e.preventDefault();var err=document.getElementById('rErr');var btn=document.getElementById('rBtn');
             err.textContent='';btn.disabled=true;btn.textContent='CRIANDO...';
@@ -430,6 +408,9 @@
                 showOk('Conta criada! Bem-vindo ao CINE BOSS');
                 setTimeout(function(){
                     document.getElementById('okScreen').classList.remove('on');
+                    document.getElementById('authForms').style.display='none';
+                    var uw=document.getElementById('userWelcome');uw.style.display='block';
+                    document.getElementById('welcomeName').textContent=nm;
                     document.getElementById('paymentPanel').classList.add('active');
                     S.pay();
                 },1200);
@@ -438,7 +419,6 @@
             .catch(function(e){err.textContent=e.message;S.err();btn.disabled=false;btn.textContent='CRIAR MINHA CONTA'});
         });
 
-        /* ===== FORGOT ===== */
         document.getElementById('forgotBtn').addEventListener('click',function(){
             var em=document.getElementById('lEmail').value;
             if(!em){document.getElementById('lErr').textContent='Informe seu email primeiro';return}
@@ -453,20 +433,24 @@
             setTimeout(function(){document.getElementById('okScreen').classList.remove('on')},2000);
         }
 
-        /* ===== INIT ===== */
+        loadPosters();particles();
+
         fetch(API+'/auth/me',{credentials:'include'}).then(function(r){return r.json()}).then(function(d){
             if(d.loggedIn&&d.hasSubscription){
                 window.location.href='/';
                 return;
             }
             if(d.loggedIn){
-                document.getElementById('authArea').classList.add('show');
+                isAlreadyLogged=true;
+                showAuthImmediate();
+                document.getElementById('authForms').style.display='none';
+                var uw=document.getElementById('userWelcome');uw.style.display='block';
+                document.getElementById('welcomeName').textContent=d.user.name||d.user.email;
                 document.getElementById('paymentPanel').classList.add('active');
+            }else{
+                startSequence();
             }
-        }).catch(function(){});
-
-        loadPosters();particles();
-        startSequence();
+        }).catch(function(){startSequence();});
     })();
     </script>
 </body>
