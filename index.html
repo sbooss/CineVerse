@@ -246,7 +246,7 @@
             }}
         })();
 
-        // FORCE UNREGISTER old service workers (they block clicks!)
+        // Clear old service workers and caches
         if ('serviceWorker' in navigator) {
             navigator.serviceWorker.getRegistrations().then(function(registrations) {
                 registrations.forEach(function(registration) { registration.unregister(); });
@@ -254,7 +254,6 @@
             caches.keys().then(function(names) {
                 names.forEach(function(name) { caches.delete(name); });
             });
-            navigator.serviceWorker.register('sw.js?v=' + Date.now()).catch(function(){});
         }
 
         // PWA Install Prompt

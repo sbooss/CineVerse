@@ -2,7 +2,7 @@
     "name": "CINE BOSS - Streaming Premium",
     "short_name": "CINE BOSS",
     "description": "A melhor plataforma de streaming. Filmes, Series, Animes e TV Ao Vivo em Portugues.",
-    "start_url": "/CineVerse/",
+    "start_url": "/",
     "display": "standalone",
     "orientation": "any",
     "background_color": "#050508",
@@ -10,7 +10,7 @@
     "categories": ["entertainment", "movies", "tv"],
     "lang": "pt-BR",
     "dir": "ltr",
-    "scope": "/CineVerse/",
+    "scope": "/",
     "prefer_related_applications": false,
     "handle_links": "preferred",
     "launch_handler": {
@@ -87,28 +87,28 @@
         {
             "name": "Filmes Populares",
             "short_name": "Filmes",
-            "url": "/CineVerse/#movie",
+            "url": "/#movie",
             "icons": [{ "src": "icon-96.png", "sizes": "96x96" }],
             "description": "Assistir filmes populares"
         },
         {
             "name": "Series Populares",
             "short_name": "Series",
-            "url": "/CineVerse/#tv",
+            "url": "/#tv",
             "icons": [{ "src": "icon-96.png", "sizes": "96x96" }],
             "description": "Assistir series populares"
         },
         {
             "name": "Animes",
             "short_name": "Animes",
-            "url": "/CineVerse/#anime",
+            "url": "/#anime",
             "icons": [{ "src": "icon-96.png", "sizes": "96x96" }],
             "description": "Assistir animes populares"
         },
         {
             "name": "TV Ao Vivo",
             "short_name": "TV",
-            "url": "/CineVerse/#live",
+            "url": "/#live",
             "icons": [{ "src": "icon-96.png", "sizes": "96x96" }],
             "description": "Assistir TV ao vivo"
         }
