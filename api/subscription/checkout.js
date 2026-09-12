@@ -8,8 +8,8 @@ const MP_TOKEN = process.env.MP_ACCESS_TOKEN || 'APP_USR-5795040715734318-091118
 const MP_API = 'https://api.mercadopago.com';
 
 const PLANS = {
-    monthly: { price: 6.99, days: 30, name: 'CINE BOSS - 30 Dias', unit: 699 },
-    quarterly: { price: 15.99, days: 90, name: 'CINE BOSS - 90 Dias', unit: 1599 }
+    monthly: { price: 6.99, days: 30, name: 'CINE BOSS - 30 Dias', unit: 6.99 },
+    quarterly: { price: 15.99, days: 90, name: 'CINE BOSS - 90 Dias', unit: 15.99 }
 };
 
 module.exports = async function handler(req, res) {
