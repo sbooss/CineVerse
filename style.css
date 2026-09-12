@@ -69,25 +69,25 @@ input { font-family: inherit; }
 /* ===================== CINEMATIC BACKGROUND ===================== */
 .cinema-bg{position:fixed;inset:0;z-index:0;overflow:hidden;pointer-events:none}
 .poster-row{position:absolute;display:flex;gap:6px;will-change:transform}
-.poster-row img{width:110px;height:165px;object-fit:cover;border-radius:4px;filter:brightness(.35) saturate(.5)}
-.poster-row.p1{top:1%;animation:scrollR 600s linear infinite}
-.poster-row.p1 img{opacity:.18}
-.poster-row.p2{top:21%;animation:scrollL 700s linear infinite}
-.poster-row.p2 img{opacity:.1;filter:brightness(.2) saturate(.3) blur(1.5px);transform:scale(1.1)}
-.poster-row.p3{top:43%;animation:scrollR 500s linear infinite}
-.poster-row.p3 img{opacity:.2;filter:brightness(.4) saturate(.6)}
-.poster-row.p4{top:63%;animation:scrollL 750s linear infinite}
-.poster-row.p4 img{opacity:.07;filter:brightness(.15) saturate(.2) blur(2.5px);transform:scale(1.15)}
-.poster-row.p5{top:82%;animation:scrollR 650s linear infinite}
-.poster-row.p5 img{opacity:.13;filter:brightness(.3) saturate(.4)}
+.poster-row img{width:110px;height:165px;object-fit:cover;border-radius:4px;filter:brightness(.45) saturate(.6)}
+.poster-row.p1{top:1%;animation:scrollR 900s linear infinite}
+.poster-row.p1 img{opacity:.25}
+.poster-row.p2{top:21%;animation:scrollL 1000s linear infinite}
+.poster-row.p2 img{opacity:.15;filter:brightness(.3) saturate(.4) blur(1px);transform:scale(1.1)}
+.poster-row.p3{top:43%;animation:scrollR 850s linear infinite}
+.poster-row.p3 img{opacity:.28;filter:brightness(.5) saturate(.7)}
+.poster-row.p4{top:63%;animation:scrollL 1100s linear infinite}
+.poster-row.p4 img{opacity:.12;filter:brightness(.25) saturate(.35) blur(1.5px);transform:scale(1.15)}
+.poster-row.p5{top:82%;animation:scrollR 950s linear infinite}
+.poster-row.p5 img{opacity:.2;filter:brightness(.4) saturate(.55)}
 @keyframes scrollR{from{transform:translateX(-20%)}to{transform:translateX(-50%)}}
 @keyframes scrollL{from{transform:translateX(-50%)}to{transform:translateX(-20%)}}
 .bg-overlay{position:absolute;inset:0;z-index:2;pointer-events:none}
-.bg-overlay::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 35%,rgba(0,168,224,0.06) 0%,transparent 50%),radial-gradient(ellipse at 70% 65%,rgba(201,165,78,0.03) 0%,transparent 40%)}
-.bg-overlay::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 15%,rgba(5,5,8,0.9) 100%)}
+.bg-overlay::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 35%,rgba(0,168,224,0.08) 0%,transparent 50%),radial-gradient(ellipse at 70% 65%,rgba(201,165,78,0.04) 0%,transparent 40%)}
+.bg-overlay::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 20%,rgba(5,5,8,0.85) 100%)}
 .vignette{position:absolute;inset:0;z-index:3;pointer-events:none}
-.vignette::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,5,8,0.92) 0%,transparent 15%,transparent 85%,rgba(5,5,8,0.92) 100%)}
-.vignette::after{content:'';position:absolute;left:0;right:0;bottom:0;height:50%;background:linear-gradient(0deg,rgba(5,5,8,0.95) 0%,transparent 100%)}
+.vignette::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,5,8,0.85) 0%,transparent 20%,transparent 80%,rgba(5,5,8,0.85) 100%)}
+.vignette::after{content:'';position:absolute;left:0;right:0;bottom:0;height:40%;background:linear-gradient(0deg,rgba(5,5,8,0.9) 0%,transparent 100%)}
 .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.1;animation:orbFloat 20s ease-in-out infinite;pointer-events:none}
 .orb.o1{width:300px;height:300px;background:var(--accent-blue);top:5%;left:10%;animation-delay:0s}
 .orb.o2{width:240px;height:240px;background:var(--accent-gold);top:50%;right:5%;animation-delay:-7s}
@@ -1356,6 +1356,12 @@ body.tv-mode .tv-focused {
     .detail-btn-play, .detail-btn-secondary { width: 100%; justify-content: center; }
     .live-channels { grid-template-columns: 1fr; }
 }
+
+/* ===================== MOBILE INSTALL BUTTON ===================== */
+.mobile-menu-extras{padding:16px 20px;border-top:1px solid rgba(255,255,255,0.06)}
+.mobile-install-btn{width:100%;padding:14px 20px;background:linear-gradient(135deg,var(--accent-blue),#0077b3);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;transition:all .2s;font-family:'Sora',sans-serif}
+.mobile-install-btn:hover{transform:scale(1.02);box-shadow:0 4px 20px rgba(0,168,224,0.3)}
+.user-dropdown-item#dropdownInstallBtn{color:var(--accent-blue)!important;font-weight:600}
 
 /* ===================== REDUCED MOTION ===================== */
 @media (prefers-reduced-motion: reduce) {

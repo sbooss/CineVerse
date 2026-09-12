@@ -4,7 +4,7 @@ const {
     jsonError, jsonSuccess
 } = require('../_lib/security');
 
-const PLANS = { monthly: { price: 4.99, days: 30 }, quarterly: { price: 14.99, days: 90 } };
+const PLANS = { monthly: { price: 6.99, days: 30 }, quarterly: { price: 15.99, days: 90 } };
 
 module.exports = async function handler(req, res) {
     setCors(req, res);

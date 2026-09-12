@@ -275,7 +275,7 @@ class AuthManager {
                 }
                 window.location.href = d.url;
             } else {
-                sounds.ok();
+                sounds.success();
                 if(btn){btn.textContent='PAGO!';}
                 setTimeout(function(){window.location.href='/'},1500);
             }

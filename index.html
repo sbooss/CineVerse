@@ -118,6 +118,7 @@
                         <div class="user-dropdown-divider"></div>
                         <a href="/account.html" class="user-dropdown-item"><i class="fas fa-user"></i> Minha Conta</a>
                         <a href="#" class="user-dropdown-item" onclick="event.preventDefault(); auth.closeModal('paywallModal');"><i class="fas fa-crown"></i> Minha Assinatura</a>
+                        <a href="#" class="user-dropdown-item" id="dropdownInstallBtn"><i class="fas fa-download"></i> Baixar App</a>
                         <a href="#" class="user-dropdown-item" onclick="event.preventDefault(); auth.logout();"><i class="fas fa-sign-out-alt"></i> Sair</a>
                     </div>
                 </div>
@@ -145,6 +146,9 @@
                 <i class="fas fa-search search-icon"></i>
                 <input type="text" id="mobileSearchInput" placeholder="Buscar..." autocomplete="off">
             </div>
+        </div>
+        <div class="mobile-menu-extras">
+            <button class="mobile-install-btn" id="mobileInstallBtn"><i class="fas fa-download"></i> Baixar App</button>
         </div>
     </div>
 
@@ -261,42 +265,28 @@
         window.addEventListener('beforeinstallprompt', function(e) {
             e.preventDefault();
             deferredPrompt = e;
-            // Show install banner after 30 seconds
-            setTimeout(function() {
-                if (deferredPrompt && !localStorage.getItem('cineboss_install_dismissed')) {
-                    showInstallBanner();
-                }
-            }, 30000);
+            document.getElementById('mobileInstallBtn').style.display='flex';
+            var dd = document.getElementById('dropdownInstallBtn');
+            if(dd) dd.style.display='block';
         });
 
-        function showInstallBanner() {
-            var banner = document.createElement('div');
-            banner.className = 'install-banner';
-            banner.innerHTML = '<div class="install-banner-text"><i class="fas fa-download"></i> Instalar CINE BOSS</div><div><button class="install-banner-btn" id="installBtn">Instalar</button><button class="install-banner-btn" id="dismissInstall" style="margin-left:8px;background:transparent;color:white;border:1px solid rgba(255,255,255,0.3)">Depois</button></div>';
-            document.body.appendChild(banner);
-
-            document.getElementById('installBtn').addEventListener('click', function() {
-                if (deferredPrompt) {
-                    deferredPrompt.prompt();
-                    deferredPrompt.userChoice.then(function(choice) {
-                        if (choice.outcome === 'accepted') {
-                            showToast('CINE BOSS instalado!');
-                        }
-                        deferredPrompt = null;
-                        banner.remove();
-                    });
-                }
-            });
-
-            document.getElementById('dismissInstall').addEventListener('click', function() {
-                localStorage.setItem('cineboss_install_dismissed', 'true');
-                banner.remove();
-            });
+        function triggerInstall(){
+            if(deferredPrompt){
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then(function(choice){
+                    if(choice.outcome==='accepted') showToast('CINE BOSS instalado!');
+                    deferredPrompt=null;
+                });
+            }else{
+                showToast('Abra no Chrome e use "Adicionar a tela de inicio"');
+            }
         }
+        document.getElementById('mobileInstallBtn').addEventListener('click',triggerInstall);
+        var ddBtn=document.getElementById('dropdownInstallBtn');
+        if(ddBtn) ddBtn.addEventListener('click',function(e){e.preventDefault();triggerInstall();});
 
         window.addEventListener('appinstalled', function() {
             showToast('CINE BOSS instalado com sucesso!');
-            localStorage.removeItem('cineboss_install_dismissed');
         });
 
         function showToast(message) {
