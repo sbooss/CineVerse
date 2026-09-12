@@ -1,5 +1,5 @@
-const CACHE_NAME = 'cineboss-v6';
-const IMAGE_CACHE = 'cineboss-images-v6';
+const CACHE_NAME = 'cineboss-v7';
+const IMAGE_CACHE = 'cineboss-images-v7';
 
 self.addEventListener('install', (event) => {
     self.skipWaiting();
