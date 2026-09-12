@@ -1,13 +1,11 @@
-const mercadopago = require('mercadopago');
 const {
     supabase, setCors, handleOptions,
     getToken, verifyToken,
     jsonError, jsonSuccess
 } = require('../_lib/security');
 
-mercadopago.configure({
-    access_token: process.env.MP_ACCESS_TOKEN || 'APP_USR-5795040715734318-091118-1a87bdaaabaa81fc45f976b9d27be954-3681341897'
-});
+const MP_TOKEN = process.env.MP_ACCESS_TOKEN || 'APP_USR-5795040715734318-091118-1a87bdaaabaa81fc45f976b9d27be954-3681341897';
+const MP_API = 'https://api.mercadopago.com';
 
 const PLANS = {
     monthly: { price: 6.99, days: 30, name: 'CINE BOSS - 30 Dias', unit: 699 },
@@ -41,7 +39,7 @@ module.exports = async function handler(req, res) {
         const planInfo = PLANS[plan];
         const siteUrl = process.env.SITE_URL || 'https://cine-verse-virid-delta.vercel.app';
 
-        const preference = {
+        const preferenceBody = {
             items: [{
                 title: planInfo.name,
                 quantity: 1,
@@ -64,23 +62,45 @@ module.exports = async function handler(req, res) {
             external_reference: JSON.stringify({ userId: user.id, plan, planDays: String(planInfo.days) })
         };
 
-        const mpResponse = await mercadopago.preferences.create(preference);
-        const preferenceData = mpResponse.body;
-        const initPoint = preferenceData.init_point || preferenceData.response?.init_point;
-        const preferenceId = preferenceData.id;
+        const mpRes = await fetch(`${MP_API}/v1/preferences`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${MP_TOKEN}`
+            },
+            body: JSON.stringify(preferenceBody)
+        });
 
-        const { data: subData } = await supabase.from('subscriptions').insert({
-            id: crypto.randomUUID(),
+        if (!mpRes.ok) {
+            const errText = await mpRes.text();
+            console.error('MP API error:', mpRes.status, errText);
+            return jsonError(res, 500, 'Erro ao criar preferencia no Mercado Pago');
+        }
+
+        const mpData = await mpRes.json();
+        const initPoint = mpData.init_point;
+        const preferenceId = mpData.id;
+
+        if (!initPoint) {
+            console.error('MP no init_point:', JSON.stringify(mpData));
+            return jsonError(res, 500, 'Mercado Pago nao retornou link de pagamento');
+        }
+
+        const subId = crypto.randomUUID();
+        const { error: subErr } = await supabase.from('subscriptions').insert({
+            id: subId,
             user_id: user.id, plan, status: 'pending',
-            payment_id: preferenceId,
+            payment_id: String(preferenceId),
             amount: planInfo.price,
             expires_at: new Date(Date.now() + planInfo.days * 24 * 60 * 60 * 1000).toISOString(),
-            mp_preference_id: preferenceId,
+            mp_preference_id: String(preferenceId),
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         });
 
-        return jsonSuccess(res, { url: initPoint, preferenceId, subscriptionId: subData && subData[0] ? subData[0].id : null });
+        if (subErr) console.error('Sub insert error:', subErr);
+
+        return jsonSuccess(res, { url: initPoint, preferenceId, subscriptionId: subId });
     } catch (error) {
         console.error('Mercado Pago checkout error:', error);
         return jsonError(res, 500, 'Erro ao criar pagamento via Mercado Pago');
