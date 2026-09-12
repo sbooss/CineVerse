@@ -21,20 +21,24 @@ const sounds = new SoundManager();
 class AuthManager {
     constructor() {
         this.user = null; this.subscription = null; this.loggedIn = false;
-        this.listeners = []; this.checking = false;
+        this.listeners = []; this.checking = false; this.checked = false;
+        this._readyPromise = null;
     }
     onAuthChange(cb) { this.listeners.push(cb); }
     notify() { this.listeners.forEach(cb => cb(this.user, this.subscription, this.loggedIn)); }
 
     async check() {
-        if (this.checking) return;
+        if (this.checking) return this._readyPromise;
         this.checking = true;
-        try {
-            const r = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
-            const d = await r.json();
-            this.loggedIn = d.loggedIn || false; this.user = d.user || null; this.subscription = d.subscription || null;
-        } catch { this.loggedIn = false; this.user = null; this.subscription = null; }
-        this.checking = false; this.notify();
+        this._readyPromise = (async () => {
+            try {
+                const r = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
+                const d = await r.json();
+                this.loggedIn = d.loggedIn || false; this.user = d.user || null; this.subscription = d.subscription || null;
+            } catch { this.loggedIn = false; this.user = null; this.subscription = null; }
+            this.checked = true; this.checking = false; this.notify();
+        })();
+        return this._readyPromise;
     }
 
     async login(email, password, remember) {
@@ -56,9 +60,14 @@ class AuthManager {
 
     hasActiveSubscription() { return !!this.subscription && this.subscription.status === 'active'; }
 
-    requireAuth() { if (!this.loggedIn) { this.showRegister(); return false; } return true; }
+    async requireAuth() {
+        if (!this.checked) await this.check();
+        if (!this.loggedIn) { this.showRegister(); return false; }
+        return true;
+    }
 
-    requireSubscription() {
+    async requireSubscription() {
+        if (!this.checked) await this.check();
         if (!this.loggedIn) { this.showRegister(); return false; }
         if (!this.hasActiveSubscription()) { this.showPaywall(); return false; }
         return true;
@@ -175,7 +184,7 @@ class AuthManager {
             const btn = e.target.querySelector('.cb-btn');
             err.textContent = ''; btn.disabled = true; btn.textContent = 'ENTRANDO...';
             try {
-                await this.login(document.getElementById('cbLEmail').value, document.getElementById('cbLPass').value, false);
+                await this.login(document.getElementById('cbLEmail').value, document.getElementById('cbLPass').value, true);
                 sounds.success(); this.closeModal('authModal');
                 if (window.playAfterAuth) { window.playAfterAuth(); window.playAfterAuth = null; }
             } catch (e) { err.textContent = e.message; sounds.error(); }

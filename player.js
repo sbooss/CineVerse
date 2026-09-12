@@ -63,7 +63,7 @@ class VideoPlayer {
 
     async open(item, season = 1, episode = 1) {
         if (typeof auth !== 'undefined') {
-            const canPlay = auth.requireSubscription();
+            const canPlay = await auth.requireSubscription();
             if (!canPlay) {
                 window.playAfterAuth = () => this.open(item, season, episode);
                 return;

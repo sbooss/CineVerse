@@ -395,7 +395,7 @@
         document.getElementById('loginF').addEventListener('submit',function(e){
             e.preventDefault();var err=document.getElementById('lErr');var btn=document.getElementById('lBtn');
             err.textContent='';btn.disabled=true;btn.textContent='ENTRANDO...';
-            fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({email:document.getElementById('lEmail').value,password:document.getElementById('lPass').value,remember:document.getElementById('lRemember').checked})})
+            fetch(API+'/auth/login',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({email:document.getElementById('lEmail').value,password:document.getElementById('lPass').value,remember:true})})
             .then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d}})})
             .then(function(r){
                 if(!r.ok)throw new Error(r.data.error);
