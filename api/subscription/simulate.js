@@ -33,7 +33,7 @@ module.exports = async function handler(req, res) {
 
         if (subscription.mp_preference_id) {
             try {
-                const mpRes = await fetch(`${MP_API}/v1/preferences/${subscription.mp_preference_id}`, {
+                const mpRes = await fetch(`${MP_API}/checkout/preferences/${subscription.mp_preference_id}`, {
                     headers: { 'Authorization': `Bearer ${MP_TOKEN}` }
                 });
                 if (mpRes.ok) {

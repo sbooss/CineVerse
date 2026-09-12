@@ -62,7 +62,7 @@ module.exports = async function handler(req, res) {
             external_reference: JSON.stringify({ userId: user.id, plan, planDays: String(planInfo.days) })
         };
 
-        const mpRes = await fetch(`${MP_API}/v1/preferences`, {
+        const mpRes = await fetch(`${MP_API}/checkout/preferences`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
