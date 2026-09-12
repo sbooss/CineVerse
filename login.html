@@ -15,33 +15,33 @@
     <style>
         *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
         :root{--bg:#050508;--blue:#00a8e0;--gold:#c9a54e;--txt:#e8e8f0;--txt2:#8a8aa0;--txt3:#4a4a60;--brd:rgba(255,255,255,0.06)}
-        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);overflow:hidden;height:100vh;width:100vw}
+        body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;width:100vw;overflow-x:hidden}
 
         /* ===== POSTER BACKGROUND ===== */
         .cinema-bg{position:fixed;inset:0;z-index:0;overflow:hidden}
         .poster-row{position:absolute;display:flex;gap:6px;will-change:transform}
-        .poster-row img{width:110px;height:165px;object-fit:cover;border-radius:4px;filter:brightness(.6) saturate(.8);transition:filter .3s}
-        .poster-row img:hover{filter:brightness(.9) saturate(1) scale(1.1);z-index:1}
-        .poster-row.r1{top:0%;animation:scrollR 320s linear infinite}.poster-row.r1 img{opacity:.22}
-        .poster-row.r2{top:18%;animation:scrollL 380s linear infinite}.poster-row.r2 img{opacity:.16;filter:brightness(.5) saturate(.7)}
-        .poster-row.r3{top:36%;animation:scrollR 280s linear infinite}.poster-row.r3 img{opacity:.25;filter:brightness(.7) saturate(.9)}
-        .poster-row.r4{top:54%;animation:scrollL 400s linear infinite}.poster-row.r4 img{opacity:.12;filter:brightness(.4) saturate(.6)}
-        .poster-row.r5{top:72%;animation:scrollR 350s linear infinite}.poster-row.r5 img{opacity:.18;filter:brightness(.55) saturate(.7)}
+        .poster-row img{width:110px;height:165px;object-fit:cover;border-radius:4px;filter:brightness(.4) saturate(.5);transition:filter .3s}
+        .poster-row img:hover{filter:brightness(.7) saturate(.8) scale(1.05);z-index:1}
+        .poster-row.r1{top:0%;animation:scrollR 600s linear infinite}.poster-row.r1 img{opacity:.10}
+        .poster-row.r2{top:18%;animation:scrollL 700s linear infinite}.poster-row.r2 img{opacity:.07;filter:brightness(.3) saturate(.4)}
+        .poster-row.r3{top:36%;animation:scrollR 550s linear infinite}.poster-row.r3 img{opacity:.12;filter:brightness(.4) saturate(.5)}
+        .poster-row.r4{top:54%;animation:scrollL 750s linear infinite}.poster-row.r4 img{opacity:.06;filter:brightness(.25) saturate(.35)}
+        .poster-row.r5{top:72%;animation:scrollR 650s linear infinite}.poster-row.r5 img{opacity:.08;filter:brightness(.3) saturate(.4)}
         @keyframes scrollR{from{transform:translateX(-20%)}to{transform:translateX(-50%)}}
         @keyframes scrollL{from{transform:translateX(-50%)}to{transform:translateX(-20%)}}
         .bg-overlay{position:absolute;inset:0;z-index:2;pointer-events:none}
-        .bg-overlay::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 35%,rgba(0,168,224,0.06) 0%,transparent 50%),radial-gradient(ellipse at 70% 65%,rgba(201,165,78,0.03) 0%,transparent 40%)}
-        .bg-overlay::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 15%,rgba(5,5,8,0.9) 100%)}
+        .bg-overlay::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 30% 35%,rgba(0,168,224,0.04) 0%,transparent 50%),radial-gradient(ellipse at 70% 65%,rgba(201,165,78,0.02) 0%,transparent 40%)}
+        .bg-overlay::after{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 10%,rgba(5,5,8,0.92) 100%)}
         .vignette{position:absolute;inset:0;z-index:3;pointer-events:none}
-        .vignette::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,5,8,0.92) 0%,transparent 15%,transparent 85%,rgba(5,5,8,0.92) 100%)}
-        .vignette::after{content:'';position:absolute;left:0;right:0;bottom:0;height:50%;background:linear-gradient(0deg,rgba(5,5,8,0.95) 0%,transparent 100%)}
-        .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.1;animation:orbFloat 20s ease-in-out infinite;pointer-events:none}
+        .vignette::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(5,5,8,0.95) 0%,transparent 15%,transparent 85%,rgba(5,5,8,0.95) 100%)}
+        .vignette::after{content:'';position:absolute;left:0;right:0;bottom:0;height:50%;background:linear-gradient(0deg,rgba(5,5,8,0.97) 0%,transparent 100%)}
+        .orb{position:absolute;border-radius:50%;filter:blur(80px);opacity:.06;animation:orbFloat 25s ease-in-out infinite;pointer-events:none}
         .orb.o1{width:300px;height:300px;background:var(--blue);top:5%;left:10%}
         .orb.o2{width:240px;height:240px;background:var(--gold);top:50%;right:5%;animation-delay:-7s}
         .orb.o3{width:200px;height:200px;background:#7b2fff;bottom:10%;left:30%;animation-delay:-14s}
         @keyframes orbFloat{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(30px,-20px) scale(1.05)}66%{transform:translate(-20px,15px) scale(.97)}}
-        .particle{position:absolute;border-radius:50%;pointer-events:none;animation:pFloat 10s ease-in-out infinite}
-        @keyframes pFloat{0%,100%{transform:translateY(0);opacity:.3}50%{transform:translateY(-25px);opacity:.5}}
+        .particle{position:absolute;border-radius:50%;pointer-events:none;animation:pFloat 12s ease-in-out infinite}
+        @keyframes pFloat{0%,100%{transform:translateY(0);opacity:.2}50%{transform:translateY(-20px);opacity:.35}}
 
         /* ===== BOOT SCREEN ===== */
         .boot{position:fixed;inset:0;z-index:200;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .8s ease,visibility .8s ease}
@@ -73,7 +73,7 @@
         /* ===== AUTH CARD ===== */
         .auth-area{position:fixed;inset:0;z-index:10;display:flex;align-items:center;justify-content:center;padding:20px;opacity:0;transition:opacity .5s ease}
         .auth-area.show{opacity:1}
-        .auth-card{position:relative;width:100%;max-width:430px;background:rgba(8,8,14,0.85);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border:1px solid var(--brd);border-radius:16px;overflow:hidden;transform:translateY(40px) scale(0.96);transition:all .6s cubic-bezier(.4,0,.2,1)}
+        .auth-card{position:relative;width:100%;max-width:480px;background:rgba(8,8,14,0.88);backdrop-filter:blur(40px);-webkit-backdrop-filter:blur(40px);border:1px solid var(--brd);border-radius:16px;overflow:hidden;transform:translateY(40px) scale(0.96);transition:all .6s cubic-bezier(.4,0,.2,1)}
         .auth-area.show .auth-card{transform:translateY(0) scale(1)}
         .auth-card::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,168,224,0.4),transparent)}
         .auth-card-inner{padding:36px 32px}
@@ -109,27 +109,31 @@
         .auth-switch span:hover{text-decoration:underline}
 
         /* ===== PAYMENT PANEL ===== */
-        .payment-panel{display:none;flex-direction:column;gap:14px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.04);max-height:calc(100vh - 200px);overflow:auto}
+        .payment-panel{display:none;flex-direction:column;gap:14px;margin-top:16px;padding-top:16px;border-top:1px solid rgba(255,255,255,0.04)}
         .payment-panel.active{display:flex}
-        .payment-panel-title{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:4px;text-align:center}
-        .payment-panel-desc{font-size:11px;color:var(--txt3);text-align:center;margin-bottom:8px}
-        .plan-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px 14px;position:relative;cursor:pointer;transition:all .25s;max-width:100%;box-sizing:border-box}
+        .payment-panel-title{font-family:'Sora',sans-serif;font-size:14px;font-weight:700;color:#fff;margin-bottom:2px;text-align:center}
+        .payment-panel-desc{font-size:11px;color:var(--txt3);text-align:center;margin-bottom:4px}
+        .plans-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+        .plan-card{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:18px 14px;position:relative;cursor:pointer;transition:all .25s;box-sizing:border-box}
         .plan-card:hover{border-color:rgba(0,168,224,0.3);background:rgba(0,168,224,0.03)}
         .plan-card.selected{border-color:var(--blue);background:rgba(0,168,224,0.06)}
-        .plan-name{font-family:'Sora',sans-serif;font-size:12px;font-weight:700;color:var(--txt);letter-spacing:.5px;margin-bottom:2px}
-        .plan-period{font-size:10px;color:var(--txt3);margin-bottom:8px}
-        .plan-price{font-family:'Sora',sans-serif;font-size:24px;font-weight:800;color:#fff;margin-bottom:10px}
-        .plan-price .period{font-size:11px;font-weight:500;color:var(--txt3)}
+        .plan-card.popular{border-color:rgba(0,168,224,0.3);background:rgba(0,168,224,0.04)}
+        .plan-card.popular::before{content:'MAIS POPULAR';position:absolute;top:-8px;right:12px;background:var(--blue);color:#fff;font-size:8px;font-weight:700;padding:2px 7px;border-radius:6px;letter-spacing:.5px}
+        .plan-name{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:var(--txt);letter-spacing:.5px;margin-bottom:2px}
+        .plan-period{font-size:10px;color:var(--txt3);margin-bottom:6px}
+        .plan-price{font-family:'Sora',sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:2px}
+        .plan-save{font-size:10px;color:var(--gold);font-weight:600;margin-bottom:8px}
+        .plan-price .period{font-size:10px;font-weight:500;color:var(--txt3)}
         .plan-features{list-style:none;margin:0 0 12px;padding:0}
-        .plan-features li{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--txt2);padding:3px 0}
-        .plan-features i{color:var(--blue);font-size:9px;width:12px;text-align:center}
-        .plan-btn{width:100%;padding:10px;border:none;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer;transition:all .25s;font-family:'Inter',sans-serif;letter-spacing:.3px}
+        .plan-features li{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--txt2);padding:2px 0}
+        .plan-features i{color:var(--blue);font-size:8px;width:10px;text-align:center}
+        .plan-btn{width:100%;padding:10px;border:none;border-radius:8px;font-size:11px;font-weight:700;cursor:pointer;transition:all .25s;font-family:'Inter',sans-serif;letter-spacing:.3px}
         .plan-btn.blue{background:var(--blue);color:#fff}
         .plan-btn.blue:hover{background:#0090c0;box-shadow:0 4px 16px rgba(0,168,224,0.3)}
         .plan-btn.gold{background:linear-gradient(135deg,var(--gold),#e0be6a);color:#0a0a12}
         .plan-btn.gold:hover{box-shadow:0 4px 16px rgba(201,165,78,0.3)}
         .plan-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
-        .plan-footer{text-align:center;font-size:10px;color:var(--txt3);margin-top:8px}
+        .plan-footer{text-align:center;font-size:10px;color:var(--txt3);margin-top:4px}
         .plan-footer i{color:var(--blue);margin-right:4px}
 
         .sound-btn{position:fixed;top:14px;right:14px;z-index:20;width:34px;height:34px;background:rgba(255,255,255,0.04);border:1px solid var(--brd);border-radius:50%;color:var(--txt3);font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
@@ -142,8 +146,11 @@
         .success-icon{width:56px;height:56px;background:rgba(0,168,224,0.1);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:24px;color:var(--blue);margin-bottom:14px;animation:pop .35s cubic-bezier(.34,1.56,.64,1)}
         @keyframes pop{from{transform:scale(0)}to{transform:scale(1)}}
         .success-txt{font-family:'Sora',sans-serif;font-size:17px;font-weight:700}
+        .redirecting{text-align:center;font-size:11px;color:var(--txt3);margin-top:8px;display:none}
+        .redirecting.show{display:block}
         @media(max-width:640px){
             .auth-card-inner{padding:28px 22px}
+            .plans-grid{grid-template-columns:1fr}
             .brand-main{letter-spacing:4px}
             .brand-sub{letter-spacing:5px}
         }
@@ -202,7 +209,7 @@
                     <div class="field"><label>Email</label><input type="email" id="lEmail" placeholder="seu@email.com" required autocomplete="email"></div>
                     <div class="field"><label>Senha</label><input type="password" id="lPass" placeholder="Sua senha" required autocomplete="current-password"></div>
                     <div class="auth-row">
-                        <label class="auth-check"><input type="checkbox" id="lRemember"> Lembrar</label>
+                        <label class="auth-check"><input type="checkbox" id="lRemember" checked> Lembrar</label>
                         <span class="auth-forgot" id="forgotBtn">Esqueci a senha</span>
                     </div>
                     <div class="auth-error" id="lErr"></div>
@@ -213,20 +220,36 @@
                 <!-- PAYMENT PANEL -->
                 <div class="payment-panel" id="paymentPanel">
                     <div class="payment-panel-title">Escolha seu plano</div>
-                    <div class="payment-panel-desc">Pagamento unico via Mercado Pago - versao 7. Sem renovacao automatica.</div>
-                    <div class="plan-card" id="planMonthly" onclick="auth._selectPlan('monthly')">
-                        <div class="plan-name">CINE BOSS MENSAL</div>
-                        <div class="plan-period">30 dias de acesso</div>
-                        <div class="plan-price">R$ 6,99 <span class="period">/mes</span></div>
-                        <ul class="plan-features">
-                            <li><i class="fas fa-check"></i>Todos os filmes e series</li>
-                            <li><i class="fas fa-check"></i>Qualidade ate 1080p</li>
-                            <li><i class="fas fa-check"></i>Sem anuncios</li>
-                        </ul>
-                        <button class="plan-btn blue" id="planMonthBtn">ASSINAR</button>
+                    <div class="payment-panel-desc">Pagamento unico via Mercado Pago. Sem renovacao automatica.</div>
+                    <div class="plans-grid">
+                        <div class="plan-card" id="planMonthly" onclick="selectPlan('monthly')">
+                            <div class="plan-name">CINE BOSS MENSAL</div>
+                            <div class="plan-period">30 dias de acesso</div>
+                            <div class="plan-price">R$ 6,99 <span class="period">/mes</span></div>
+                            <ul class="plan-features">
+                                <li><i class="fas fa-check"></i>Todos os filmes e series</li>
+                                <li><i class="fas fa-check"></i>Qualidade ate 1080p</li>
+                                <li><i class="fas fa-check"></i>Sem anuncios</li>
+                            </ul>
+                            <button class="plan-btn blue" id="planMonthBtn">ASSINAR</button>
+                        </div>
+                        <div class="plan-card popular" id="planQuarterly" onclick="selectPlan('quarterly')">
+                            <div class="plan-name">CINE BOSS TRIMESTRAL</div>
+                            <div class="plan-period">90 dias de acesso</div>
+                            <div class="plan-price">R$ 15,99 <span class="period">/3 meses</span></div>
+                            <div class="plan-save">Economize 25%</div>
+                            <ul class="plan-features">
+                                <li><i class="fas fa-check"></i>Tudo do plano mensal</li>
+                                <li><i class="fas fa-check"></i>3 meses de acesso</li>
+                                <li><i class="fas fa-check" style="color:var(--gold)"></i>Suporte prioritario</li>
+                            </ul>
+                            <button class="plan-btn gold" id="planQtrBtn">ASSINAR</button>
+                        </div>
                     </div>
                     <div class="plan-footer"><i class="fas fa-shield-halved"></i>Pagamento unico. Sem renovacao automatica.</div>
                 </div>
+
+                <div class="redirecting" id="redirecting">Redirecionando...</div>
             </div>
         </div>
     </div>
@@ -291,21 +314,51 @@
                     var s=p.slice().sort(function(){return Math.random()-.5});
                     el.innerHTML=s.concat(s).map(function(s){return'<img src="'+s+'" alt="" loading="lazy">'}).join('');
                 });
-                }).catch(function(){});
+            }).catch(function(){});
         }
 
         function particles(){
             var bg=document.querySelector('.cinema-bg');
-            for(var i=0;i<18;i++){
+            for(var i=0;i<14;i++){
                 var p=document.createElement('div');p.className='particle';
-                var sz=Math.random()*3+1;
-                var c=['rgba(0,168,224,.3)','rgba(201,165,78,.2)','rgba(255,255,255,.2)'];
-                p.style.cssText='width:'+sz+'px;height:'+sz+'px;background:'+c[Math.floor(Math.random()*c.length)]+';left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;animation-delay:'+(-Math.random()*10)+'s;animation-duration:'+(8+Math.random()*6)+'s';
+                var sz=Math.random()*2.5+1;
+                var c=['rgba(0,168,224,.2)','rgba(201,165,78,.15)','rgba(255,255,255,.15)'];
+                p.style.cssText='width:'+sz+'px;height:'+sz+'px;background:'+c[Math.floor(Math.random()*c.length)]+';left:'+Math.random()*100+'%;top:'+Math.random()*100+'%;animation-delay:'+(-Math.random()*12)+'s;animation-duration:'+(10+Math.random()*8)+'s';
                 bg.appendChild(p);
             }
         }
 
+        /* ===== PLAN SELECTION ===== */
+        window.selectPlan = function(plan){
+            S.click();
+            var btn = document.getElementById(plan==='monthly'?'planMonthBtn':'planQtrBtn');
+            if(btn){btn.disabled=true;btn.textContent='PROCESSANDO...';}
+            fetch(API+'/subscription/checkout',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({plan:plan})})
+            .then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d}})})
+            .then(function(r){
+                if(!r.ok)throw new Error(r.data.error);
+                if(r.data.url){
+                    var subId=r.data.subscriptionId||r.data.subscription_id;
+                    if(subId){
+                        setTimeout(function(){
+                            fetch(API+'/subscription/simulate',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({subscription_id:subId})}).catch(function(){});
+                        },1000);
+                    }
+                    window.location.href=r.data.url;
+                }else{
+                    S.ok();
+                    if(btn){btn.textContent='PAGO!';}
+                    setTimeout(function(){window.location.href='/'},1500);
+                }
+            })
+            .catch(function(e){
+                if(btn){btn.disabled=false;btn.textContent='ASSINAR';}
+                alert(e.message||'Erro ao processar pagamento');
+            });
+        };
+
         /* ===== SEQUENCE ===== */
+        var bootDone=false;
         function startSequence(){
             S.init();S.boot();
             setTimeout(function(){
@@ -320,6 +373,7 @@
             },5200);
             setTimeout(function(){
                 document.getElementById('authArea').classList.add('show');
+                bootDone=true;
             },5600);
         }
 
@@ -345,13 +399,17 @@
             .then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d}})})
             .then(function(r){
                 if(!r.ok)throw new Error(r.data.error);
-                /* Brief success then show payment panel */
-                showOk('Bem-vindo, '+(r.data.user.name||'')+'!');
-                setTimeout(function(){
-                    document.getElementById('okScreen').classList.remove('on');
-                    document.getElementById('paymentPanel').classList.add('active');
-                    S.pay();
-                },1200);
+                if(r.data.subscription&&r.data.subscription.status==='active'){
+                    showOk('Bem-vindo de volta, '+(r.data.user.name||'')+'!');
+                    setTimeout(function(){window.location.href='/';},1200);
+                }else{
+                    showOk('Bem-vindo, '+(r.data.user.name||'')+'!');
+                    setTimeout(function(){
+                        document.getElementById('okScreen').classList.remove('on');
+                        document.getElementById('paymentPanel').classList.add('active');
+                        S.pay();
+                    },1200);
+                }
                 btn.disabled=false;btn.textContent='ENTRAR';
             })
             .catch(function(e){err.textContent=e.message;S.err();btn.disabled=false;btn.textContent='ENTRAR'});
@@ -396,7 +454,17 @@
         }
 
         /* ===== INIT ===== */
-        fetch(API+'/auth/me',{credentials:'include'}).then(function(r){return r.json()}).then(function(d){if(d.loggedIn){document.getElementById('authArea').classList.add('show');document.getElementById('paymentPanel').classList.add('active')}}).catch(function(){});
+        fetch(API+'/auth/me',{credentials:'include'}).then(function(r){return r.json()}).then(function(d){
+            if(d.loggedIn&&d.hasSubscription){
+                window.location.href='/';
+                return;
+            }
+            if(d.loggedIn){
+                document.getElementById('authArea').classList.add('show');
+                document.getElementById('paymentPanel').classList.add('active');
+            }
+        }).catch(function(){});
+
         loadPosters();particles();
         startSequence();
     })();

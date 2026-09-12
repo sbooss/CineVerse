@@ -355,6 +355,14 @@
                 showToast('Pagamento cancelado.');
                 window.history.replaceState({}, '', window.location.pathname);
             }
+            if (params.get('payment') === 'failed') {
+                showToast('Pagamento falhou. Tente novamente.');
+                window.history.replaceState({}, '', window.location.pathname);
+            }
+            if (params.get('payment') === 'pending') {
+                showToast('Pagamento pendente. Aguarde a confirmacao.');
+                window.history.replaceState({}, '', window.location.pathname);
+            }
         })();
 
         // Popup/redirect blocker - SAFE
