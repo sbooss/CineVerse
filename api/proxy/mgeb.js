@@ -2,40 +2,49 @@ export default async function handler(req, res) {
     const { url } = req.query;
     if (!url) return res.status(400).json({ error: 'Missing url parameter' });
 
-    try {
-        const response = await fetch(url, {
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                'Accept': 'text/html,application/xhtml+xml',
-                'Accept-Language': 'pt-BR,pt;q=0.9,en-US;q=0.8,en;q=0.7'
-            }
-        });
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-        let html = await response.text();
+    if (req.method === 'OPTIONS') return res.status(200).end();
 
-        html = html.replace(/<script[^>]*>[\s\S]*?aclib[\s\S]*?<\/script>/gi, '<!-- ad removed -->');
-        html = html.replace(/<script[^>]*>[\s\S]*?acscdn[\s\S]*?<\/script>/gi, '<!-- ad removed -->');
-        html = html.replace(/<script[^>]*>[\s\S]*?onclickperformance[\s\S]*?<\/script>/gi, '<!-- ad removed -->');
-        html = html.replace(/<script[^>]*>[\s\S]*?zoneId[\s\S]*?<\/script>/gi, '<!-- ad removed -->');
-        html = html.replace(/<script[^>]*>[\s\S]*?runPop[\s\S]*?<\/script>/gi, '<!-- ad removed -->');
-        html = html.replace(/<script[^>]*src=["'][^"']*aclib[^"']*["'][^>]*><\/script>/gi, '<!-- ad script removed -->');
-        html = html.replace(/<script[^>]*src=["'][^"']*acscdn[^"']*["'][^>]*><\/script>/gi, '<!-- ad script removed -->');
-        html = html.replace(/<script[^>]*src=["'][^"']*onclickperformance[^"']*["'][^>]*><\/script>/gi, '<!-- ad script removed -->');
-        html = html.replace(/<script[^>]*src=["'][^"']*disable-devtool[^"']*["'][^>]*><\/script>/gi, '<!-- devtool blocker removed -->');
-        html = html.replace(/DisableDevtool\([\s\S]*?\);/g, '');
-        html = html.replace(/<script>[\s\S]*?ondevtoolopen[\s\S]*?<\/script>/gi, '<!-- devtool handler removed -->');
-        html = html.replace(/<iframe[^>]*height=["']?1["']?[^>]*style=["'][^"']*visibility:\s*hidden[^"']*["'][^>]*><\/iframe>/gi, '<!-- hidden ad iframe removed -->');
-        html = html.replace(/var _Hasync[\s\S]*?<\/script>/gi, '<!-- histats removed -->');
-        html = html.replace(/<noscript>[\s\S]*?Histats[\s\S]*?<\/noscript>/gi, '');
-        html = html.replace(/<script[^>]*src=["'][^"']*cloudflareinsights[^"']*["'][^>]*><\/script>/gi, '<!-- cf removed -->');
-        html = html.replace(/<script>[\s\S]*?__CF\$cv\$params[\s\S]*?<\/script>/gi, '');
-        html = html.replace(/webstats[\s\S]*?<\/script>/gi, '<!-- webstats removed -->');
+    const PROXY_SERVICES = [
+        'https://api.allorigins.win/raw?url=',
+        'https://corsproxy.io/?url='
+    ];
 
-        res.setHeader('Content-Type', 'text/html; charset=utf-8');
-        res.setHeader('X-Frame-Options', 'ALLOWALL');
-        res.setHeader('Access-Control-Allow-Origin', '*');
-        res.status(200).send(html);
-    } catch (err) {
-        res.status(500).json({ error: 'Proxy fetch failed', details: err.message });
+    for (const proxyBase of PROXY_SERVICES) {
+        try {
+            const response = await fetch(proxyBase + encodeURIComponent(url), {
+                headers: { 'Accept': 'text/html' },
+                signal: AbortSignal.timeout(10000)
+            });
+
+            if (!response.ok) continue;
+            const html = await response.text();
+            if (html.includes('Just a moment') || html.includes('cf-browser-verification')) continue;
+
+            const sourcesMatch = html.match(/var\s+sources\s*=\s*(\[[\s\S]*?\])\s*;/);
+            if (!sourcesMatch) continue;
+
+            let sources;
+            try { sources = JSON.parse(sourcesMatch[1]); } catch(e) { continue; }
+
+            const titleMatch = html.match(/var\s+title\s*=\s*["']([^"']*)["']/);
+            const posterMatch = html.match(/var\s+poster\s*=\s*["']([^"']*)["']/);
+            const backdropMatch = html.match(/var\s+backdrop\s*=\s*["']([^"']*)["']/);
+            const overviewMatch = html.match(/var\s+overview\s*=\s*["']([\s\S]*?)["'];/);
+
+            return res.status(200).json({
+                ok: true,
+                sources: sources,
+                title: titleMatch ? titleMatch[1] : '',
+                poster: posterMatch ? posterMatch[1] : '',
+                backdrop: backdropMatch ? backdropMatch[1] : '',
+                overview: overviewMatch ? overviewMatch[1] : ''
+            });
+        } catch(e) { continue; }
     }
+
+    return res.status(200).json({ ok: false, fallback: true });
 }

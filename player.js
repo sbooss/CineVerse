@@ -122,6 +122,92 @@ class VideoPlayer {
 
             serverBar.innerHTML = buildServerBar(index);
 
+            if (index === 0) {
+                this._tryVidstack(url, p, index, type, tmdbId, season, episode);
+            } else {
+                this._loadIframe(url, index, type, tmdbId, season, episode);
+            }
+        };
+
+        this._tryVidstack = async (url, provider, index, type, tmdbId, season, episode) => {
+            try {
+                const proxyUrl = '/api/proxy/mgeb?url=' + encodeURIComponent(
+                    type === 'tv'
+                        ? 'https://mgeb.top/embed/tv/' + tmdbId + '/' + season + '/' + episode
+                        : 'https://mgeb.top/embed/movie/' + tmdbId
+                );
+                const resp = await fetch(proxyUrl);
+                const data = await resp.json();
+
+                if (data.ok && data.sources && data.sources.length > 0) {
+                    this._loadVidstack(data.sources, index, type, tmdbId, season, episode);
+                    return;
+                }
+            } catch(e) {}
+
+            this._loadIframe(url, index, type, tmdbId, season, episode);
+        };
+
+        this._loadVidstack = (sources, index, type, tmdbId, season, episode) => {
+            this.wrapper.innerHTML = '';
+            const container = document.createElement('div');
+            container.id = 'vidstackPlayer';
+            container.style.cssText = 'width:100%;height:100%;background:#000;border-radius:8px;overflow:hidden;';
+            this.wrapper.appendChild(container);
+
+            const mp4Sources = sources.filter(s => s.type === 'mp4' || (s.file && s.file.endsWith('.mp4')));
+            const allSources = mp4Sources.length > 0 ? mp4Sources : sources;
+
+            const video = document.createElement('video');
+            video.id = 'vsPlayer';
+            video.setAttribute('playsinline', '');
+            video.setAttribute('controls', '');
+            video.style.cssText = 'width:100%;height:100%;';
+
+            allSources.forEach((s, i) => {
+                const src = document.createElement('source');
+                src.setAttribute('src', s.file);
+                src.setAttribute('type', 'video/mp4');
+                src.setAttribute('label', s.label || 'Opcao ' + (i + 1));
+                video.appendChild(src);
+            });
+
+            container.appendChild(video);
+
+            if (typeof videojs !== 'undefined') {
+                videojs(video, {
+                    controls: true,
+                    autoplay: false,
+                    preload: 'metadata',
+                    fluid: false,
+                    responsive: true,
+                    playbackRates: [0.5, 0.75, 1, 1.25, 1.5, 2],
+                    controlBar: {
+                        volumePanel: { inline: false },
+                        pictureInPictureToggle: true,
+                        fullscreenToggle: true
+                    }
+                });
+            }
+
+            currentIndex = index;
+            this._currentProviders = this._currentProviders || providers;
+            this._currentIndex = index;
+            this._currentType = type;
+            this._currentTmdbId = tmdbId;
+            this._currentSeason = season;
+            this._currentEpisode = episode;
+
+            serverBar.querySelectorAll('.server-chip').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    this._switchServer(parseInt(btn.getAttribute('data-server')));
+                });
+            });
+        };
+
+        this._loadIframe = (url, index, type, tmdbId, season, episode) => {
             const iframe = document.createElement('iframe');
             iframe.setAttribute('src', url);
             iframe.setAttribute('frameborder', '0');
@@ -140,13 +226,12 @@ class VideoPlayer {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
-                    const idx = parseInt(btn.getAttribute('data-server'));
-                    this._switchServer(idx);
+                    this._switchServer(parseInt(btn.getAttribute('data-server')));
                 });
             });
 
             currentIndex = index;
-            this._currentProviders = providers;
+            this._currentProviders = this._currentProviders || providers;
             this._currentIndex = index;
             this._currentType = type;
             this._currentTmdbId = tmdbId;
@@ -194,10 +279,13 @@ class VideoPlayer {
             : p.movie(this._currentTmdbId);
 
         this._currentIndex = index;
-        const iframe = this.wrapper.querySelector('iframe');
-        if (iframe) {
-            iframe.src = url;
+
+        if (index === 0) {
+            this._tryVidstack(url, p, index, this._currentType, this._currentTmdbId, this._currentSeason, this._currentEpisode);
+        } else {
+            this._loadIframe(url, index, this._currentType, this._currentTmdbId, this._currentSeason, this._currentEpisode);
         }
+
         const serverBar = document.getElementById('serverBar');
         serverBar.querySelectorAll('.server-chip').forEach((chip, i) => {
             chip.classList.toggle('active', i === index);
