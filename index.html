@@ -366,8 +366,13 @@
         iframe[src*="adsrvr"],iframe[src*="popads"],iframe[src*="propellerads"],
         iframe[src*="clickadu"],iframe[src*="monetag"],iframe[src*="adsterra"],
         iframe[src*="amazon-adsystem"],iframe[src*="casalemedia"],iframe[src*="rubiconproject"],
-        iframe[src*="openx"],iframe[src*="pubmatic"],iframe[src*="pagead"],iframe[src*="googleads"]
+        iframe[src*="openx"],iframe[src*="pubmatic"],iframe[src*="pagead"],iframe[src*="googleads"],
+        iframe[src*="acscdn"],iframe[src*="onclickperformance"],iframe[src*="aclib"]
         {display:none!important;width:0!important;height:0!important;pointer-events:none!important;visibility:hidden!important;position:fixed!important;top:-9999px!important;left:-9999px!important;opacity:0!important;z-index:-1!important}
+        [class*="ad-banner"],[class*="ad-placement"],[class*="adsbox"],[id*="ad-"],[id*="ads-"],
+        [class*="popunder"],[class*="popup-ad"],[class*="interstitial"],
+        [data-ad],.aclib_pop,.aclib_pop_under,.ac-overlay,.ac-notice
+        {display:none!important;pointer-events:none!important}
         .player-overlay{z-index:999999!important;position:fixed!important;inset:0!important}
         *{-webkit-user-select:none!important;-moz-user-select:none!important;-ms-user-select:none!important;user-select:none!important}
         input,textarea{-webkit-user-select:text!important;user-select:text!important}
@@ -386,6 +391,28 @@
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); }, true);
         // Block drag
         document.addEventListener('dragstart', function(e) { e.preventDefault(); }, true);
+    })();
+    </script>
+
+    <!-- ANTI-ADS: Block popunders and redirects -->
+    <script>
+    (function() {
+        window.open = function() { return null; };
+        Object.defineProperty(window, 'open', { value: function() { return null; }, writable: false, configurable: false });
+        var origAssign = window.location.assign;
+        var origReplace = window.location.replace;
+        window.location.assign = function(url) { if(url && !url.includes('onclickperformance') && !url.includes('acscdn')) origAssign.call(window.location, url); };
+        window.location.replace = function(url) { if(url && !url.includes('onclickperformance') && !url.includes('acscdn')) origReplace.call(window.location, url); };
+        document.addEventListener('click', function(e) {
+            var t = e.target;
+            if(t && (t.tagName === 'A' || t.closest('a'))) {
+                var a = t.tagName === 'A' ? t : t.closest('a');
+                var href = a.href || '';
+                if(href.includes('onclickperformance') || href.includes('acscdn') || href.includes('aclib') || href.includes('popads') || href.includes('clickadu')) {
+                    e.preventDefault(); e.stopPropagation(); return false;
+                }
+            }
+        }, true);
     })();
     </script>
 </body>
