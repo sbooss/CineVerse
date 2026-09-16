@@ -3,8 +3,8 @@ const CONFIG = {
         PROVIDERS: [
             {
                 name: 'Servidor 1',
-                movie: function(id) { return '/api/proxy/mgeb?url=' + encodeURIComponent('https://mgeb.top/embed/movie/' + id); },
-                tv: function(id, s, e) { return '/api/proxy/mgeb?url=' + encodeURIComponent('https://mgeb.top/embed/tv/' + id + '/' + s + '/' + e); }
+                movie: function(id) { return 'https://mgeb.top/embed/movie/' + id; },
+                tv: function(id, s, e) { return 'https://mgeb.top/embed/tv/' + id + '/' + s + '/' + e; }
             },
             {
                 name: 'Servidor 2',

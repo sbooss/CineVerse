@@ -964,41 +964,6 @@ input { font-family: inherit; }
     background: #000;
 }
 
-/* Video.js Dark Theme */
-.video-js {
-    width: 100% !important;
-    height: 100% !important;
-    background: #000;
-    font-family: 'Inter', sans-serif;
-}
-.video-js .vjs-control-bar {
-    background: linear-gradient(transparent, rgba(0,0,0,0.85));
-    height: 48px;
-    padding: 0 8px;
-}
-.video-js .vjs-play-progress,
-.video-js .vjs-volume-level { background: #00a8e0; }
-.video-js .vjs-slider { background: rgba(255,255,255,0.15); }
-.video-js .vjs-load-progress { background: rgba(255,255,255,0.25); }
-.video-js .vjs-button > .vjs-icon-placeholder:before { color: #fff; }
-.video-js .vjs-time-control { color: #fff; font-size: 13px; padding: 0 6px; }
-.video-js .vjs-fullscreen-control .vjs-icon-placeholder:before { color: #fff; }
-.video-js .vjs-picture-in-picture-control .vjs-icon-placeholder:before { color: #fff; }
-.video-js:hover .vjs-play-progress { background: #00c8ff; }
-.video-js .vjs-volume-panel:hover .vjs-volume-bar { background: rgba(255,255,255,0.15); }
-.video-js .vjs-big-play-button {
-    background: rgba(0,168,224,0.85);
-    border: none;
-    border-radius: 50%;
-    width: 72px; height: 72px;
-    line-height: 72px;
-    font-size: 32px;
-    top: 50%; left: 50%;
-    transform: translate(-50%, -50%);
-    transition: all 0.2s;
-}
-.video-js:hover .vjs-big-play-button { background: #00a8e0; transform: translate(-50%, -50%) scale(1.08); }
-
 .provider-info { display: none; }
 .change-provider-btn { display: none; }
 .server-grid { display: none; }
