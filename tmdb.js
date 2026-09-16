@@ -85,59 +85,59 @@ class TMDBAPI {
             backdrop: this.getBackdrop(item.backdrop_path),
             releaseDate: item.release_date || item.first_air_date,
             rating: item.vote_average || 0,
-            genreIds: item.genre_ids || item.genres?.map(g => g.id) || [],
+            genreIds: item.genre_ids || (item.genres ? item.genres.map(function(g){return g.id}) : []),
             mediaType: mediaType || item.media_type || 'movie',
             seasons: item.number_of_seasons || 0,
             episodes: item.number_of_episodes || 0,
             runtime: item.runtime || 0,
-            imdbId: item.external_ids?.imdb_id || null,
+            imdbId: (item.external_ids && item.external_ids.imdb_id) || null,
             originalLanguage: item.original_language || 'en'
         };
     }
 
     async getTrending(type = 'all', window = 'week') {
         const r = await this.fetchAPI(`/trending/${type}/${window}`);
-        return r?.results ? r.results.filter(i => !i.adult).map(i => this.formatItem(i, i.media_type)) : null;
+        return (r && r.results) ? r.results.filter(function(i){return !i.adult}).map(function(i){return _this.formatItem(i, i.media_type)}) : null;
     }
 
     async getPopular(type = 'movie', page = 1) {
         const r = await this.fetchAPI(`/${type}/popular`, { page });
-        return r?.results ? r.results.filter(i => !i.adult).map(i => this.formatItem(i, type)) : null;
+        return r && r.results ? r.results.filter(i => !i.adult).map(i => this.formatItem(i, type)) : null;
     }
 
     async getTopRated(type = 'movie', page = 1) {
         const r = await this.fetchAPI(`/${type}/top_rated`, { page });
-        return r?.results ? r.results.filter(i => !i.adult).map(i => this.formatItem(i, type)) : null;
+        return r && r.results ? r.results.filter(i => !i.adult).map(i => this.formatItem(i, type)) : null;
     }
 
     async getNowPlaying(page = 1) {
         const r = await this.fetchAPI('/movie/now_playing', { page });
-        return r?.results ? r.results.filter(i => !i.adult).map(i => this.formatItem(i, 'movie')) : null;
+        return r && r.results ? r.results.filter(i => !i.adult).map(i => this.formatItem(i, 'movie')) : null;
     }
 
     async getUpcoming(page = 1) {
         const r = await this.fetchAPI('/movie/upcoming', { page });
-        return r?.results ? r.results.filter(i => !i.adult).map(i => this.formatItem(i, 'movie')) : null;
+        return r && r.results ? r.results.filter(i => !i.adult).map(i => this.formatItem(i, 'movie')) : null;
     }
 
     async getAiringToday(page = 1) {
         const r = await this.fetchAPI('/tv/airing_today', { page });
-        return r?.results ? r.results.map(i => this.formatItem(i, 'tv')) : null;
+        return r && r.results ? r.results.map(i => this.formatItem(i, 'tv')) : null;
     }
 
     async getOnTheAir(page = 1) {
         const r = await this.fetchAPI('/tv/on_the_air', { page });
-        return r?.results ? r.results.map(i => this.formatItem(i, 'tv')) : null;
+        return r && r.results ? r.results.map(i => this.formatItem(i, 'tv')) : null;
     }
 
     async getByGenre(type, genreId, page = 1) {
         const r = await this.fetchAPI(`/discover/${type}`, { with_genres: genreId, page, sort_by: 'popularity.desc' });
-        return r?.results ? r.results.filter(i => !i.adult).map(i => this.formatItem(i, type)) : null;
+        return r && r.results ? r.results.filter(i => !i.adult).map(i => this.formatItem(i, type)) : null;
     }
 
     async getAnime(page = 1) {
         const r = await this.fetchAPI('/discover/tv', { with_genres: 16, sort_by: 'popularity.desc', page, 'vote_count.gte': 20 });
-        return r?.results ? r.results.map(i => this.formatItem(i, 'anime')) : null;
+        return r && r.results ? r.results.map(i => this.formatItem(i, 'anime')) : null;
     }
 
     async getDetails(type, id) {
@@ -150,7 +150,7 @@ class TMDBAPI {
 
     async search(query, page = 1) {
         const r = await this.fetchAPI('/search/multi', { query, page, include_adult: false });
-        if (!r?.results) return [];
+        if (!r && r.results) return [];
         return r.results.filter(i => (i.media_type === 'movie' || i.media_type === 'tv') && !i.adult).map(i => this.formatItem(i, i.media_type));
     }
 
@@ -164,13 +164,13 @@ class TMDBAPI {
         try {
             const d = await this.getDetails(heroItem.mediaType, heroItem.id);
             if (d) {
-                const trailer = d.videos?.results?.find(v => v.type === 'Trailer' && v.site === 'YouTube');
+                                var trailer = d && d.videos && d.videos.results ? d.videos.results.filter(function(v){return v.type === 'Trailer' && v.site === 'YouTube'})[0] : null;
                 return {
                     ...this.formatItem(d, heroItem.mediaType),
                     trailer: trailer ? `https://www.youtube.com/embed/${trailer.key}` : null,
-                    cast: d.credits?.cast?.slice(0, 5).map(c => c.name) || [],
+                    cast: (d.credits && d.credits.cast) ? d.credits.cast.slice(0, 5).map(function(c){return c.name}) : [],
                     runtime: d.runtime || 0,
-                    imdbId: d.external_ids?.imdb_id || null,
+                    imdbId: (d.external_ids && d.external_ids.imdb_id) || null,
                     seasons: d.number_of_seasons || 0,
                     episodes: d.number_of_episodes || 0
                 };
@@ -244,7 +244,7 @@ class TMDBAPI {
 
     async getSimilar(id, type = 'tv') {
         const r = await this.fetchAPI(`/${type}/${id}/similar`);
-        return r?.results ? r.results.filter(i => !i.adult).map(i => this.formatItem(i, type)) : [];
+        return r && r.results ? r.results.filter(i => !i.adult).map(i => this.formatItem(i, type)) : [];
     }
 }
 

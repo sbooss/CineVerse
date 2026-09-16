@@ -1,4 +1,4 @@
-# CineVerse - Streaming Platform
+# CINE BOSS - Streaming Platform
 
 Plataforma de streaming completa com filmes, series, anime e TV ao vivo.
 
