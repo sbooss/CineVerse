@@ -4,7 +4,8 @@ const {
     jsonError, jsonSuccess
 } = require('../_lib/security');
 
-const MP_TOKEN = process.env.MP_ACCESS_TOKEN || 'APP_USR-5795040715734318-091118-1a87bdaaabaa81fc45f976b9d27be954-3681341897';
+const MP_TOKEN = process.env.MP_ACCESS_TOKEN;
+if (!MP_TOKEN) console.error('CRITICAL: MP_ACCESS_TOKEN not set');
 const MP_API = 'https://api.mercadopago.com';
 
 const PLANS = { monthly: { days: 30 }, quarterly: { days: 90 } };

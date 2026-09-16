@@ -532,8 +532,7 @@
     <script>
         // CINEMATIC POSTER BACKGROUND
         (function(){
-            var TMDB='eb9690431d1dd3d86de35def2b1b0a2c';
-            fetch('https://api.themoviedb.org/3/trending/all/week?api_key='+TMDB+'&language=pt-BR')
+            fetch('/api/tmdb/trending/all/week?language=pt-BR')
             .then(function(r){return r.json()}).then(function(d){
                 var p=(d.results||[]).filter(function(i){return i.poster_path}).map(function(i){return'https://image.tmdb.org/t/p/w200'+i.poster_path});
                 if(!p.length)return;
@@ -679,19 +678,35 @@
         input,textarea{-webkit-user-select:text!important;user-select:text!important}
     </style>
 
-    <!-- SECURITY -->
+    <!-- SECURITY - Anti-Inspection -->
     <script>
     (function() {
-        // Block print screen
+        // Block F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U (view source)
         document.addEventListener('keydown', function(e) {
-            if (e.key === 'F12' || (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i'))) {
+            if (e.key === 'F12' ||
+                (e.ctrlKey && e.shiftKey && (e.key === 'I' || e.key === 'i' || e.key === 'J' || e.key === 'j' || e.key === 'C' || e.key === 'c')) ||
+                (e.ctrlKey && (e.key === 'U' || e.key === 'u'))) {
                 e.preventDefault();
+                e.stopPropagation();
+                return false;
             }
         }, true);
-        // Block context menu
+        // Block context menu (right-click)
         document.addEventListener('contextmenu', function(e) { e.preventDefault(); }, true);
         // Block drag
         document.addEventListener('dragstart', function(e) { e.preventDefault(); }, true);
+        // Block text selection on sensitive elements
+        document.addEventListener('selectstart', function(e) {
+            if (e.target.tagName === 'SCRIPT' || e.target.tagName === 'STYLE') {
+                e.preventDefault();
+            }
+        }, true);
+        // Disable console.log in production (optional - uncomment if needed)
+        // if (console) { console.log = function(){}; console.warn = function(){}; console.error = function(){}; }
+        // Block viewing page source via Ctrl+U
+        document.onkeydown = function(e) {
+            if (e.ctrlKey && (e.key === 'U' || e.key === 'u')) return false;
+        };
     })();
     </script>
 

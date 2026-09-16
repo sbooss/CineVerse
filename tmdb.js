@@ -1,7 +1,6 @@
 class TMDBAPI {
     constructor() {
-        this.apiKey = 'eb9690431d1dd3d86de35def2b1b0a2c';
-        this.baseURL = 'https://api.themoviedb.org/3';
+        this.proxyBase = '/api/tmdb';
         this.imgURL = 'https://image.tmdb.org/t/p/';
         this.cache = new Map();
         this.cacheTimeout = 15 * 60 * 1000;
@@ -47,20 +46,20 @@ class TMDBAPI {
         const cached = this.cache.get(cacheKey);
         if (cached && Date.now() - cached.time < this.cacheTimeout) return cached.data;
 
-        const url = new URL(this.baseURL + endpoint);
-        url.searchParams.set('api_key', this.apiKey);
+        var path = endpoint.replace(/^\//, '');
+        var url = new URL(this.proxyBase + '/' + path, window.location.origin);
         url.searchParams.set('language', 'pt-BR');
         url.searchParams.set('include_adult', 'false');
-        Object.entries(params).forEach(([k, v]) => url.searchParams.set(k, v));
+        Object.entries(params).forEach(function(pair) { url.searchParams.set(pair[0], pair[1]); });
 
         try {
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 15000);
-            const response = await fetch(url.toString(), { signal: controller.signal });
+            var controller = new AbortController();
+            var timeout = setTimeout(function() { controller.abort(); }, 15000);
+            var response = await fetch(url.toString(), { signal: controller.signal });
             clearTimeout(timeout);
-            if (!response.ok) throw new Error(`TMDB ${response.status}`);
-            const data = await response.json();
-            this.cache.set(cacheKey, { data, time: Date.now() });
+            if (!response.ok) throw new Error('TMDB ' + response.status);
+            var data = await response.json();
+            this.cache.set(cacheKey, { data: data, time: Date.now() });
             return data;
         } catch (error) {
             console.warn('TMDB fetch failed:', endpoint, error.message);

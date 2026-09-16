@@ -271,7 +271,6 @@
     <script>
     (function(){
         var API=window.location.origin+'/api';
-        var TMDB='eb9690431d1dd3d86de35def2b1b0a2c';
         var isAlreadyLogged=false;
 
         var S={ctx:null,m:false,
@@ -299,7 +298,7 @@
         });
 
         function loadPosters(){
-            fetch('https://api.themoviedb.org/3/trending/all/week?api_key='+TMDB+'&language=pt-BR')
+            fetch('/api/tmdb/trending/all/week?language=pt-BR')
             .then(function(r){return r.json()}).then(function(d){
                 var p=(d.results||[]).filter(function(i){return i.poster_path}).map(function(i){return'https://image.tmdb.org/t/p/w200'+i.poster_path});
                 if(!p.length)return;
