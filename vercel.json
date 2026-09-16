@@ -26,6 +26,12 @@
             "headers": [
                 { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
             ]
+        },
+        {
+            "source": "/(.*)",
+            "headers": [
+                { "key": "Content-Security-Policy", "value": "frame-ancestors *; frame-src * https://mgeb.top https://nhdapi.com https://multiembed.mov https://*.playercdn.xyz https://*.x10.mx http://*.71dtkt53bkse73.com https://cdn.jsdelivr.net; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://mgeb.top https://cdn.jsdelivr.net https://acscdn.com https://static.cloudflareinsights.com https://s10.histats.com; style-src 'self' 'unsafe-inline' https://mgeb.top https://fonts.googleapis.com; connect-src *; img-src * data:;" }
+            ]
         }
     ]
 }

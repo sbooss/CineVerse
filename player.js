@@ -128,7 +128,6 @@ class VideoPlayer {
             iframe.setAttribute('allowfullscreen', 'true');
             iframe.setAttribute('allow', 'autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen');
             iframe.setAttribute('class', 'video-iframe');
-            iframe.setAttribute('referrerpolicy', 'no-referrer');
             iframe.setAttribute('loading', 'eager');
             iframe.style.opacity = '0';
             iframe.style.transition = 'opacity 0.3s';
