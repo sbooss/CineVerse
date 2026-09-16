@@ -17,11 +17,9 @@ class VideoPlayer {
             if (!this.isOpen()) return;
             const target = e.target;
             const isOurUI = target.closest('#playerBack') ||
-                           target.closest('.change-provider-btn') ||
-                           target.closest('.provider-btn') ||
-                           target.closest('#playerErrorBack') ||
-                           target.closest('#changeProviderBtn') ||
-                           target.closest('.provider-list');
+                           target.closest('.server-chip') ||
+                           target.closest('.server-bar') ||
+                           target.closest('#playerErrorBack');
             if (!isOurUI && target.tagName === 'IFRAME') {
                 e.preventDefault();
                 e.stopPropagation();
@@ -33,8 +31,8 @@ class VideoPlayer {
             if (!this.isOpen()) return;
             const target = e.target;
             const isOurUI = target.closest('#playerBack') ||
-                           target.closest('.change-provider-btn') ||
-                           target.closest('.provider-btn') ||
+                           target.closest('.server-chip') ||
+                           target.closest('.server-bar') ||
                            target.closest('#playerErrorBack');
             if (!isOurUI && target.tagName === 'IFRAME') {
                 e.preventDefault();
@@ -92,6 +90,15 @@ class VideoPlayer {
         const providers = CONFIG.EMBED.PROVIDERS;
         let currentIndex = 0;
 
+        const buildServerBar = (activeIndex) => {
+            let html = '<div class="server-bar"><span class="server-label">Servidor:</span>';
+            providers.forEach((p, i) => {
+                const cls = i === activeIndex ? 'server-chip active' : 'server-chip';
+                html += '<button class="' + cls + '" data-server="' + i + '">' + p.name + '</button>';
+            });
+            return html + '</div>';
+        };
+
         const tryProvider = (index) => {
             if (index >= providers.length) {
                 this.wrapper.innerHTML = `
@@ -109,13 +116,7 @@ class VideoPlayer {
             const p = providers[index];
             const url = type === 'tv' ? p.tv(tmdbId, season, episode) : p.movie(tmdbId);
 
-            this.wrapper.innerHTML = `
-                <div class="provider-selector">
-                    <span class="current-provider"><i class="fas fa-play-circle"></i> ${p.name}</span>
-                    <button class="change-provider-btn" id="changeProviderBtn">
-                        <i class="fas fa-exchange-alt"></i> Trocar Server
-                    </button>
-                </div>`;
+            this.wrapper.innerHTML = buildServerBar(index);
 
             const iframe = document.createElement('iframe');
             iframe.setAttribute('src', url);
@@ -131,7 +132,14 @@ class VideoPlayer {
 
             this.wrapper.appendChild(iframe);
 
-            document.getElementById('changeProviderBtn').addEventListener('click', () => this.showServers());
+            this.wrapper.querySelectorAll('.server-chip').forEach(btn => {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const idx = parseInt(btn.getAttribute('data-server'));
+                    this._switchServer(idx);
+                });
+            });
 
             currentIndex = index;
             this._currentProviders = providers;
@@ -155,21 +163,17 @@ class VideoPlayer {
 
     showServers() {
         if (!this._currentProviders) return;
-        let html = '<div class="provider-list"><h3>Escolha o Servidor</h3><div class="provider-grid">';
-        this._currentProviders.forEach((p, i) => {
-            const isActive = i === this._currentIndex;
-            const icon = i === 0 ? 'fa-bolt' : 'fa-rocket';
-            html += `<button class="provider-btn ${isActive ? 'active' : ''}" data-server="${i}">
-                <i class="fas ${icon}"></i> ${p.name}
-                ${isActive ? '<span class="provider-active-label">Atual</span>' : ''}
-            </button>`;
-        });
-        html += '</div></div>';
-        const existing = this.wrapper.querySelector('.provider-list');
+        const existing = this.wrapper.querySelector('.server-bar');
         if (existing) existing.remove();
-        this.wrapper.insertAdjacentHTML('beforeend', html);
+        let html = '<div class="server-bar"><span class="server-label">Servidor:</span>';
+        this._currentProviders.forEach((p, i) => {
+            const cls = i === this._currentIndex ? 'server-chip active' : 'server-chip';
+            html += '<button class="' + cls + '" data-server="' + i + '">' + p.name + '</button>';
+        });
+        html += '</div>';
+        this.wrapper.insertAdjacentHTML('afterbegin', html);
 
-        this.wrapper.querySelectorAll('.provider-btn').forEach(btn => {
+        this.wrapper.querySelectorAll('.server-chip').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -180,8 +184,6 @@ class VideoPlayer {
     }
 
     _switchServer(index) {
-        const list = this.wrapper.querySelector('.provider-list');
-        if (list) list.remove();
         if (!this._currentProviders || index < 0 || index >= this._currentProviders.length) return;
 
         const p = this._currentProviders[index];
@@ -193,9 +195,10 @@ class VideoPlayer {
         const iframe = this.wrapper.querySelector('iframe');
         if (iframe) {
             iframe.src = url;
-            const prov = this.wrapper.querySelector('.current-provider');
-            if (prov) prov.textContent = p.name;
         }
+        this.wrapper.querySelectorAll('.server-chip').forEach((chip, i) => {
+            chip.classList.toggle('active', i === index);
+        });
     }
 
     openLiveTV(channel) {
@@ -205,9 +208,7 @@ class VideoPlayer {
 
         if (channel.streamUrl && channel.streamUrl.includes('.m3u8')) {
             this.wrapper.innerHTML = `
-                <div class="provider-selector">
-                    <span class="current-provider">TV Ao Vivo - ${channel.title}</span>
-                </div>
+                <div class="server-bar"><span class="server-label">TV Ao Vivo</span></div>
                 <video id="liveVideo" class="video-iframe" controls autoplay muted></video>`;
             const video = document.getElementById('liveVideo');
             if (typeof Hls !== 'undefined' && Hls.isSupported()) {
@@ -236,9 +237,7 @@ class VideoPlayer {
             }
         } else if (channel.streamUrl) {
             this.wrapper.innerHTML = `
-                <div class="provider-selector">
-                    <span class="current-provider">TV Ao Vivo - ${channel.title}</span>
-                </div>`;
+                <div class="server-bar"><span class="server-label">TV Ao Vivo</span></div>`;
             const iframe = document.createElement('iframe');
             iframe.setAttribute('src', channel.streamUrl);
             iframe.setAttribute('frameborder', '0');

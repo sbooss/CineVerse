@@ -2,24 +2,24 @@ const CONFIG = {
     EMBED: {
         PROVIDERS: [
             {
-                name: 'VidSrc',
-                movie: function(id) { return 'https://vidsrc.to/embed/movie/' + id; },
-                tv: function(id, s, e) { return 'https://vidsrc.to/embed/tv/' + id + '/' + s + '/' + e; }
-            },
-            {
-                name: 'SuperEmbed',
+                name: 'Servidor 1',
                 movie: function(id) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1&lang=pt'; },
                 tv: function(id, s, e) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1&lang=pt&season=' + s + '&episode=' + e; }
             },
             {
-                name: '2Embed',
-                movie: function(id) { return 'https://2embed.cc/embed/movie?tmdb=' + id; },
-                tv: function(id, s, e) { return 'https://2embed.cc/embed/tv?tmdb=' + id + '&season=' + s + '&episode=' + e; }
+                name: 'Servidor 2',
+                movie: function(id) { return 'https://vidsrc.to/embed/movie/' + id; },
+                tv: function(id, s, e) { return 'https://vidsrc.to/embed/tv/' + id + '/' + s + '/' + e; }
             },
             {
-                name: 'FilmU',
-                movie: function(id) { return 'https://embed.filmu.in/movie/' + id; },
-                tv: function(id, s, e) { return 'https://embed.filmu.in/tv/' + id + '/' + s + '/' + e; }
+                name: 'Servidor 3',
+                movie: function(id) { return 'https://vidsrc.pm/embed/movie/' + id; },
+                tv: function(id, s, e) { return 'https://vidsrc.pm/embed/tv/' + id + '/' + s + '/' + e; }
+            },
+            {
+                name: 'Servidor 4',
+                movie: function(id) { return 'https://2embed.cc/embed/movie?tmdb=' + id; },
+                tv: function(id, s, e) { return 'https://2embed.cc/embed/tv?tmdb=' + id + '&season=' + s + '&episode=' + e; }
             }
         ]
     },

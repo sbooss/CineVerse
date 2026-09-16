@@ -464,7 +464,7 @@ function setupTVRemote() {
         tvFocusableElements = Array.from(document.querySelectorAll(
             '.nav-link, .mobile-link, .movie-card, .channel-card, .filter-btn, ' +
             '.btn-primary, .btn-secondary, .detail-btn-play, .detail-btn-secondary, ' +
-            '.change-provider-btn, .provider-btn, #heroPlayBtn, #heroFavBtn, ' +
+            '.server-chip, #heroPlayBtn, #heroFavBtn, ' +
             '.season-tab, .detail-episode-card, .card-fav'
         )).filter(function(el) {
             return el.offsetParent !== null && el.offsetWidth > 0;
