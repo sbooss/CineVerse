@@ -79,6 +79,8 @@ class VideoPlayer {
         const iframes = this.wrapper.querySelectorAll('iframe');
         iframes.forEach(f => { try { f.src = 'about:blank'; f.remove(); } catch(ex) {} });
         this.wrapper.innerHTML = '';
+        const serverBar = document.getElementById('serverBar');
+        if (serverBar) serverBar.innerHTML = '';
         if (document.fullscreenElement) {
             document.exitFullscreen().catch(() => {});
         }
@@ -88,19 +90,21 @@ class VideoPlayer {
         const type = (item.mediaType === 'tv' || item.mediaType === 'anime') ? 'tv' : 'movie';
         const tmdbId = item.id;
         const providers = CONFIG.EMBED.PROVIDERS;
+        const serverBar = document.getElementById('serverBar');
         let currentIndex = 0;
 
         const buildServerBar = (activeIndex) => {
-            let html = '<div class="server-bar"><span class="server-label">Servidor:</span>';
+            let html = '<span class="server-label">Servidor:</span>';
             providers.forEach((p, i) => {
                 const cls = i === activeIndex ? 'server-chip active' : 'server-chip';
                 html += '<button class="' + cls + '" data-server="' + i + '">' + p.name + '</button>';
             });
-            return html + '</div>';
+            return html;
         };
 
         const tryProvider = (index) => {
             if (index >= providers.length) {
+                serverBar.innerHTML = '';
                 this.wrapper.innerHTML = `
                     <div class="player-error">
                         <i class="fas fa-exclamation-triangle"></i>
@@ -116,7 +120,7 @@ class VideoPlayer {
             const p = providers[index];
             const url = type === 'tv' ? p.tv(tmdbId, season, episode) : p.movie(tmdbId);
 
-            this.wrapper.innerHTML = buildServerBar(index);
+            serverBar.innerHTML = buildServerBar(index);
 
             const iframe = document.createElement('iframe');
             iframe.setAttribute('src', url);
@@ -130,9 +134,10 @@ class VideoPlayer {
             iframe.style.transition = 'opacity 0.3s';
             iframe.onload = function() { this.style.opacity = '1'; };
 
+            this.wrapper.innerHTML = '';
             this.wrapper.appendChild(iframe);
 
-            this.wrapper.querySelectorAll('.server-chip').forEach(btn => {
+            serverBar.querySelectorAll('.server-chip').forEach(btn => {
                 btn.addEventListener('click', (e) => {
                     e.preventDefault();
                     e.stopPropagation();
@@ -163,17 +168,15 @@ class VideoPlayer {
 
     showServers() {
         if (!this._currentProviders) return;
-        const existing = this.wrapper.querySelector('.server-bar');
-        if (existing) existing.remove();
-        let html = '<div class="server-bar"><span class="server-label">Servidor:</span>';
+        const serverBar = document.getElementById('serverBar');
+        let html = '<span class="server-label">Servidor:</span>';
         this._currentProviders.forEach((p, i) => {
             const cls = i === this._currentIndex ? 'server-chip active' : 'server-chip';
             html += '<button class="' + cls + '" data-server="' + i + '">' + p.name + '</button>';
         });
-        html += '</div>';
-        this.wrapper.insertAdjacentHTML('afterbegin', html);
+        serverBar.innerHTML = html;
 
-        this.wrapper.querySelectorAll('.server-chip').forEach(btn => {
+        serverBar.querySelectorAll('.server-chip').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 e.preventDefault();
                 e.stopPropagation();
@@ -196,7 +199,8 @@ class VideoPlayer {
         if (iframe) {
             iframe.src = url;
         }
-        this.wrapper.querySelectorAll('.server-chip').forEach((chip, i) => {
+        const serverBar = document.getElementById('serverBar');
+        serverBar.querySelectorAll('.server-chip').forEach((chip, i) => {
             chip.classList.toggle('active', i === index);
         });
     }
@@ -205,11 +209,11 @@ class VideoPlayer {
         this.titleEl.textContent = channel.title;
         this.overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
+        const serverBar = document.getElementById('serverBar');
+        serverBar.innerHTML = '<span class="server-label">TV Ao Vivo</span>';
 
         if (channel.streamUrl && channel.streamUrl.includes('.m3u8')) {
-            this.wrapper.innerHTML = `
-                <div class="server-bar"><span class="server-label">TV Ao Vivo</span></div>
-                <video id="liveVideo" class="video-iframe" controls autoplay muted></video>`;
+            this.wrapper.innerHTML = `<video id="liveVideo" class="video-iframe" controls autoplay muted></video>`;
             const video = document.getElementById('liveVideo');
             if (typeof Hls !== 'undefined' && Hls.isSupported()) {
                 const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
@@ -236,8 +240,7 @@ class VideoPlayer {
                     </div>`;
             }
         } else if (channel.streamUrl) {
-            this.wrapper.innerHTML = `
-                <div class="server-bar"><span class="server-label">TV Ao Vivo</span></div>`;
+            this.wrapper.innerHTML = '';
             const iframe = document.createElement('iframe');
             iframe.setAttribute('src', channel.streamUrl);
             iframe.setAttribute('frameborder', '0');

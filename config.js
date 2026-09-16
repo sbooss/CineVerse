@@ -8,18 +8,8 @@ const CONFIG = {
             },
             {
                 name: 'Servidor 2',
-                movie: function(id) { return 'https://vidsrc.to/embed/movie/' + id; },
-                tv: function(id, s, e) { return 'https://vidsrc.to/embed/tv/' + id + '/' + s + '/' + e; }
-            },
-            {
-                name: 'Servidor 3',
                 movie: function(id) { return 'https://vidsrc.pm/embed/movie/' + id; },
                 tv: function(id, s, e) { return 'https://vidsrc.pm/embed/tv/' + id + '/' + s + '/' + e; }
-            },
-            {
-                name: 'Servidor 4',
-                movie: function(id) { return 'https://2embed.cc/embed/movie?tmdb=' + id; },
-                tv: function(id, s, e) { return 'https://2embed.cc/embed/tv?tmdb=' + id + '&season=' + s + '&episode=' + e; }
             }
         ]
     },
