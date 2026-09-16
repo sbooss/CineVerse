@@ -4,6 +4,9 @@
     "functions": {
         "api/webhook/mercadopago.js": {
             "maxDuration": 30
+        },
+        "api/proxy/mgeb.js": {
+            "maxDuration": 30
         }
     },
     "headers": [
