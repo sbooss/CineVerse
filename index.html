@@ -532,7 +532,7 @@
     <script>
         // CINEMATIC POSTER BACKGROUND
         (function(){
-            fetch('/api/tmdb/trending/all/week?language=pt-BR')
+            fetch('/api/tmdb?path=trending/all/week&language=pt-BR')
             .then(function(r){return r.json()}).then(function(d){
                 var p=(d.results||[]).filter(function(i){return i.poster_path}).map(function(i){return'https://image.tmdb.org/t/p/w200'+i.poster_path});
                 if(!p.length)return;

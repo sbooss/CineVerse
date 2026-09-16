@@ -47,7 +47,8 @@ class TMDBAPI {
         if (cached && Date.now() - cached.time < this.cacheTimeout) return cached.data;
 
         var path = endpoint.replace(/^\//, '');
-        var url = new URL(this.proxyBase + '/' + path, window.location.origin);
+        var url = new URL(this.proxyBase, window.location.origin);
+        url.searchParams.set('path', path);
         url.searchParams.set('language', 'pt-BR');
         url.searchParams.set('include_adult', 'false');
         Object.entries(params).forEach(function(pair) { url.searchParams.set(pair[0], pair[1]); });
