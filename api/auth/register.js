@@ -14,7 +14,7 @@ async function sendWelcomeEmail(to, name) {
         const templatePath = path.join(__dirname, '..', '..', 'email-welcome.html');
         let html = fs.readFileSync(templatePath, 'utf8');
         html = html.replace(/\{\{NAME\}\}/g, name);
-        html = html.replace(/\{\{SITE_URL\}\}/g, process.env.SITE_URL || 'https://cine-boss.vercel.app');
+        html = html.replace(/\{\{SITE_URL\}\}/g, process.env.SITE_URL || 'https://cine-boss-80xzp7o6p-william-ns-projects-ffa32c68.vercel.app');
         const res = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: { 'Authorization': `Bearer ${process.env.RESEND_API_KEY}`, 'Content-Type': 'application/json' },
