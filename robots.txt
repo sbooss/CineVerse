@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /account.html
+Disallow: /expired.html
+
+Sitemap: https://cineboss.vercel.app/sitemap.xml
+
+# CINE BOSS - Streaming Premium
+# Filmes, Series, Animes e TV Ao Vivo em Portugues
