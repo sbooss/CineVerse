@@ -664,7 +664,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (adminBtn) {
                         if (auth.isAdmin) {
                             adminBtn.style.display = 'block';
-                            adminBtn.onclick = function(e) { e.preventDefault(); window.open('/admin.html', '_blank'); };
+                            adminBtn.onclick = function(e) { e.preventDefault(); e.stopPropagation(); location.href = '/admin.html'; };
                         } else {
                             adminBtn.style.display = 'none';
                         }
