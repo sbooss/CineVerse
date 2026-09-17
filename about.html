@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sobre o CINE BOSS | Plataforma de Streaming</title>
+    <meta name="description" content="Conheca o CINE BOSS: a plataforma brasileira de streaming com filmes e series em alta qualidade, iptv ao vivo e experiencia cinematografica premium.">
+    <meta name="keywords" content="sobre cine boss, plataforma streaming, cine boss, streaming brasileiro, filmes series, iptv, plataforma video">
+    <meta name="author" content="CINE BOSS">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="https://cineboss.online/about.html">
+
+    <meta property="og:title" content="Sobre o CINE BOSS">
+    <meta property="og:description" content="A plataforma brasileira de streaming com experiencia cinematografica premium.">
+    <meta property="og:image" content="https://cineboss.online/og-image.png">
+    <meta property="og:url" content="https://cineboss.online/about.html">
+    <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+
+    <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "AboutPage",
+        "name": "Sobre o CINE BOSS",
+        "description": "Conheca a plataforma CINE BOSS de streaming com filmes, series e IPTV.",
+        "url": "https://cineboss.online/about.html",
+        "mainEntity": {
+            "@type": "Organization",
+            "name": "CINE BOSS",
+            "url": "https://cineboss.online",
+            "description": "Plataforma brasileira de streaming premium",
+            "sameAs": [],
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "contactType": "customer support",
+                "email": "williannunes31994@gmail.com",
+                "availableLanguage": "Portuguese"
+            }
+        }
+    }
+    </script>
+</head>
+<body>
+    <div class="donate-banner">
+        <a href="donate.html"><i class="fas fa-heart"></i> Doe para ajudar o CINE BOSS a crescer! <i class="fas fa-arrow-right"></i></a>
+    </div>
+
+    <nav class="navbar" id="navbar">
+        <div class="nav-brand">
+            <a href="/"><img src="https://imgur.com/6opzHhy.png" alt="CINE BOSS"></a>
+        </div>
+        <div class="nav-links">
+            <a href="/" class="nav-link"><i class="fas fa-home"></i> Inicio</a>
+            <a href="/#filmes" class="nav-link"><i class="fas fa-film"></i> Filmes</a>
+            <a href="/#series" class="nav-link"><i class="fas fa-tv"></i> Series</a>
+            <a href="/#ao-vivo" class="nav-link"><i class="fas fa-satellite-dish"></i> Ao Vivo</a>
+            <a href="about.html" class="nav-link"><i class="fas fa-info-circle"></i> Sobre</a>
+        </div>
+        <div class="nav-actions">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Buscar filmes e series...">
+                <button id="searchBtn"><i class="fas fa-search"></i></button>
+            </div>
+            <div class="auth-buttons" id="authButtons">
+                <a href="login.html" class="btn-login">Entrar</a>
+                <a href="login.html?register=true" class="btn-register">Cadastrar</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="main-content">
+        <section class="about-hero">
+            <h1>Sobre o <span class="blue">CINE BOSS</span></h1>
+            <p class="about-subtitle">A plataforma brasileira de streaming premium</p>
+        </section>
+
+        <section class="about-content">
+            <div class="about-block">
+                <h2><i class="fas fa-rocket"></i> O que e o CINE BOSS?</h2>
+                <p>O <strong>CINE BOSS</strong> e uma plataforma de streaming brasileira que oferece acesso a milhares de filmes e series em alta qualidade, com interface premium e experiencia cinematografica. Nascemos com o objetivo de criar a melhor plataforma de streaming do Brasil.</p>
+            </div>
+
+            <div class="about-block">
+                <h2><i class="fas fa-star"></i> Nossas Caracteristicas</h2>
+                <div class="features-grid">
+                    <div class="feature-item">
+                        <i class="fas fa-film"></i>
+                        <h3>Filmes em HD</h3>
+                        <p>Acesso a milhares de filmes em alta definicao com legends e dublados em portugues.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-tv"></i>
+                        <h3>Series Completas</h3>
+                        <p>Todas as temporadas das melhores series nacionais e internacionais.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-satellite-dish"></i>
+                        <h3>IPTV Ao Vivo</h3>
+                        <p>Canais de TV ao vivo, esportes e conteudo em tempo real.</p>
+                    </div>
+                    <div class="feature-item">
+                        <i class="fas fa-mobile-alt"></i>
+                        <h3>Multi-Dispositivo</h3>
+                        <p>Assista no celular, tablet, computador ou Smart TV.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-block">
+                <h2><i class="fas fa-shield-alt"></i> Seguranca e Privacidade</h2>
+                <p>Seus dados estao protegidos com criptografia de ponta. Utilizamos <strong>Supabase</strong> para gerenciamento seguro de contas e autenticacao. Nao compartilhamos seus dados com terceiros.</p>
+            </div>
+
+            <div class="about-block">
+                <h2><i class="fas fa-hand-holding-heart"></i> Como Funciona</h2>
+                <div class="how-it-works">
+                    <div class="step">
+                        <div class="step-number">1</div>
+                        <h3>Crie sua Conta</h3>
+                        <p>Registre-se gratuitamente em segundos.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">2</div>
+                        <h3>Escolha seu Plano</h3>
+                        <p>Planos a partir de R$ 6,99/mês via Mercado Pago.</p>
+                    </div>
+                    <div class="step">
+                        <div class="step-number">3</div>
+                        <h3>Assista Agora</h3>
+                        <p>Acesse todo o catalogo imediatamente apos o pagamento.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="about-block">
+                <h2><i class="fas fa-envelope"></i> Contato</h2>
+                <p>Tem duvidas ou sugestoes? Entre em contato:</p>
+                <a href="mailto:williannunes31994@gmail.com" class="contact-email">
+                    <i class="fas fa-envelope"></i> williannunes31994@gmail.com
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-brand">
+                <img src="https://imgur.com/6opzHhy.png" alt="CINE BOSS" class="footer-logo">
+                <p class="footer-tagline">Streaming premium brasileiro.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Links</h4>
+                <a href="about.html">Sobre</a>
+                <a href="terms.html">Termos de Uso</a>
+                <a href="privacy.html">Politica de Privacidade</a>
+                <a href="payment.html">Planos e Precos</a>
+                <a href="donate.html">Doe para ajudar</a>
+                <a href="mailto:williannunes31994@gmail.com">Contato</a>
+            </div>
+            <div class="footer-legal">
+                <h4>Legal</h4>
+                <p>2026 CINE BOSS. Todos os direitos reservados.</p>
+                <p>Feito com <i class="fas fa-heart" style="color: var(--gold);"></i> no Brasil.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="config.js"></script>
+    <script src="tmdb.js"></script>
+    <script src="auth.js"></script>
+    <script src="app.js"></script>
+    <script src="https://www.googletagmanager.com/gtag/js?id=G-3RT0TLN4F4"></script>
+    <script>
+        window.dataLayer = window.dataLayer || [];
+        function gtag(){dataLayer.push(arguments);}
+        gtag('js', new Date());
+        gtag('config', 'G-3RT0TLN4F4');
+    </script>
+</body>
+</html>
