@@ -8,33 +8,39 @@ class VideoPlayer {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isOpen()) this.close();
         });
-        this._setupPlayerAntiAds();
-        this._setupIframeMessageBlocker();
+        this._setupNuclearAntiAds();
     }
 
-    _setupPlayerAntiAds() {
+    _setupNuclearAntiAds() {
         this.overlay.addEventListener('click', (e) => {
             if (!this.isOpen()) return;
-            const target = e.target;
-            const isOurUI = target.closest('#playerBack') ||
-                           target.closest('.server-chip') ||
-                           target.closest('.server-bar') ||
-                           target.closest('#playerErrorBack');
-            if (!isOurUI && target.tagName === 'IFRAME') {
+            var t = e.target;
+            var isUI = t.closest('#playerBack') ||
+                       t.closest('.server-chip') ||
+                       t.closest('.server-bar') ||
+                       t.closest('#playerErrorBack') ||
+                       t.closest('.player-header');
+            if (!isUI) {
                 e.preventDefault();
                 e.stopPropagation();
-                return false;
+                if (t.tagName === 'IFRAME' || t.style?.position === 'fixed') {
+                    return false;
+                }
             }
+        }, true);
+
+        this.overlay.addEventListener('auxclick', (e) => {
+            if (this.isOpen()) { e.preventDefault(); return false; }
         }, true);
 
         this.overlay.addEventListener('touchstart', (e) => {
             if (!this.isOpen()) return;
-            const target = e.target;
-            const isOurUI = target.closest('#playerBack') ||
-                           target.closest('.server-chip') ||
-                           target.closest('.server-bar') ||
-                           target.closest('#playerErrorBack');
-            if (!isOurUI && target.tagName === 'IFRAME') {
+            var t = e.target;
+            var isUI = t.closest('#playerBack') ||
+                       t.closest('.server-chip') ||
+                       t.closest('.server-bar') ||
+                       t.closest('#playerErrorBack');
+            if (!isUI) {
                 e.preventDefault();
                 return false;
             }
@@ -42,33 +48,35 @@ class VideoPlayer {
 
         this._popupObserver = new MutationObserver((mutations) => {
             if (!this.isOpen()) return;
-            for (const m of mutations) {
-                for (const node of m.addedNodes) {
+            for (var m of mutations) {
+                for (var node of m.addedNodes) {
                     if (node.nodeType !== 1) continue;
-                    if (node.tagName === 'IFRAME' && node !== this.wrapper.querySelector('iframe')) {
-                        node.remove();
+                    if (node.tagName === 'IFRAME' && !node.classList.contains('video-iframe')) {
+                        node.remove(); continue;
                     }
-                    if (node.tagName === 'DIV' && node.style && node.style.position === 'fixed' && node.style.zIndex > 9999) {
-                        node.remove();
+                    if (node.style && node.style.position === 'fixed' && parseInt(node.style.zIndex || 0) > 9999) {
+                        node.remove(); continue;
                     }
                     if (node.querySelectorAll) {
-                        node.querySelectorAll('iframe').forEach(f => {
-                            if (f !== this.wrapper.querySelector('iframe')) f.remove();
+                        node.querySelectorAll('iframe:not(.video-iframe)').forEach(f => f.remove());
+                        node.querySelectorAll('div[style*="position: fixed"]').forEach(f => {
+                            if (parseInt(f.style.zIndex || 0) > 9999) f.remove();
                         });
+                        node.querySelectorAll('[onclick], [data-href], [data-url]').forEach(f => f.remove());
                     }
                 }
             }
         });
         this._popupObserver.observe(document.body, { childList: true, subtree: true });
-    }
 
-    _setupIframeMessageBlocker() {
         window.addEventListener('message', (e) => {
             if (!this.isOpen()) return;
-            const data = e.data;
-            if (typeof data === 'string') {
-                const lower = data.toLowerCase();
-                if (lower.includes('popunder') || lower.includes('acscdn') || lower.includes('aclib') || lower.includes('onclickperformance')) {
+            var d = e.data;
+            if (typeof d === 'string') {
+                var l = d.toLowerCase();
+                if (l.includes('open') || l.includes('popup') || l.includes('redirect') ||
+                    l.includes('navigate') || l.includes('popunder') || l.includes('acscdn') ||
+                    l.includes('aclib') || l.includes('onclick') || l.includes('location')) {
                     e.stopImmediatePropagation();
                     return false;
                 }
@@ -82,7 +90,7 @@ class VideoPlayer {
 
     async open(item, season = 1, episode = 1) {
         if (typeof auth !== 'undefined') {
-            const canPlay = await auth.requireSubscription();
+            var canPlay = await auth.requireSubscription();
             if (!canPlay) {
                 window.playAfterAuth = () => this.open(item, season, episode);
                 return;
@@ -91,69 +99,50 @@ class VideoPlayer {
         this.titleEl.textContent = item.title;
         this.overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
-        this._showAdWarning();
         this._loadEmbed(item, season, episode);
-    }
-
-    _showAdWarning() {
-        const existing = document.getElementById('playerAdWarning');
-        if (existing) existing.remove();
-
-        const warning = document.createElement('div');
-        warning.id = 'playerAdWarning';
-        warning.style.cssText = 'position:absolute;top:56px;left:50%;transform:translateX(-50%);z-index:10;background:rgba(255,200,0,0.12);border:1px solid rgba(255,200,0,0.25);border-radius:8px;padding:8px 16px;display:flex;align-items:center;gap:8px;max-width:90%;animation:adWarnFade 0.3s ease';
-        warning.innerHTML = '<i class="fas fa-info-circle" style="color:#ffc800;font-size:12px;flex-shrink:0"></i><span style="font-size:11px;color:#e8e8f0;line-height:1.4">Se uma aba indesejada abrir, feche e volte ao filme. Use os servidores abaixo para trocar.</span>';
-        this.overlay.querySelector('.player-container').insertBefore(warning, this.overlay.querySelector('.server-bar'));
-        setTimeout(() => { if (warning.parentNode) warning.style.opacity = '0.6'; }, 5000);
-        setTimeout(() => { if (warning.parentNode) warning.remove(); }, 10000);
     }
 
     close() {
         this.overlay.classList.remove('active');
         document.body.style.overflow = '';
-        const iframes = this.wrapper.querySelectorAll('iframe');
+        var iframes = this.wrapper.querySelectorAll('iframe');
         iframes.forEach(f => { try { f.src = 'about:blank'; f.remove(); } catch(ex) {} });
         this.wrapper.innerHTML = '';
-        const serverBar = document.getElementById('serverBar');
+        var serverBar = document.getElementById('serverBar');
         if (serverBar) serverBar.innerHTML = '';
-        if (this._popupObserver) {
-            this._popupObserver.disconnect();
-        }
-        if (document.fullscreenElement) {
-            document.exitFullscreen().catch(() => {});
-        }
+        if (this._popupObserver) this._popupObserver.disconnect();
+        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
     }
 
     _loadEmbed(item, season, episode) {
-        const type = (item.mediaType === 'tv' || item.mediaType === 'anime') ? 'tv' : 'movie';
-        const tmdbId = item.id;
-        const providers = CONFIG.EMBED.PROVIDERS;
-        const serverBar = document.getElementById('serverBar');
-        let currentIndex = 0;
-        let loadTimeout = null;
+        var type = (item.mediaType === 'tv' || item.mediaType === 'anime') ? 'tv' : 'movie';
+        var tmdbId = item.id;
+        var providers = CONFIG.EMBED.PROVIDERS;
+        var serverBar = document.getElementById('serverBar');
+        var self = this;
+        var currentIndex = 0;
+        var loadTimeout = null;
 
-        const buildServerBar = (activeIndex) => {
-            let html = '<span class="server-label">Servidor:</span>';
-            providers.forEach((p, i) => {
-                const cls = i === activeIndex ? 'server-chip active' : 'server-chip';
+        var buildServerBar = function(activeIndex) {
+            var html = '<span class="server-label">Servidor:</span>';
+            providers.forEach(function(p, i) {
+                var cls = i === activeIndex ? 'server-chip active' : 'server-chip';
                 html += '<button class="' + cls + '" data-server="' + i + '">' + p.name + '</button>';
             });
             return html;
         };
 
-        const showError = (msg) => {
-            this.wrapper.innerHTML = `
-                <div class="player-error">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <p>${msg || 'Nenhum servidor disponivel'}</p>
-                    <button class="btn-secondary" id="playerErrorBack" style="margin-top:15px">
-                        <i class="fas fa-arrow-left"></i> Voltar
-                    </button>
-                </div>`;
-            document.getElementById('playerErrorBack').addEventListener('click', () => this.close());
+        var showError = function(msg) {
+            self.wrapper.innerHTML =
+                '<div class="player-error">' +
+                '<i class="fas fa-exclamation-triangle"></i>' +
+                '<p>' + (msg || 'Nenhum servidor disponivel') + '</p>' +
+                '<button class="btn-secondary" id="playerErrorBack" style="margin-top:15px">' +
+                '<i class="fas fa-arrow-left"></i> Voltar</button></div>';
+            document.getElementById('playerErrorBack').addEventListener('click', function() { self.close(); });
         };
 
-        const tryProvider = (index) => {
+        var tryProvider = function(index) {
             if (loadTimeout) clearTimeout(loadTimeout);
             if (index >= providers.length) {
                 serverBar.innerHTML = '';
@@ -161,99 +150,77 @@ class VideoPlayer {
                 return;
             }
 
-            const p = providers[index];
-            const url = type === 'tv' ? p.tv(tmdbId, season, episode) : p.movie(tmdbId);
+            var p = providers[index];
+            var url = type === 'tv' ? p.tv(tmdbId, season, episode) : p.movie(tmdbId);
 
             serverBar.innerHTML = buildServerBar(index);
 
-            const iframe = document.createElement('iframe');
-            iframe.setAttribute('src', url);
-            iframe.setAttribute('frameborder', '0');
-            iframe.setAttribute('allowfullscreen', 'true');
-            iframe.setAttribute('allow', 'autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen');
-            iframe.setAttribute('class', 'video-iframe');
-            iframe.setAttribute('loading', 'eager');
+            var iframe = document.createElement('iframe');
+            iframe.src = url;
+            iframe.frameBorder = '0';
+            iframe.allowFullscreen = true;
+            iframe.allow = 'autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen';
+            iframe.className = 'video-iframe';
+            iframe.loading = 'eager';
             iframe.style.opacity = '0';
             iframe.style.transition = 'opacity 0.3s';
-            let loaded = false;
+            var loaded = false;
             iframe.onload = function() {
                 loaded = true;
                 this.style.opacity = '1';
             };
 
-            this.wrapper.innerHTML = '';
-            this.wrapper.appendChild(iframe);
+            self.wrapper.innerHTML = '';
+            self.wrapper.appendChild(iframe);
 
-            loadTimeout = setTimeout(() => {
+            loadTimeout = setTimeout(function() {
                 if (!loaded && index < providers.length - 1) {
-                    this._nextProvider();
+                    self._nextProvider();
                 }
             }, 10000);
 
-            serverBar.querySelectorAll('.server-chip').forEach(btn => {
-                btn.addEventListener('click', (e) => {
+            serverBar.querySelectorAll('.server-chip').forEach(function(btn) {
+                btn.addEventListener('click', function(e) {
                     e.preventDefault();
                     e.stopPropagation();
-                    const idx = parseInt(btn.getAttribute('data-server'));
-                    this._switchServer(idx);
+                    var idx = parseInt(btn.getAttribute('data-server'));
+                    self._switchServer(idx);
                 });
             });
 
             currentIndex = index;
-            this._currentProviders = providers;
-            this._currentIndex = index;
-            this._currentType = type;
-            this._currentTmdbId = tmdbId;
-            this._currentSeason = season;
-            this._currentEpisode = episode;
+            self._currentProviders = providers;
+            self._currentIndex = index;
+            self._currentType = type;
+            self._currentTmdbId = tmdbId;
+            self._currentSeason = season;
+            self._currentEpisode = episode;
         };
 
-        this._nextProvider = () => {
+        this._nextProvider = function() {
             if (currentIndex < providers.length - 1) {
                 currentIndex++;
                 tryProvider(currentIndex);
             }
         };
 
-        this._nextProvider = this._nextProvider.bind(this);
         tryProvider(0);
-    }
-
-    showServers() {
-        if (!this._currentProviders) return;
-        const serverBar = document.getElementById('serverBar');
-        let html = '<span class="server-label">Servidor:</span>';
-        this._currentProviders.forEach((p, i) => {
-            const cls = i === this._currentIndex ? 'server-chip active' : 'server-chip';
-            html += '<button class="' + cls + '" data-server="' + i + '">' + p.name + '</button>';
-        });
-        serverBar.innerHTML = html;
-
-        serverBar.querySelectorAll('.server-chip').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                const index = parseInt(btn.getAttribute('data-server'));
-                this._switchServer(index);
-            });
-        });
     }
 
     _switchServer(index) {
         if (!this._currentProviders || index < 0 || index >= this._currentProviders.length) return;
 
-        const p = this._currentProviders[index];
-        const url = this._currentType === 'tv'
+        var p = this._currentProviders[index];
+        var url = this._currentType === 'tv'
             ? p.tv(this._currentTmdbId, this._currentSeason, this._currentEpisode)
             : p.movie(this._currentTmdbId);
 
         this._currentIndex = index;
-        const iframe = this.wrapper.querySelector('iframe');
-        if (iframe) {
-            iframe.src = url;
-        }
-        const serverBar = document.getElementById('serverBar');
-        serverBar.querySelectorAll('.server-chip').forEach((chip, i) => {
+        var iframe = this.wrapper.querySelector('iframe');
+        if (iframe) iframe.src = url;
+
+        var serverBar = document.getElementById('serverBar');
+        serverBar.querySelectorAll('.server-chip').forEach(function(chip, i) {
             chip.classList.toggle('active', i === index);
         });
     }
@@ -262,53 +229,45 @@ class VideoPlayer {
         this.titleEl.textContent = channel.title;
         this.overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
-        const serverBar = document.getElementById('serverBar');
+        var serverBar = document.getElementById('serverBar');
         serverBar.innerHTML = '<span class="server-label">TV Ao Vivo</span>';
+        var self = this;
 
         if (channel.streamUrl && channel.streamUrl.includes('.m3u8')) {
-            this.wrapper.innerHTML = `<video id="liveVideo" class="video-iframe" controls autoplay muted></video>`;
-            const video = document.getElementById('liveVideo');
+            this.wrapper.innerHTML = '<video id="liveVideo" class="video-iframe" controls autoplay muted></video>';
+            var video = document.getElementById('liveVideo');
             if (typeof Hls !== 'undefined' && Hls.isSupported()) {
-                const hls = new Hls({ enableWorker: true, lowLatencyMode: true });
+                var hls = new Hls({ enableWorker: true, lowLatencyMode: true });
                 hls.loadSource(channel.streamUrl);
                 hls.attachMedia(video);
-                hls.on(Hls.Events.MANIFEST_PARSED, () => video.play().catch(() => {}));
-                hls.on(Hls.Events.ERROR, (_, data) => {
+                hls.on(Hls.Events.MANIFEST_PARSED, function() { video.play().catch(function(){}); });
+                hls.on(Hls.Events.ERROR, function(_, data) {
                     if (data.fatal) {
-                        this.wrapper.innerHTML = `
-                            <div class="player-error">
-                                <i class="fas fa-tv"></i>
-                                <p>Stream indisponivel</p>
-                            </div>`;
+                        self.wrapper.innerHTML =
+                            '<div class="player-error"><i class="fas fa-tv"></i><p>Stream indisponivel</p></div>';
                     }
                 });
             } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
                 video.src = channel.streamUrl;
-                video.play().catch(() => {});
+                video.play().catch(function(){});
             } else {
-                this.wrapper.innerHTML = `
-                    <div class="player-error">
-                        <i class="fas fa-tv"></i>
-                        <p>Seu navegador nao suporta HLS</p>
-                    </div>`;
+                this.wrapper.innerHTML =
+                    '<div class="player-error"><i class="fas fa-tv"></i><p>Seu navegador nao suporta HLS</p></div>';
             }
         } else if (channel.streamUrl) {
             this.wrapper.innerHTML = '';
-            const iframe = document.createElement('iframe');
-            iframe.setAttribute('src', channel.streamUrl);
-            iframe.setAttribute('frameborder', '0');
-            iframe.setAttribute('allowfullscreen', 'true');
-            iframe.setAttribute('allow', 'autoplay; encrypted-media');
-            iframe.setAttribute('class', 'video-iframe');
+            var iframe = document.createElement('iframe');
+            iframe.src = channel.streamUrl;
+            iframe.frameBorder = '0';
+            iframe.allowFullscreen = true;
+            iframe.allow = 'autoplay; encrypted-media';
+            iframe.className = 'video-iframe';
             this.wrapper.appendChild(iframe);
         } else {
-            this.wrapper.innerHTML = `
-                <div class="player-error">
-                    <i class="fas fa-tv"></i>
-                    <p>Stream nao disponivel</p>
-                </div>`;
+            this.wrapper.innerHTML =
+                '<div class="player-error"><i class="fas fa-tv"></i><p>Stream nao disponivel</p></div>';
         }
     }
 }
 
-const player = new VideoPlayer();
+var player = new VideoPlayer();
