@@ -39,6 +39,27 @@ class VideoPlayer {
                 return false;
             }
         }, { passive: false, capture: true });
+
+        this._popupObserver = new MutationObserver((mutations) => {
+            if (!this.isOpen()) return;
+            for (const m of mutations) {
+                for (const node of m.addedNodes) {
+                    if (node.nodeType !== 1) continue;
+                    if (node.tagName === 'IFRAME' && node !== this.wrapper.querySelector('iframe')) {
+                        node.remove();
+                    }
+                    if (node.tagName === 'DIV' && node.style && node.style.position === 'fixed' && node.style.zIndex > 9999) {
+                        node.remove();
+                    }
+                    if (node.querySelectorAll) {
+                        node.querySelectorAll('iframe').forEach(f => {
+                            if (f !== this.wrapper.querySelector('iframe')) f.remove();
+                        });
+                    }
+                }
+            }
+        });
+        this._popupObserver.observe(document.body, { childList: true, subtree: true });
     }
 
     _setupIframeMessageBlocker() {
@@ -95,6 +116,9 @@ class VideoPlayer {
         this.wrapper.innerHTML = '';
         const serverBar = document.getElementById('serverBar');
         if (serverBar) serverBar.innerHTML = '';
+        if (this._popupObserver) {
+            this._popupObserver.disconnect();
+        }
         if (document.fullscreenElement) {
             document.exitFullscreen().catch(() => {});
         }
@@ -149,6 +173,7 @@ class VideoPlayer {
             iframe.setAttribute('allow', 'autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen');
             iframe.setAttribute('class', 'video-iframe');
             iframe.setAttribute('loading', 'eager');
+            iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads');
             iframe.style.opacity = '0';
             iframe.style.transition = 'opacity 0.3s';
             let loaded = false;
@@ -276,6 +301,7 @@ class VideoPlayer {
             iframe.setAttribute('allowfullscreen', 'true');
             iframe.setAttribute('allow', 'autoplay; encrypted-media');
             iframe.setAttribute('class', 'video-iframe');
+            iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-presentation');
             this.wrapper.appendChild(iframe);
         } else {
             this.wrapper.innerHTML = `

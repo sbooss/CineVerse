@@ -3,18 +3,13 @@ const CONFIG = {
         PROVIDERS: [
             {
                 name: 'Servidor 1',
-                movie: function(id) { return 'https://vidcore.org/embed/movie/' + id + '?lang=pt'; },
-                tv: function(id, s, e) { return 'https://vidcore.org/embed/tv/' + id + '/' + s + '/' + e + '?lang=pt'; }
+                movie: function(id) { return 'https://vixsrc.to/movie/' + id + '?lang=pt&autoplay=true'; },
+                tv: function(id, s, e) { return 'https://vixsrc.to/tv/' + id + '/' + s + '/' + e + '?lang=pt&autoplay=true'; }
             },
             {
                 name: 'Servidor 2',
-                movie: function(id) { return 'https://vidlink.pro/movie/' + id; },
-                tv: function(id, s, e) { return 'https://vidlink.pro/tv/' + id + '/' + s + '/' + e; }
-            },
-            {
-                name: 'Servidor 3',
-                movie: function(id) { return 'https://www.2embed.cc/embedmovie/' + id; },
-                tv: function(id, s, e) { return 'https://www.2embed.cc/embedtv/' + id + '&s=' + s + '&e=' + e; }
+                movie: function(id) { return 'https://moviesapi.to/movie/' + id; },
+                tv: function(id, s, e) { return 'https://moviesapi.to/tv/' + id + '-' + s + '-' + e; }
             }
         ]
     },
