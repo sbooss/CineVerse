@@ -3,13 +3,13 @@ const CONFIG = {
         PROVIDERS: [
             {
                 name: 'Servidor 1',
-                movie: function(id) { return 'https://mgeb.top/embed/' + id; },
-                tv: function(id, s, e) { return 'https://mgeb.top/embed/' + id + '/' + s + '/' + e; }
+                movie: function(id) { return 'https://vidcore.org/embed/movie/' + id + '?lang=pt'; },
+                tv: function(id, s, e) { return 'https://vidcore.org/embed/tv/' + id + '/' + s + '/' + e + '?lang=pt'; }
             },
             {
                 name: 'Servidor 2',
-                movie: function(id) { return 'https://moviesapi.to/movie/' + id; },
-                tv: function(id, s, e) { return 'https://moviesapi.to/tv/' + id + '-' + s + '-' + e; }
+                movie: function(id) { return 'https://www.2embed.cc/embed/' + id; },
+                tv: function(id, s, e) { return 'https://www.2embed.cc/embedtv/' + id + '&s=' + s + '&e=' + e; }
             }
         ]
     },
