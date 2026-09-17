@@ -66,9 +66,8 @@
             width: 200px; height: 200px; margin: 0 auto 12px;
             background: #fff; border-radius: 8px;
             display: flex; align-items: center; justify-content: center;
-            position: relative; overflow: hidden;
+            overflow: hidden;
         }
-        .qr-code canvas { display: block; }
         .pix-label { font-size: 12px; color: #666; font-weight: 600; margin-top: 8px; }
         .pix-key {
             background: rgba(0,168,224,0.08); border: 1px solid rgba(0,168,224,0.2);
@@ -135,7 +134,9 @@
         </p>
 
         <div class="qr-section">
-            <div class="qr-code" id="qrCode"></div>
+            <div class="qr-code" id="qrCode">
+                <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=00020126580014BR.GOV.BCB.PIX0136aaffe908-34c3-4eba-8379-c4ab086ef3a552040000530398654040.015802BR5913CINE%20BOSS6009SAO%20PAULO62140510CINEBOSS0063A1B2&bgcolor=ffffff&color=000000" alt="QR Code PIX" style="width:200px;height:200px;border-radius:8px">
+            </div>
             <div class="pix-label">Escaneie o QR Code PIX</div>
         </div>
 
@@ -183,68 +184,6 @@
         }
     }
 
-    function generateQR() {
-        var canvas = document.getElementById('qrCode');
-        var size = 200;
-        canvas.width = size;
-        canvas.height = size;
-        var ctx = canvas.getContext('2d');
-
-        ctx.fillStyle = '#ffffff';
-        ctx.fillRect(0, 0, size, size);
-
-        var pixPayload = '00020126580014BR.GOV.BCB.PIX0136aaffe908-34c3-4eba-8379-c4ab086ef3a552040000530398654040.015802BR5913CINE BOSS6009SAO PAULO62140510CINEBOSS0063A1B2';
-
-        var modules = [];
-        var moduleCount = 25;
-        for (var i = 0; i < moduleCount; i++) {
-            modules[i] = [];
-            for (var j = 0; j < moduleCount; j++) {
-                modules[i][j] = false;
-            }
-        }
-
-        for (var i = 0; i < moduleCount; i++) {
-            for (var j = 0; j < moduleCount; j++) {
-                if (i < 7 || i >= moduleCount - 7 || j < 7 || j >= moduleCount - 7) {
-                    modules[i][j] = true;
-                } else {
-                    var idx = (i * moduleCount + j) % pixPayload.length;
-                    var charCode = pixPayload.charCodeAt(idx);
-                    modules[i][j] = (charCode + i + j) % 3 === 0;
-                }
-            }
-        }
-
-        var moduleSize = size / moduleCount;
-        ctx.fillStyle = '#1a1a2e';
-        for (var i = 0; i < moduleCount; i++) {
-            for (var j = 0; j < moduleCount; j++) {
-                if (modules[i][j]) {
-                    ctx.fillRect(j * moduleSize, i * moduleSize, moduleSize + 0.5, moduleSize + 0.5);
-                }
-            }
-        }
-
-        var logoSize = 36;
-        var logoX = (size - logoSize) / 2;
-        var logoY = (size - logoSize) / 2;
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.arc(size/2, size/2, logoSize/2 + 4, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#00a8e0';
-        ctx.beginPath();
-        ctx.arc(size/2, size/2, logoSize/2, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.fillStyle = '#ffffff';
-        ctx.font = 'bold 14px Arial';
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('CB', size/2, size/2);
-    }
-
-    generateQR();
     </script>
 </body>
 </html>
