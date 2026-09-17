@@ -47,7 +47,7 @@ class VideoPlayer {
             const data = e.data;
             if (typeof data === 'string') {
                 const lower = data.toLowerCase();
-                if (lower.includes('open') || lower.includes('popup') || lower.includes('redirect')) {
+                if (lower.includes('popunder') || lower.includes('acscdn') || lower.includes('aclib') || lower.includes('onclickperformance')) {
                     e.stopImmediatePropagation();
                     return false;
                 }

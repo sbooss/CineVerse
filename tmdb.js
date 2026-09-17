@@ -95,9 +95,9 @@ class TMDBAPI {
         };
     }
 
-    async getTrending(type = 'all', window = 'week') {
-        const r = await this.fetchAPI(`/trending/${type}/${window}`);
-        return (r && r.results) ? r.results.filter(function(i){return !i.adult}).map(function(i){return _this.formatItem(i, i.media_type)}) : null;
+    async getTrending(type = 'all', timeWindow = 'week') {
+        const r = await this.fetchAPI('/trending/' + type + '/' + timeWindow);
+        return (r && r.results) ? r.results.filter(i => !i.adult).map(i => this.formatItem(i, i.media_type)) : null;
     }
 
     async getPopular(type = 'movie', page = 1) {
@@ -149,8 +149,8 @@ class TMDBAPI {
     }
 
     async search(query, page = 1) {
-        const r = await this.fetchAPI('/search/multi', { query, page, include_adult: false });
-        if (!r && r.results) return [];
+        const r = await this.fetchAPI('/search/multi', { query: query, page: page, include_adult: false });
+        if (!r || !r.results) return [];
         return r.results.filter(i => (i.media_type === 'movie' || i.media_type === 'tv') && !i.adult).map(i => this.formatItem(i, i.media_type));
     }
 

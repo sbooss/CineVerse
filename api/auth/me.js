@@ -11,7 +11,7 @@ module.exports = async function handler(req, res) {
 
     try {
         const token = getToken(req);
-        if (!token) return res.status(401).json({ error: 'Token nao fornecido', loggedIn: false });
+        if (!token) return res.status(200).json({ loggedIn: false });
 
         let decoded;
         try {

@@ -1,4 +1,5 @@
 const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const {
     supabase, setCors, handleOptions, setAuthCookie,
     sanitizeEmail, isValidEmail,
@@ -36,7 +37,7 @@ module.exports = async function handler(req, res) {
         }
 
         const expiryDays = remember ? 90 : 30;
-        const token = require('jsonwebtoken').sign(
+        const token = jwt.sign(
             { userId: user.id, iat: Math.floor(Date.now() / 1000) },
             process.env.JWT_SECRET,
             { expiresIn: `${expiryDays}d` }

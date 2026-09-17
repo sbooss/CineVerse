@@ -39,7 +39,7 @@ module.exports = async function handler(req, res) {
                 });
                 if (mpRes.ok) {
                     const mpData = await mpRes.json();
-                    if (mpData.status === 'approved' || mpData.status === 'pending_payment') {
+                    if (mpData.status === 'approved' || mpData.status === 'pending') {
                         const planDays = planInfo.days;
                         const expiresAt = new Date(Date.now() + planDays * 24 * 60 * 60 * 1000);
                         await supabase.from('subscriptions').update({
@@ -70,15 +70,15 @@ module.exports = async function handler(req, res) {
         }
 
         const expiresAt = new Date(Date.now() + planInfo.days * 24 * 60 * 60 * 1000);
-        await supabase.from('subscriptions').update({
-            status: 'active', activated_at: new Date().toISOString(),
-            expires_at: expiresAt.toISOString(), updated_at: new Date().toISOString()
-        }).eq('id', subscription_id);
 
-        return jsonSuccess(res, {
-            message: 'Pagamento confirmado! Assinatura ativa.',
-            subscription: { id: subscription_id, plan: subscription.plan, status: 'active', expires_at: expiresAt.toISOString() }
-        });
+        if (subscription.status === 'active') {
+            return jsonSuccess(res, {
+                message: 'Assinatura ja ativa.',
+                subscription: { id: subscription_id, plan: subscription.plan, status: 'active', expires_at: subscription.expires_at }
+            });
+        }
+
+        return jsonError(res, 400, 'Pagamento ainda nao confirmado. Aguarde o processamento do Mercado Pago.');
     } catch (error) {
         console.error('Simulate payment error:', error);
         return jsonError(res, 500, 'Erro ao processar pagamento');

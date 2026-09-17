@@ -4,6 +4,7 @@ const {
 } = require('../_lib/security');
 
 const MP_TOKEN = process.env.MP_ACCESS_TOKEN;
+const MP_WEBHOOK_SECRET = process.env.MP_WEBHOOK_SECRET || 'cineboss_mp_webhook_2026';
 if (!MP_TOKEN) console.error('CRITICAL: MP_ACCESS_TOKEN not set');
 const MP_API = 'https://api.mercadopago.com';
 
@@ -50,7 +51,7 @@ module.exports = async function handler(req, res) {
 
             if (!subscription) return jsonSuccess(res, { received: true, message: 'Subscription not found' });
 
-            if (paymentData.status === 'approved' || paymentData.status === 'pending_payment') {
+            if (paymentData.status === 'approved' || paymentData.status === 'pending') {
                 const planDays = ref.planDays ? parseInt(ref.planDays) : 30;
                 const expiresAt = new Date(Date.now() + planDays * 24 * 60 * 60 * 1000);
 

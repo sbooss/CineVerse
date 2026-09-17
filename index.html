@@ -590,12 +590,6 @@
                 window.history.replaceState({}, '', window.location.pathname);
             }
         })();
-
-        // Popup/redirect blocker - SAFE
-        (function() {
-            window.open = function() { return null; };
-            Object.defineProperty(window, 'open', { value: function() { return null; }, writable: false, configurable: false });
-        })();
     </script>
     <style>
         iframe[src*="doubleclick"],iframe[src*="googlesyndication"],iframe[src*="adnxs"],
@@ -610,8 +604,8 @@
         [data-ad],.aclib_pop,.aclib_pop_under,.ac-overlay,.ac-notice
         {display:none!important;pointer-events:none!important}
         .player-overlay{z-index:999999!important;position:fixed!important;inset:0!important}
-        *{-webkit-user-select:none!important;-moz-user-select:none!important;-ms-user-select:none!important;user-select:none!important}
-        input,textarea{-webkit-user-select:text!important;user-select:text!important}
+        .navbar,.mobile-menu,.player-overlay,.modal-overlay{-webkit-user-select:none!important;-moz-user-select:none!important;-ms-user-select:none!important;user-select:none!important}
+        input,textarea,.hero-desc,.movie-overview{-webkit-user-select:text!important;user-select:text!important}
     </style>
 
     <!-- SECURITY - Anti-Inspection -->
