@@ -3,15 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sobre o CINE BOSS | Plataforma de Streaming</title>
-    <meta name="description" content="Conheca o CINE BOSS: a plataforma brasileira de streaming com filmes e series em alta qualidade, iptv ao vivo e experiencia cinematografica premium.">
-    <meta name="keywords" content="sobre cine boss, plataforma streaming, cine boss, streaming brasileiro, filmes series, iptv, plataforma video">
+    <title>Sobre o CINE BOSS | A Plataforma de Streaming Premium do Brasil</title>
+    <meta name="description" content="Conheca o CINE BOSS: a plataforma brasileira de streaming com filmes, series, IPTV ao vivo e experiencia cinematografica premium. Qualidade HD, interface moderna, planos a partir de R$ 6,99.">
+    <meta name="keywords" content="sobre cine boss, plataforma streaming, streaming brasileiro, filmes series, iptv ao vivo, streaming HD, cineboss, plataforma video premium">
     <meta name="author" content="CINE BOSS">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://cineboss.online/about.html">
 
-    <meta property="og:title" content="Sobre o CINE BOSS">
-    <meta property="og:description" content="A plataforma brasileira de streaming com experiencia cinematografica premium.">
+    <meta property="og:title" content="Sobre o CINE BOSS - Plataforma de Streaming Premium">
+    <meta property="og:description" content="A plataforma brasileira de streaming com experiencia cinematografica premium. Filmes, series e IPTV ao vivo.">
     <meta property="og:image" content="https://cineboss.online/og-image.png">
     <meta property="og:url" content="https://cineboss.online/about.html">
     <meta property="og:type" content="website">
@@ -36,17 +36,325 @@
             "@type": "Organization",
             "name": "CINE BOSS",
             "url": "https://cineboss.online",
-            "description": "Plataforma brasileira de streaming premium",
-            "sameAs": [],
+            "logo": "https://imgur.com/6opzHhy.png",
+            "description": "Plataforma brasileira de streaming premium com filmes, series e IPTV ao vivo",
             "contactPoint": {
                 "@type": "ContactPoint",
                 "contactType": "customer support",
                 "email": "williannunes31994@gmail.com",
                 "availableLanguage": "Portuguese"
-            }
+            },
+            "areaServed": {
+                "@type": "Country",
+                "name": "Brazil"
+            },
+            "sameAs": []
         }
     }
     </script>
+
+    <style>
+        .about-hero-section {
+            position: relative;
+            padding: 80px 24px 60px;
+            text-align: center;
+            overflow: hidden;
+        }
+        .about-hero-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0,168,224,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .about-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: rgba(0,168,224,0.08);
+            border: 1px solid rgba(0,168,224,0.15);
+            border-radius: 50px;
+            font-size: 13px;
+            color: var(--accent-blue);
+            font-weight: 600;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        .about-hero-badge i { font-size: 14px; }
+        .about-hero-title {
+            font-family: 'Sora', sans-serif;
+            font-size: clamp(32px, 5vw, 52px);
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.15;
+            margin-bottom: 16px;
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+        .about-hero-title .blue { color: var(--accent-blue); }
+        .about-hero-title .gold { color: var(--accent-gold); }
+        .about-hero-desc {
+            font-size: 17px;
+            color: var(--text-secondary);
+            max-width: 640px;
+            margin: 0 auto;
+            line-height: 1.7;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+        .about-stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 48px;
+            margin-top: 40px;
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+        .about-stat {
+            text-align: center;
+        }
+        .about-stat-number {
+            font-family: 'Sora', sans-serif;
+            font-size: 36px;
+            font-weight: 800;
+            color: var(--accent-blue);
+        }
+        .about-stat-label {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+        .about-content-wrapper {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+        .about-section {
+            margin-bottom: 48px;
+        }
+        .about-section-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .about-section-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: var(--accent-blue);
+            flex-shrink: 0;
+        }
+        .about-section-header h2 {
+            font-family: 'Sora', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .about-section-header p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+        .about-section-text {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 20px;
+        }
+        .about-grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 16px;
+        }
+        .about-feature-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            padding: 28px 24px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .about-feature-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-brand);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .about-feature-card:hover {
+            border-color: var(--border-accent);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-glow-blue);
+        }
+        .about-feature-card:hover::before {
+            opacity: 1;
+        }
+        .about-feature-card i {
+            font-size: 28px;
+            color: var(--accent-blue);
+            margin-bottom: 16px;
+            display: block;
+        }
+        .about-feature-card h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        .about-feature-card p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .about-how-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .about-step {
+            text-align: center;
+            padding: 32px 20px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-md);
+            position: relative;
+        }
+        .about-step-num {
+            width: 56px;
+            height: 56px;
+            background: var(--gradient-brand);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-size: 22px;
+            font-weight: 800;
+            color: #fff;
+            margin: 0 auto 16px;
+            box-shadow: 0 4px 20px rgba(0,168,224,0.25);
+        }
+        .about-step h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+        .about-step p {
+            font-size: 13px;
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+        .about-tech-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .about-tech-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+        }
+        .about-tech-item:hover {
+            border-color: var(--border-accent);
+        }
+        .about-tech-item i {
+            font-size: 18px;
+            color: var(--accent-blue);
+            width: 20px;
+            text-align: center;
+        }
+        .about-tech-item span {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+        .about-cta {
+            text-align: center;
+            padding: 60px 24px;
+            background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-deep) 100%);
+            border-top: 1px solid var(--border-subtle);
+        }
+        .about-cta h2 {
+            font-family: 'Sora', sans-serif;
+            font-size: 28px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        .about-cta p {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+        .about-cta-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 16px;
+        }
+        .about-cta-btn {
+            padding: 14px 32px;
+            border-radius: var(--radius-sm);
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        .about-cta-btn.primary {
+            background: var(--gradient-brand);
+            color: #fff;
+            box-shadow: 0 4px 16px rgba(0,168,224,0.3);
+        }
+        .about-cta-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0,168,224,0.4);
+        }
+        .about-cta-btn.secondary {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-medium);
+            color: var(--text-primary);
+        }
+        .about-cta-btn.secondary:hover {
+            border-color: var(--accent-blue);
+            background: var(--accent-blue-glow);
+        }
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 768px) {
+            .about-stats-row { gap: 24px; flex-wrap: wrap; }
+            .about-stat-number { font-size: 28px; }
+            .about-grid-3, .about-how-grid { grid-template-columns: 1fr; }
+            .about-tech-list { grid-template-columns: 1fr; }
+            .about-cta-buttons { flex-direction: column; align-items: center; }
+        }
+    </style>
 </head>
 <body>
     <div class="donate-banner">
@@ -77,74 +385,177 @@
     </nav>
 
     <main class="main-content">
-        <section class="about-hero">
-            <h1>Sobre o <span class="blue">CINE BOSS</span></h1>
-            <p class="about-subtitle">A plataforma brasileira de streaming premium</p>
+        <section class="about-hero-section">
+            <div class="about-hero-badge">
+                <i class="fas fa-bolt"></i>
+                Plataforma Brasileira de Streaming
+            </div>
+            <h1 class="about-hero-title">
+                O Streaming que o Brasil<br><span class="blue">Merecia</span> e Agora <span class="gold">Tem</span>
+            </h1>
+            <p class="about-hero-desc">
+                O CINE BOSS nasceu pra acabar com a bagunca. Uma plataforma de verdade: rapida, bonita, com catalogo completo e sem enrolacao. Filmes, series, IPTV ao vivo — tudo num so lugar, com a qualidade que voce merece.
+            </p>
+            <div class="about-stats-row">
+                <div class="about-stat">
+                    <div class="about-stat-number">1000+</div>
+                    <div class="about-stat-label">Filmes e Series</div>
+                </div>
+                <div class="about-stat">
+                    <div class="about-stat-number">HD</div>
+                    <div class="about-stat-label">Qualidade Maxima</div>
+                </div>
+                <div class="about-stat">
+                    <div class="about-stat-number">24/7</div>
+                    <div class="about-stat-label">IPTV Ao Vivo</div>
+                </div>
+                <div class="about-stat">
+                    <div class="about-stat-number">R$6,99</div>
+                    <div class="about-stat-label">A partir de</div>
+                </div>
+            </div>
         </section>
 
-        <section class="about-content">
-            <div class="about-block">
-                <h2><i class="fas fa-rocket"></i> O que e o CINE BOSS?</h2>
-                <p>O <strong>CINE BOSS</strong> e uma plataforma de streaming brasileira que oferece acesso a milhares de filmes e series em alta qualidade, com interface premium e experiencia cinematografica. Nascemos com o objetivo de criar a melhor plataforma de streaming do Brasil.</p>
-            </div>
+        <div class="about-content-wrapper">
+            <section class="about-section">
+                <div class="about-section-header">
+                    <div class="about-section-icon"><i class="fas fa-rocket"></i></div>
+                    <div>
+                        <h2>O Que e o CINE BOSS?</h2>
+                        <p>Streaming de verdade, nao gambiarra</p>
+                    </div>
+                </div>
+                <p class="about-section-text">
+                    O CINE BOSS e uma plataforma de streaming brasileira criada com um unico objetivo: oferecer a melhor experiencia de conteudo audiovisual do pais. Nao somos mais um site generico de filmes. Somos uma plataforma completa, com interface premium, catalogo organizado e funcionamento impecavel em qualquer dispositivo.
+                </p>
+                <p class="about-section-text">
+                    Com dados em tempo real do TMDB (The Movie Database), sempre tera as informacoes mais atualizadas sobre filmes e series. Nosso player embutido roda direto no navegador, sem necessidade de baixar nada. E pra complementar, temos IPTV ao vivo com canais nacionais e internacionais.
+                </p>
+            </section>
 
-            <div class="about-block">
-                <h2><i class="fas fa-star"></i> Nossas Caracteristicas</h2>
-                <div class="features-grid">
-                    <div class="feature-item">
-                        <i class="fas fa-film"></i>
-                        <h3>Filmes em HD</h3>
-                        <p>Acesso a milhares de filmes em alta definicao com legends e dublados em portugues.</p>
+            <section class="about-section">
+                <div class="about-section-header">
+                    <div class="about-section-icon"><i class="fas fa-star"></i></div>
+                    <div>
+                        <h2>Por Que o CINE BOSS e Diferente?</h2>
+                        <p>Nao e so mais um site de filmes</p>
                     </div>
-                    <div class="feature-item">
-                        <i class="fas fa-tv"></i>
-                        <h3>Series Completas</h3>
-                        <p>Todas as temporadas das melhores series nacionais e internacionais.</p>
+                </div>
+                <div class="about-grid-3">
+                    <div class="about-feature-card">
+                        <i class="fas fa-bolt"></i>
+                        <h3>Velocidade Real</h3>
+                        <p>Interface criada pra ser rapida. Carregamento instantaneo, busca fluida, transicoes suaves. Zero enrolacao.</p>
                     </div>
-                    <div class="feature-item">
-                        <i class="fas fa-satellite-dish"></i>
-                        <h3>IPTV Ao Vivo</h3>
-                        <p>Canais de TV ao vivo, esportes e conteudo em tempo real.</p>
+                    <div class="about-feature-card">
+                        <i class="fas fa-palette"></i>
+                        <h3>Design Premium</h3>
+                        <p>Visual cinematografico com tema escuro, tipografia Sora e efeitos que parecem Netflix. Feito pra impressionar.</p>
                     </div>
-                    <div class="feature-item">
+                    <div class="about-feature-card">
                         <i class="fas fa-mobile-alt"></i>
                         <h3>Multi-Dispositivo</h3>
-                        <p>Assista no celular, tablet, computador ou Smart TV.</p>
+                        <p>Funciona em qualquer tela. Computador, celular, tablet, Smart TV. A experiencia e a mesma: perfeita.</p>
+                    </div>
+                    <div class="about-feature-card">
+                        <i class="fas fa-satellite-dish"></i>
+                        <h3>IPTV Ao Vivo</h3>
+                        <p>Canais de TV ao vivo, esportes, noticias e conteudo em tempo real. Tudo integrado na mesma plataforma.</p>
+                    </div>
+                    <div class="about-feature-card">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Seguranca Total</h3>
+                        <p>Autenticacao com JWT, senhas criptografadas com bcrypt, limite de dispositivos por conta. Seus dados protegidos.</p>
+                    </div>
+                    <div class="about-feature-card">
+                        <i class="fas fa-credit-card"></i>
+                        <h3>Preco Justo</h3>
+                        <p>Planos a partir de R$ 6,99. Pagamento unico via Mercado Pago, sem renovacao automatica. Transparencia total.</p>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="about-block">
-                <h2><i class="fas fa-shield-alt"></i> Seguranca e Privacidade</h2>
-                <p>Seus dados estao protegidos com criptografia de ponta. Utilizamos <strong>Supabase</strong> para gerenciamento seguro de contas e autenticacao. Nao compartilhamos seus dados com terceiros.</p>
-            </div>
-
-            <div class="about-block">
-                <h2><i class="fas fa-hand-holding-heart"></i> Como Funciona</h2>
-                <div class="how-it-works">
-                    <div class="step">
-                        <div class="step-number">1</div>
+            <section class="about-section">
+                <div class="about-section-header">
+                    <div class="about-section-icon"><i class="fas fa-cogs"></i></div>
+                    <div>
+                        <h2>Como Funciona</h2>
+                        <p>Do registro ao conteudo em 3 passos</p>
+                    </div>
+                </div>
+                <div class="about-how-grid">
+                    <div class="about-step">
+                        <div class="about-step-num">1</div>
                         <h3>Crie sua Conta</h3>
-                        <p>Registre-se gratuitamente em segundos.</p>
+                        <p>Registre-se com email e senha em segundos. Sem burocracia, sem formulario infinito.</p>
                     </div>
-                    <div class="step">
-                        <div class="step-number">2</div>
-                        <h3>Escolha seu Plano</h3>
-                        <p>Planos a partir de R$ 6,99/mês via Mercado Pago.</p>
+                    <div class="about-step">
+                        <div class="about-step-num">2</div>
+                        <h3>Escolha o Plano</h3>
+                        <p>Mensal por R$ 6,99 ou trimestral por R$ 15,99. Pague via Mercado Pago com total seguranca.</p>
                     </div>
-                    <div class="step">
-                        <div class="step-number">3</div>
+                    <div class="about-step">
+                        <div class="about-step-num">3</div>
                         <h3>Assista Agora</h3>
-                        <p>Acesse todo o catalogo imediatamente apos o pagamento.</p>
+                        <p>Ativacao instantanea. Apos o pagamento, seu acesso e liberado na hora. Sem esperar.</p>
                     </div>
                 </div>
-            </div>
+            </section>
 
-            <div class="about-block">
-                <h2><i class="fas fa-envelope"></i> Contato</h2>
-                <p>Tem duvidas ou sugestoes? Entre em contato:</p>
-                <a href="mailto:williannunes31994@gmail.com" class="contact-email">
-                    <i class="fas fa-envelope"></i> williannunes31994@gmail.com
+            <section class="about-section">
+                <div class="about-section-header">
+                    <div class="about-section-icon"><i class="fas fa-layer-group"></i></div>
+                    <div>
+                        <h2>Tecnologia por Tras</h2>
+                        <p>Stack moderna e segura</p>
+                    </div>
+                </div>
+                <div class="about-tech-list">
+                    <div class="about-tech-item">
+                        <i class="fas fa-server"></i>
+                        <span>Vercel (Hospedagem Global)</span>
+                    </div>
+                    <div class="about-tech-item">
+                        <i class="fas fa-database"></i>
+                        <span>Supabase (Banco + Auth)</span>
+                    </div>
+                    <div class="about-tech-item">
+                        <i class="fas fa-film"></i>
+                        <span>TMDB API (Catalogo)</span>
+                    </div>
+                    <div class="about-tech-item">
+                        <i class="fas fa-play-circle"></i>
+                        <span>MegaEmbed (Player)</span>
+                    </div>
+                    <div class="about-tech-item">
+                        <i class="fas fa-lock"></i>
+                        <span>JWT + bcrypt (Seguranca)</span>
+                    </div>
+                    <div class="about-tech-item">
+                        <i class="fas fa-wallet"></i>
+                        <span>Mercado Pago (Pagamentos)</span>
+                    </div>
+                    <div class="about-tech-item">
+                        <i class="fas fa-chart-line"></i>
+                        <span>Google Analytics (Metricas)</span>
+                    </div>
+                    <div class="about-tech-item">
+                        <i class="fas fa-mobile-alt"></i>
+                        <span>PWA (Instalavel)</span>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <section class="about-cta">
+            <h2>Pronto pra Assistir?</h2>
+            <p>Crie sua conta agora e comece a assistir em minutos.</p>
+            <div class="about-cta-buttons">
+                <a href="login.html?register=true" class="about-cta-btn primary">
+                    <i class="fas fa-rocket"></i> Criar Conta Gratis
+                </a>
+                <a href="payment.html" class="about-cta-btn secondary">
+                    <i class="fas fa-tag"></i> Ver Planos
                 </a>
             </div>
         </section>
@@ -153,23 +564,20 @@
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
-                <img src="https://imgur.com/6opzHhy.png" alt="CINE BOSS" class="footer-logo">
-                <p class="footer-tagline">Streaming premium brasileiro.</p>
+                <span class="logo-text">CINE <span class="accent">BOSS</span></span>
+                <p>Sua experiencia de streaming definitiva</p>
             </div>
             <div class="footer-links">
-                <h4>Links</h4>
-                <a href="about.html">Sobre</a>
-                <a href="terms.html">Termos de Uso</a>
-                <a href="privacy.html">Politica de Privacidade</a>
-                <a href="payment.html">Planos e Precos</a>
-                <a href="donate.html">Doe para ajudar</a>
+                <a href="/about.html">Sobre</a>
+                <a href="/terms.html">Termos de Uso</a>
+                <a href="/privacy.html">Politica de Privacidade</a>
+                <a href="/payment.html">Planos e Precos</a>
+                <a href="/donate.html">Doe para ajudar</a>
                 <a href="mailto:williannunes31994@gmail.com">Contato</a>
             </div>
-            <div class="footer-legal">
-                <h4>Legal</h4>
-                <p>2026 CINE BOSS. Todos os direitos reservados.</p>
-                <p>Feito com <i class="fas fa-heart" style="color: var(--gold);"></i> no Brasil.</p>
-            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 CINE BOSS. Todos os direitos reservados. Dados fornecidos por TMDB.</p>
         </div>
     </footer>
 

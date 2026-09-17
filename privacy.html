@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Politica de Privacidade | CINE BOSS</title>
-    <meta name="description" content="Politica de privacidade do CINE BOSS. Saiba como seus dados pessoais sao coletados, usados e protegidos pela plataforma.">
-    <meta name="keywords" content="privacidade cine boss, dados pessoais, protecao dados, LGPD, politica privacidade streaming">
+    <title>Politica de Privacidade | CINE BOSS - Protecao de Dados</title>
+    <meta name="description" content="Politica de Privacidade do CINE BOSS. Saiba como seus dados sao coletados, usados e protegidos em conformidade com a LGPD. Transparencia total nos seus direitos.">
+    <meta name="keywords" content="politica de privacidade, privacidade, LGPD, dados pessoais, protecao de dados, CINE BOSS, streaming, seguranca">
+    <meta name="author" content="CINE BOSS">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://cineboss.online/privacy.html">
+
     <meta property="og:title" content="Politica de Privacidade - CINE BOSS">
-    <meta property="og:description" content="Saiba como o CINE BOSS protege seus dados pessoais.">
+    <meta property="og:description" content="Saiba como o CINE BOSS protege seus dados. Conformidade total com a LGPD. Transparencia e seguranca.">
     <meta property="og:image" content="https://cineboss.online/og-image.png">
     <meta property="og:url" content="https://cineboss.online/privacy.html">
     <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,6 +24,541 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <script type="application/ld+json">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "Politica de Privacidade do CINE BOSS",
+        "description": "Politica de Privacidade e protecao de dados do CINE BOSS em conformidade com a LGPD.",
+        "url": "https://cineboss.online/privacy.html",
+        "isPartOf": {
+            "@type": "WebSite",
+            "name": "CINE BOSS",
+            "url": "https://cineboss.online"
+        },
+        "dateModified": "2026-09-17"
+    }
+    </script>
+
+    <style>
+        :root {
+            --bg-deep: #050508;
+            --bg-primary: #08080e;
+            --bg-secondary: #0c0c16;
+            --bg-card: #10101c;
+            --bg-elevated: #16162a;
+            --accent-blue: #00a8e0;
+            --accent-blue-glow: rgba(0,168,224,0.08);
+            --accent-gold: #c9a54e;
+            --text-primary: #e8e8f0;
+            --text-secondary: #8a8aa0;
+            --text-muted: #4a4a60;
+            --border-subtle: rgba(255,255,255,0.04);
+            --border-medium: rgba(255,255,255,0.08);
+            --border-accent: rgba(0,168,224,0.2);
+            --gradient-brand: linear-gradient(135deg, #00a8e0 0%, #0080b3 100%);
+            --shadow-glow-blue: 0 4px 30px rgba(0,168,224,0.15);
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+        }
+
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-deep);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .donate-banner {
+            background: var(--gradient-brand);
+            text-align: center;
+            padding: 10px 16px;
+            font-size: 13px;
+            font-weight: 600;
+        }
+        .donate-banner a {
+            color: #fff;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .donate-banner a i { font-size: 12px; }
+
+        .navbar {
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 32px;
+            background: rgba(8,8,14,0.85);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .nav-brand img { height: 32px; }
+        .nav-links { display: flex; gap: 28px; }
+        .nav-link {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: color 0.2s;
+        }
+        .nav-link:hover, .nav-link.active { color: var(--accent-blue); }
+        .nav-link i { font-size: 12px; }
+        .nav-actions { display: flex; align-items: center; gap: 16px; }
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            padding: 0 12px;
+        }
+        .search-bar input {
+            background: none;
+            border: none;
+            color: var(--text-primary);
+            font-size: 13px;
+            padding: 8px 0;
+            width: 180px;
+            outline: none;
+        }
+        .search-bar input::placeholder { color: var(--text-muted); }
+        .search-bar button {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            font-size: 13px;
+        }
+        .auth-buttons { display: flex; gap: 10px; }
+        .btn-login {
+            padding: 8px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            text-decoration: none;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-medium);
+            transition: all 0.2s;
+        }
+        .btn-login:hover { border-color: var(--accent-blue); color: var(--accent-blue); }
+        .btn-register {
+            padding: 8px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            color: #fff;
+            text-decoration: none;
+            background: var(--gradient-brand);
+            transition: all 0.2s;
+        }
+        .btn-register:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(0,168,224,0.3); }
+
+        .privacy-hero {
+            position: relative;
+            padding: 80px 24px 60px;
+            text-align: center;
+            overflow: hidden;
+        }
+        .privacy-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(0,168,224,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .privacy-hero-icon {
+            width: 72px;
+            height: 72px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            font-size: 30px;
+            color: var(--accent-blue);
+            animation: shieldPulse 3s ease-in-out infinite;
+        }
+        @keyframes shieldPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0,168,224,0.15); }
+            50% { box-shadow: 0 0 0 18px rgba(0,168,224,0); }
+        }
+        .privacy-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: rgba(0,168,224,0.08);
+            border: 1px solid rgba(0,168,224,0.15);
+            border-radius: 50px;
+            font-size: 12px;
+            color: var(--accent-blue);
+            font-weight: 600;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.6s ease-out;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .privacy-hero-badge i { font-size: 13px; }
+        .privacy-hero-title {
+            font-family: 'Sora', sans-serif;
+            font-size: clamp(28px, 5vw, 48px);
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.15;
+            margin-bottom: 16px;
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+        .privacy-hero-title .blue { color: var(--accent-blue); }
+        .privacy-hero-desc {
+            font-size: 16px;
+            color: var(--text-secondary);
+            max-width: 620px;
+            margin: 0 auto 20px;
+            line-height: 1.7;
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+        .privacy-hero-date {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 50px;
+            font-size: 13px;
+            color: var(--text-muted);
+            animation: fadeInUp 0.6s ease-out 0.3s both;
+        }
+        .privacy-hero-date i { color: var(--accent-blue); font-size: 12px; }
+
+        .privacy-index {
+            max-width: 1000px;
+            margin: 0 auto 60px;
+            padding: 0 24px;
+        }
+        .privacy-index-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 32px;
+        }
+        .privacy-index-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .privacy-index-title i { color: var(--accent-blue); font-size: 16px; }
+        .privacy-index-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .privacy-index-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        .privacy-index-item:hover {
+            border-color: var(--border-accent);
+            color: var(--accent-blue);
+            background: var(--accent-blue-glow);
+            transform: translateX(4px);
+        }
+        .privacy-index-num {
+            width: 28px;
+            height: 28px;
+            background: var(--gradient-brand);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-size: 12px;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+        }
+
+        .privacy-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        .privacy-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 36px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: border-color 0.3s;
+        }
+        .privacy-card:hover { border-color: var(--border-accent); }
+        .privacy-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--gradient-brand);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .privacy-card:hover::before { opacity: 1; }
+        .privacy-card-header {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            margin-bottom: 20px;
+        }
+        .privacy-card-badge {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-brand);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            color: #fff;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(0,168,224,0.2);
+        }
+        .privacy-card-header h2 {
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+        .privacy-card-text {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+        .privacy-card-list {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 16px;
+        }
+        .privacy-card-list li {
+            position: relative;
+            padding: 8px 0 8px 24px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        .privacy-card-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 16px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+        }
+        .privacy-card-list li strong {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .privacy-highlight {
+            background: linear-gradient(135deg, rgba(0,168,224,0.06) 0%, rgba(0,168,224,0.02) 100%);
+            border: 1px solid var(--border-accent);
+            border-left: 3px solid var(--accent-blue);
+            border-radius: var(--radius-md);
+            padding: 28px 32px;
+            margin: 24px 0;
+        }
+        .privacy-highlight-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent-blue);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .privacy-highlight-title i { font-size: 16px; }
+        .privacy-highlight-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+        }
+        .privacy-highlight-list {
+            list-style: none;
+            padding: 0;
+            margin-top: 12px;
+        }
+        .privacy-highlight-list li {
+            position: relative;
+            padding: 6px 0 6px 24px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        .privacy-highlight-list li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 14px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-blue);
+            border-radius: 50%;
+        }
+        .privacy-highlight-list li strong {
+            color: var(--accent-blue);
+            font-weight: 600;
+        }
+
+        .privacy-contact {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: var(--radius-lg);
+            padding: 40px;
+            text-align: center;
+            margin-top: 40px;
+        }
+        .privacy-contact-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-accent);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 22px;
+            color: var(--accent-blue);
+        }
+        .privacy-contact h2 {
+            font-family: 'Sora', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        .privacy-contact p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            max-width: 480px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.7;
+        }
+        .privacy-contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 32px;
+            background: var(--gradient-brand);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-decoration: none;
+            transition: all 0.3s;
+            box-shadow: 0 4px 16px rgba(0,168,224,0.3);
+        }
+        .privacy-contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 24px rgba(0,168,224,0.4);
+        }
+
+        .footer {
+            background: var(--bg-primary);
+            border-top: 1px solid var(--border-subtle);
+            padding: 48px 32px 24px;
+        }
+        .footer-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 32px;
+        }
+        .footer-brand .logo-text {
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+        .footer-brand .accent { color: var(--accent-blue); }
+        .footer-brand p { font-size: 13px; color: var(--text-muted); margin-top: 8px; }
+        .footer-links { display: flex; gap: 24px; flex-wrap: wrap; }
+        .footer-links a { font-size: 13px; color: var(--text-muted); text-decoration: none; transition: color 0.2s; }
+        .footer-links a:hover { color: var(--accent-blue); }
+        .footer-bottom {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-subtle);
+            text-align: center;
+        }
+        .footer-bottom p { font-size: 12px; color: var(--text-muted); }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @media (max-width: 768px) {
+            .navbar { padding: 12px 16px; flex-wrap: wrap; gap: 10px; }
+            .nav-links { gap: 16px; }
+            .nav-link span { display: none; }
+            .search-bar input { width: 120px; }
+            .privacy-index-grid { grid-template-columns: 1fr; }
+            .privacy-card { padding: 24px; }
+            .footer-content { flex-direction: column; gap: 24px; }
+            .footer-links { gap: 16px; }
+        }
+    </style>
 </head>
 <body>
     <div class="donate-banner">
@@ -50,118 +589,260 @@
     </nav>
 
     <main class="main-content">
-        <section class="legal-page">
-            <h1>Politica de <span class="blue">Privacidade</span></h1>
-            <p class="legal-update">Ultima atualizacao: 17 de Setembro de 2026</p>
-
-            <div class="legal-content">
-                <div class="legal-section">
-                    <h2>1. Introducao</h2>
-                    <p>A sua privacidade e importante para nos. Esta Politica de Privacidade descreve como o CINE BOSS coleta, usa e protege suas informacoes pessoais, em conformidade com a <strong>Lei Geral de Protecao de Dados (LGPD)</strong> do Brasil.</p>
-                </div>
-
-                <div class="legal-section">
-                    <h2>2. Informacoes Coletadas</h2>
-                    <p>Podemos coletar os seguintes tipos de informacoes:</p>
-                    <ul>
-                        <li><strong>Dados de cadastro:</strong> nome, email e senha (criptografada)</li>
-                        <li><strong>Dados de pagamento:</strong> processados pelo Mercado Pago, nos nao armazenamos dados de cartao</li>
-                        <li><strong>Dados de uso:</strong> historico de assistidos, preferencias, dispositivo utilizado</li>
-                        <li><strong>Dados de sessao:</strong> tipo de dispositivo, navegador e sistema operacional</li>
-                    </ul>
-                </div>
-
-                <div class="legal-section">
-                    <h2>3. Uso das Informacoes</h2>
-                    <p>Utilizamos seus dados para:</p>
-                    <ul>
-                        <li>Fornecer e manter o servico de streaming</li>
-                        <li>Gerenciar sua assinatura e pagamentos</li>
-                        <li>Melhorar a experiencia do usuario</li>
-                        <li>Enviaremails importantes sobre sua conta</li>
-                        <li>Garantir a seguranca da plataforma</li>
-                    </ul>
-                </div>
-
-                <div class="legal-section">
-                    <h2>4. Compartilhamento de Dados</h2>
-                    <p><strong>Nao vendemos ou compartilhamos</strong> seus dados pessoais com terceiros para fins de marketing. Seus dados podem ser compartilhados apenas com:</p>
-                    <ul>
-                        <li><strong>Supabase:</strong> hospedagem segura de dados e autenticacao</li>
-                        <li><strong>Mercado Pago:</strong> processamento de pagamentos</li>
-                        <li><strong>Vercel:</strong> hospedagem da plataforma</li>
-                    </ul>
-                </div>
-
-                <div class="legal-section">
-                    <h2>5. Seguranca dos Dados</h2>
-                    <p>Implementamos medidas de seguranca tecnicas e organizacionais para proteger seus dados, incluindo:</p>
-                    <ul>
-                        <li>Criptografia de senhas com bcrypt</li>
-                        <li>HTTPS em todas as conexoes</li>
-                        <li>Autenticacao segura via JWT</li>
-                        <li>Limite de dispositivos por conta</li>
-                    </ul>
-                </div>
-
-                <div class="legal-section">
-                    <h2>6. Seus Direitos (LGPD)</h2>
-                    <p>De acordo com a LGPD, voce tem direito a:</p>
-                    <ul>
-                        <li>Acessar seus dados pessoais</li>
-                        <li>Corrigir dados incompletos ou desatualizados</li>
-                        <li>Solicitar a exclusao de seus dados</li>
-                        <li>Revogar o consentimento a qualquer momento</li>
-                        <li>Solicitar a portabilidade dos dados</li>
-                    </ul>
-                </div>
-
-                <div class="legal-section">
-                    <h2>7. Cookies</h2>
-                    <p>O CINE BOSS utiliza cookies para manter sua sessao ativa e melhorar a experiencia. Voce pode gerenciar as configuracoes de cookies no seu navegador.</p>
-                </div>
-
-                <div class="legal-section">
-                    <h2>8. Retencao de Dados</h2>
-                    <p>Mantemos seus dados pelo tempo necessario para fornecer o servico. Apos a exclusao da conta, seus dados serao removidos em ate 30 dias.</p>
-                </div>
-
-                <div class="legal-section">
-                    <h2>9. Alteracoes nesta Politica</h2>
-                    <p>Podemos atualizar esta Politica de Privacidade periodicamente. Alteracoes significativas serao comunicadas por email ou notificacao na plataforma.</p>
-                </div>
-
-                <div class="legal-section">
-                    <h2>10. Contato</h2>
-                    <p>Em caso de duvidas sobre esta politica ou sobre seus dados pessoais:</p>
-                    <a href="mailto:williannunes31994@gmail.com" class="contact-email">
-                        <i class="fas fa-envelope"></i> williannunes31994@gmail.com
-                    </a>
-                </div>
+        <section class="privacy-hero">
+            <div class="privacy-hero-icon">
+                <i class="fas fa-shield-alt"></i>
+            </div>
+            <div class="privacy-hero-badge">
+                <i class="fas fa-lock"></i>
+                Conformidade Total com a LGPD
+            </div>
+            <h1 class="privacy-hero-title">Politica de <span class="blue">Privacidade</span></h1>
+            <p class="privacy-hero-desc">
+                Transparencia e seguranca na protecao dos seus dados. Entenda como o CINE BOSS coleta, utiliza e protege todas as informacoes dos seus usuarios.
+            </p>
+            <div class="privacy-hero-date">
+                <i class="fas fa-calendar-alt"></i>
+                Ultima atualizacao: 17 de Setembro de 2026
             </div>
         </section>
+
+        <div class="privacy-index">
+            <div class="privacy-index-box">
+                <div class="privacy-index-title">
+                    <i class="fas fa-list-ol"></i>
+                    Secoes desta Politica
+                </div>
+                <div class="privacy-index-grid">
+                    <a href="#introducao" class="privacy-index-item"><span class="privacy-index-num">1</span> Introducao</a>
+                    <a href="#informacoes" class="privacy-index-item"><span class="privacy-index-num">2</span> Informacoes Coletadas</a>
+                    <a href="#uso" class="privacy-index-item"><span class="privacy-index-num">3</span> Uso das Informacoes</a>
+                    <a href="#compartilhamento" class="privacy-index-item"><span class="privacy-index-num">4</span> Compartilhamento de Dados</a>
+                    <a href="#seguranca" class="privacy-index-item"><span class="privacy-index-num">5</span> Seguranca dos Dados</a>
+                    <a href="#direitos" class="privacy-index-item"><span class="privacy-index-num">6</span> Seus Direitos</a>
+                    <a href="#cookies" class="privacy-index-item"><span class="privacy-index-num">7</span> Cookies</a>
+                    <a href="#retencao" class="privacy-index-item"><span class="privacy-index-num">8</span> Retencao de Dados</a>
+                    <a href="#alteracoes" class="privacy-index-item"><span class="privacy-index-num">9</span> Alteracoes nesta Politica</a>
+                    <a href="#contato" class="privacy-index-item"><span class="privacy-index-num">10</span> Contato</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="privacy-content">
+
+            <article class="privacy-card" id="introducao">
+                <div class="privacy-card-header">
+                    <div class="privacy-card-badge">1</div>
+                    <h2>Introducao</h2>
+                </div>
+                <p class="privacy-card-text">
+                    Esta Politica de Privacidade descreve como o CINE BOSS ("Plataforma"), operado por meio do dominio cineboss.online, coleta, utiliza, armazena e protege as informacoes pessoais de seus usuarios, em conformidade com a Lei Geral de Protecao de Dados (LGPD - Lei 13.709/2018).
+                </p>
+                <p class="privacy-card-text">
+                    Ao acessar ou utilizar o CINE BOSS, voce concorda com as praticas descritas nesta politica. Nos comprometemos em tratar seus dados com o maximo respeito e seguranca, garantindo transparencia total em todos os processos envolvendo informacoes pessoais.
+                </p>
+                <p class="privacy-card-text">
+                    O CINE BOSS opera com base nos principios de finalidade, adequacao, necessidade, livre acesso, qualidade dos dados, transparencia, seguranca, prevencao, nao discriminacao e responsabilizacao, conforme estabelecido pela LGPD.
+                </p>
+            </article>
+
+            <article class="privacy-card" id="informacoes">
+                <div class="privacy-card-header">
+                    <div class="privacy-card-badge">2</div>
+                    <h2>Informacoes Coletadas</h2>
+                </div>
+                <p class="privacy-card-text">
+                    O CINE BOSS coleta apenas as informacoes estritamente necessarias para o funcionamento adequado da plataforma e a prestacao dos servicos contratados pelos usuarios. Os dados sao coletados das seguintes formas:
+                </p>
+                <ul class="privacy-card-list">
+                    <li><strong>Dados de Cadastro:</strong> nome completo, endereco de e-mail e senha criptografada. Essas informacoes sao fornecidas diretamente pelo usuario durante o registro na plataforma.</li>
+                    <li><strong>Dados de Pagamento:</strong> informacoes de transacao processadas pelo Mercado Pago, incluindo status do pagamento e plano contratado. O CINE BOSS nao armazena dados de cartao de credito ou dados bancarios em seus servidores.</li>
+                    <li><strong>Dados de Uso:</strong> informacoes sobre como o usuario interage com a plataforma, incluindo filmes e series assistidos, preferencias de busca, historico de navegacao e dispositivo utilizado.</li>
+                    <li><strong>Dados de Sessao:</strong> token JWT de autenticacao, endereco IP, tipo de navegador, sistema operacional e registro de dispositivos conectados a conta.</li>
+                </ul>
+            </article>
+
+            <article class="privacy-card" id="uso">
+                <div class="privacy-card-header">
+                    <div class="privacy-card-badge">3</div>
+                    <h2>Uso das Informacoes</h2>
+                </div>
+                <p class="privacy-card-text">
+                    As informacoes coletadas sao utilizadas exclusivamente para os seguintes propositos:
+                </p>
+                <ul class="privacy-card-list">
+                    <li><strong>Prestacao do Servico:</strong> autenticacao do usuario, gerenciamento de conta, liberacao de acesso ao catalogo de conteudo e controle de dispositivos conectados.</li>
+                    <li><strong>Processamento de Pagamentos:</strong> verificacao de status de pagamento, ativacao de planos e gestao de assinaturas atraves do Mercado Pago.</li>
+                    <li><strong>Melhoria da Experiencia:</strong> personalizacao de recomendacoes de conteudo, otimizacao da interface e analise de padroes de uso para aprimorar a plataforma.</li>
+                    <li><strong>Comunicacao:</strong> envio de notificacoes relevantes sobre a conta, atualizacoes da plataforma e respostas a solicitacoes de suporte.</li>
+                    <li><strong>Seguranca:</strong> deteccao e prevencao de fraudes, uso indevido de contas e violacoes dos termos de uso.</li>
+                    <li><strong>Obrigacao Legal:</strong> cumprimento de obrigatoriedades legais e regulatórias quando aplicavel.</li>
+                </ul>
+            </article>
+
+            <article class="privacy-card" id="compartilhamento">
+                <div class="privacy-card-header">
+                    <div class="privacy-card-badge">4</div>
+                    <h2>Compartilhamento de Dados</h2>
+                </div>
+                <p class="privacy-card-text">
+                    O CINE BOSS nao vende, aluga ou comercializa dados pessoais de seus usuarios. O compartilhamento de informacoes ocorre apenas nas seguintes situacoes e com as seguintes terceiras partes:
+                </p>
+                <ul class="privacy-card-list">
+                    <li><strong>Supabase:</strong> provedor de infraestrutura de banco de dados e autenticacao. Os dados de cadastro e sessao sao armazenados de forma criptografada nos servidores do Supabase, que possui certificacoes de seguranca e compliance.</li>
+                    <li><strong>Mercado Pago:</strong> processador de pagamentos. Apenas os dados necessarios para processar a transacao sao compartilhados. O CINE BOSS nao tem acesso a dados completos de cartao de credito.</li>
+                    <li><strong>Vercel:</strong> provedor de hospedagem da plataforma. Os dados trafegam criptografados entre o navegador do usuario e os servidores da Vercel.</li>
+                </ul>
+                <p class="privacy-card-text">
+                    Em caso de obrigacao legal, ordem judicial ou necessidade de protecao dos direitos do CINE BOSS, informacoes podem ser compartilhadas com autoridades competentes, nos limites da lei.
+                </p>
+            </article>
+
+            <article class="privacy-card" id="seguranca">
+                <div class="privacy-card-header">
+                    <div class="privacy-card-badge">5</div>
+                    <h2>Seguranca dos Dados</h2>
+                </div>
+                <p class="privacy-card-text">
+                    O CINE BOSS adota medidas tecnicas e administrativas robustas para proteger os dados pessoais dos usuarios contra acessos nao autorizados, alteracoes, divulgacoes ou destruicao:
+                </p>
+                <ul class="privacy-card-list">
+                    <li><strong>Criptografia bcrypt:</strong> todas as senhas sao criptografadas com o algoritmo bcrypt antes de serem armazenadas. As senhas nunca sao mantidas em texto plano.</li>
+                    <li><strong>Conexao HTTPS:</strong> todo o trafego entre o navegador do usuario e os servidores do CINE BOSS e criptografado por meio de certificados SSL/TLS.</li>
+                    <li><strong>Autenticacao JWT:</strong> o sistema de autenticacao utiliza JSON Web Tokens (JWT) para garantir que apenas usuarios autenticados acessem conteudo restrito.</li>
+                    <li><strong>Limite de Dispositivos:</strong> cada conta possui um limite de dispositivos conectados simultaneamente, evitando uso indevido e compartilhamento nao autorizado.</li>
+                    <li><strong>Controle de Acesso:</strong> apenas profissionais autorizados do CINE BOSS possuem acesso aos dados dos usuarios, e somente quando estritamente necessario.</li>
+                </ul>
+            </article>
+
+            <article class="privacy-card" id="direitos">
+                <div class="privacy-card-header">
+                    <div class="privacy-card-badge">6</div>
+                    <h2>Seus Direitos</h2>
+                </div>
+                <p class="privacy-card-text">
+                    Em conformidade com a LGPD, voce possui os seguintes direitos em relacao aos seus dados pessoais:
+                </p>
+                <div class="privacy-highlight">
+                    <div class="privacy-highlight-title">
+                        <i class="fas fa-balance-scale"></i>
+                        Direitos Garantidos pela LGPD
+                    </div>
+                    <div class="privacy-highlight-text">
+                        A Lei Geral de Protecao de Dados assegura aos titulares de dados um conjunto de direitos exerciveis a qualquer momento:
+                    </div>
+                    <ul class="privacy-highlight-list">
+                        <li><strong>Acesso:</strong> solicitar a confirmacao da existencia de tratamento e acesso aos seus dados pessoais armazenados.</li>
+                        <li><strong>Correcao:</strong> solicitar a correcao de dados incompletos, inexatos ou desatualizados.</li>
+                        <li><strong>Exclusao:</strong> solicitar a exclusao dos seus dados pessoais, exceto quando houver obrigacao legal de manutencao.</li>
+                        <li><strong>Revogacao do Consentimento:</strong> revogar o consentimento a qualquer momento, mediante manifestacao expressa.</li>
+                        <li><strong>Portabilidade:</strong> solicitar a portabilidade dos seus dados para outro fornecedor de servico, em formato estruturado e de uso comum.</li>
+                        <li><strong>Informacao sobre Compartilhamento:</strong> solicitar informacoes sobre entidades com as quais seus dados foram compartilhados.</li>
+                        <li><strong>Oposicao:</strong> opor-se ao tratamento de dados quando realizado com base em legittimo interesse.</li>
+                    </ul>
+                </div>
+                <p class="privacy-card-text">
+                    Para exercer qualquer um desses direitos, entre em contato com o CINE BOSS por meio do e-mail williannunes31994@gmail.com. Todas as solicitacoes serao analisadas e respondidas no prazo de 15 dias uteis.
+                </p>
+            </article>
+
+            <article class="privacy-card" id="cookies">
+                <div class="privacy-card-header">
+                    <div class="privacy-card-badge">7</div>
+                    <h2>Cookies</h2>
+                </div>
+                <p class="privacy-card-text">
+                    O CINE BOSS utiliza cookies e tecnologias similares para melhorar a experiencia do usuario e garantir o funcionamento adequado da plataforma:
+                </p>
+                <ul class="privacy-card-list">
+                    <li><strong>Cookies Essenciais:</strong> necessarios para o funcionamento da plataforma, incluindo autenticacao de sessao, mantendo o usuario conectado durante a navegacao.</li>
+                    <li><strong>Cookies de Preferencias:</strong> armazenam configuracoes escolhidas pelo usuario, como tema, idioma e preferencias de exibicao.</li>
+                    <li><strong>Cookies de Analise:</strong> utilizados pelo Google Analytics (GA4) para coletar dados anonimos de navegacao, ajudando a entender como os usuarios utilizam a plataforma e a melhorar continuamente o servico.</li>
+                </ul>
+                <p class="privacy-card-text">
+                    Voce pode gerenciar as preferencias de cookies diretamente nas configuracoes do seu navegador. A desativacao de cookies essenciais pode comprometer o funcionamento da plataforma.
+                </p>
+            </article>
+
+            <article class="privacy-card" id="retencao">
+                <div class="privacy-card-header">
+                    <div class="privacy-card-badge">8</div>
+                    <h2>Retencao de Dados</h2>
+                </div>
+                <p class="privacy-card-text">
+                    Os dados pessoais dos usuarios sao mantidos pelo tempo necessario para cumprir as finalidades para as quais foram coletados:
+                </p>
+                <ul class="privacy-card-list">
+                    <li><strong>Dados de Cadastro:</strong> mantidos enquanto a conta do usuario estiver ativa. Apos a exclusao da conta, os dados pessoais sao removidos de forma segura dentro de 30 dias.</li>
+                    <li><strong>Dados de Pagamento:</strong> registros de transacao sao mantidos por 5 anos, em conformidade com a legislacao fiscal e tributaria brasileira.</li>
+                    <li><strong>Dados de Sessao:</strong> tokens JWT possuem tempo de expiracao configurado e sao invalidados apos periodo de inatividade ou ao encerrar a sessao.</li>
+                    <li><strong>Dados de Analise:</strong> dados anonimos de uso podem ser mantidos indefinidamente para fins estatisticos e melhoria da plataforma, sem identificacao pessoal.</li>
+                </ul>
+            </article>
+
+            <article class="privacy-card" id="alteracoes">
+                <div class="privacy-card-header">
+                    <div class="privacy-card-badge">9</div>
+                    <h2>Alteracoes nesta Politica</h2>
+                </div>
+                <p class="privacy-card-text">
+                    O CINE BOSS reserva-se o direito de atualizar esta Politica de Privacidade a qualquer momento, visando sempre melhorar a protecao dos dados dos usuarios e adequar-se a possiveis alteracoes na legislacao vigente.
+                </p>
+                <p class="privacy-card-text">
+                    Quando alteracoes relevantes forem realizadas, os usuarios serao notificados por meio de e-mail ou por um aviso em destaque na plataforma. A data da ultima atualizacao sera sempre indicada no topo desta pagina.
+                </p>
+                <p class="privacy-card-text">
+                    Recomendamos que os usuarios revisem esta politica periodicamente para se manterem informados sobre como seus dados sao protegidos. O uso continuado da plataforma apos as alteracoes constitui aceitacao das novas praticas.
+                </p>
+            </article>
+
+            <article class="privacy-card" id="contato">
+                <div class="privacy-card-header">
+                    <div class="privacy-card-badge">10</div>
+                    <h2>Contato</h2>
+                </div>
+                <p class="privacy-card-text">
+                    Se voce tiver duvidas, sugestoes ou desejar exercer qualquer direito relacionado a esta Politica de Privacidade ou a protecao dos seus dados pessoais, entre em contato com o time do CINE BOSS:
+                </p>
+                <ul class="privacy-card-list">
+                    <li><strong>E-mail:</strong> williannunes31994@gmail.com</li>
+                    <li><strong>Assunto:</strong> utilize "Privacidade - [Seu Nome]" para agilizar o atendimento.</li>
+                    <li><strong>Prazo de Resposta:</strong> todas as solicitacoes serao respondidas em ate 15 dias uteis, conforme exigido pela LGPD.</li>
+                </ul>
+            </article>
+
+            <div class="privacy-contact">
+                <div class="privacy-contact-icon">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <h2>Precisa de Ajuda?</h2>
+                <p>Entre em contato com o nosso time para qualquer duvida sobre a protecao dos seus dados pessoais.</p>
+                <a href="mailto:williannunes31994@gmail.com" class="privacy-contact-btn">
+                    <i class="fas fa-paper-plane"></i>
+                    Enviar E-mail
+                </a>
+            </div>
+
+        </div>
     </main>
 
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
-                <img src="https://imgur.com/6opzHhy.png" alt="CINE BOSS" class="footer-logo">
-                <p class="footer-tagline">Streaming premium brasileiro.</p>
+                <span class="logo-text">CINE <span class="accent">BOSS</span></span>
+                <p>Sua experiencia de streaming definitiva</p>
             </div>
             <div class="footer-links">
-                <h4>Links</h4>
-                <a href="about.html">Sobre</a>
-                <a href="terms.html">Termos de Uso</a>
-                <a href="privacy.html">Politica de Privacidade</a>
-                <a href="payment.html">Planos e Precos</a>
-                <a href="donate.html">Doe para ajudar</a>
+                <a href="/about.html">Sobre</a>
+                <a href="/terms.html">Termos de Uso</a>
+                <a href="/privacy.html">Politica de Privacidade</a>
+                <a href="/payment.html">Planos e Precos</a>
+                <a href="/donate.html">Doe para ajudar</a>
                 <a href="mailto:williannunes31994@gmail.com">Contato</a>
             </div>
-            <div class="footer-legal">
-                <h4>Legal</h4>
-                <p>2026 CINE BOSS. Todos os direitos reservados.</p>
-                <p>Feito com <i class="fas fa-heart" style="color: var(--gold);"></i> no Brasil.</p>
-            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 CINE BOSS. Todos os direitos reservados. Dados fornecidos por TMDB.</p>
         </div>
     </footer>
 

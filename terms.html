@@ -3,16 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Termos de Uso | CINE BOSS</title>
-    <meta name="description" content="Termos de uso da plataforma CINE BOSS. Leia os termos e condicoes para utilizar o servico de streaming.">
-    <meta name="keywords" content="termos de uso, termos cine boss, condicoes uso, streaming termos, politica uso">
+    <title>Termos de Uso | CINE BOSS - Plataforma de Streaming Premium</title>
+    <meta name="description" content="Leia os termos de uso do CINE BOSS: plataforma de streaming brasileira com filmes, series e IPTV ao vivo. Conheca seus direitos e obrigacoes como usuario.">
+    <meta name="keywords" content="termos de uso cineboss, termos streaming, politica uso plataforma, termos cine boss, streaming termos servico">
+    <meta name="author" content="CINE BOSS">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://cineboss.online/terms.html">
+
     <meta property="og:title" content="Termos de Uso - CINE BOSS">
-    <meta property="og:description" content="Leia os termos e condicoes de uso da plataforma CINE BOSS.">
+    <meta property="og:description" content="Termos de uso da plataforma CINE BOSS. Conheca as regras, direitos e obrigacoes ao utilizar o servico de streaming.">
     <meta property="og:image" content="https://cineboss.online/og-image.png">
     <meta property="og:url" content="https://cineboss.online/terms.html">
     <meta property="og:type" content="website">
+    <meta property="og:locale" content="pt_BR">
+
     <link rel="icon" href="favicon.ico" type="image/x-icon">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -20,6 +24,377 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="style.css">
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        .terms-hero {
+            position: relative;
+            padding: 80px 24px 60px;
+            text-align: center;
+            overflow: hidden;
+        }
+        .terms-hero::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(201,165,78,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .terms-hero-icon {
+            width: 72px;
+            height: 72px;
+            background: linear-gradient(135deg, rgba(201,165,78,0.15) 0%, rgba(201,165,78,0.05) 100%);
+            border: 1px solid rgba(201,165,78,0.2);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            color: var(--accent-gold);
+            margin: 0 auto 24px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        .terms-hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 20px;
+            background: rgba(201,165,78,0.08);
+            border: 1px solid rgba(201,165,78,0.15);
+            border-radius: 50px;
+            font-size: 13px;
+            color: var(--accent-gold);
+            font-weight: 600;
+            margin-bottom: 24px;
+            animation: fadeInUp 0.6s ease-out 0.05s both;
+        }
+        .terms-hero-badge i { font-size: 12px; }
+        .terms-hero-title {
+            font-family: 'Sora', sans-serif;
+            font-size: clamp(32px, 5vw, 52px);
+            font-weight: 800;
+            color: var(--text-primary);
+            line-height: 1.15;
+            margin-bottom: 16px;
+            animation: fadeInUp 0.6s ease-out 0.1s both;
+        }
+        .terms-hero-title .gold { color: var(--accent-gold); }
+        .terms-hero-desc {
+            font-size: 17px;
+            color: var(--text-secondary);
+            max-width: 600px;
+            margin: 0 auto 28px;
+            line-height: 1.7;
+            animation: fadeInUp 0.6s ease-out 0.15s both;
+        }
+        .terms-hero-date {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 50px;
+            font-size: 13px;
+            color: var(--text-muted);
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+        .terms-hero-date i { color: var(--accent-gold); font-size: 12px; }
+
+        .terms-index {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px 48px;
+            animation: fadeInUp 0.6s ease-out 0.25s both;
+        }
+        .terms-index-box {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 32px;
+            position: relative;
+            overflow: hidden;
+        }
+        .terms-index-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+        }
+        .terms-index-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .terms-index-title i {
+            color: var(--accent-gold);
+            font-size: 14px;
+        }
+        .terms-index-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        .terms-index-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            text-decoration: none;
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.25s ease;
+        }
+        .terms-index-link:hover {
+            border-color: rgba(201,165,78,0.3);
+            color: var(--accent-gold);
+            background: rgba(201,165,78,0.05);
+            transform: translateX(4px);
+        }
+        .terms-index-link .num {
+            width: 28px;
+            height: 28px;
+            background: rgba(201,165,78,0.1);
+            border: 1px solid rgba(201,165,78,0.15);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            flex-shrink: 0;
+        }
+
+        .terms-content {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 0 24px 80px;
+        }
+
+        .terms-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 36px;
+            margin-bottom: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .terms-card:hover {
+            border-color: var(--border-medium);
+        }
+        .terms-card-header {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        .terms-card-badge {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg, rgba(201,165,78,0.2) 0%, rgba(201,165,78,0.08) 100%);
+            border: 1px solid rgba(201,165,78,0.25);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Sora', sans-serif;
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--accent-gold);
+            flex-shrink: 0;
+        }
+        .terms-card-header h2 {
+            font-family: 'Sora', sans-serif;
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--text-primary);
+            line-height: 1.3;
+        }
+        .terms-card-header h2 i {
+            color: var(--accent-gold);
+            font-size: 16px;
+            margin-right: 8px;
+        }
+        .terms-card p {
+            font-size: 15px;
+            color: var(--text-secondary);
+            line-height: 1.8;
+            margin-bottom: 16px;
+        }
+        .terms-card ul {
+            list-style: none;
+            padding: 0;
+            margin: 0 0 16px 0;
+        }
+        .terms-card ul li {
+            position: relative;
+            padding: 8px 0 8px 24px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+        .terms-card ul li::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 16px;
+            width: 8px;
+            height: 8px;
+            background: var(--accent-gold);
+            border-radius: 50%;
+            opacity: 0.7;
+        }
+        .terms-card .highlight-box {
+            background: linear-gradient(135deg, rgba(201,165,78,0.08) 0%, rgba(201,165,78,0.03) 100%);
+            border: 1px solid rgba(201,165,78,0.15);
+            border-left: 3px solid var(--accent-gold);
+            border-radius: 0 12px 12px 0;
+            padding: 20px 24px;
+            margin-top: 16px;
+        }
+        .terms-card .highlight-box h4 {
+            font-family: 'Sora', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-gold);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .terms-card .highlight-box p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin: 0;
+            line-height: 1.7;
+        }
+        .terms-warning {
+            background: linear-gradient(135deg, rgba(220,80,80,0.06) 0%, rgba(220,80,80,0.02) 100%);
+            border: 1px solid rgba(220,80,80,0.15);
+            border-left: 3px solid #dc5050;
+            border-radius: 0 12px 12px 0;
+            padding: 24px;
+            margin-bottom: 24px;
+        }
+        .terms-warning h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #dc5050;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .terms-warning p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+        }
+
+        .terms-contact {
+            background: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .terms-contact::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--accent-gold), transparent);
+        }
+        .terms-contact-icon {
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, rgba(201,165,78,0.15) 0%, rgba(201,165,78,0.05) 100%);
+            border: 1px solid rgba(201,165,78,0.2);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--accent-gold);
+            margin: 0 auto 20px;
+        }
+        .terms-contact h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 10px;
+        }
+        .terms-contact p {
+            font-size: 15px;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+            line-height: 1.7;
+        }
+        .terms-contact-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 14px 36px;
+            background: linear-gradient(135deg, var(--accent-gold) 0%, #b8943e 100%);
+            border: none;
+            border-radius: 12px;
+            font-family: 'Sora', sans-serif;
+            font-size: 15px;
+            font-weight: 700;
+            color: #0a0a10;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(201,165,78,0.3);
+        }
+        .terms-contact-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 28px rgba(201,165,78,0.4);
+        }
+        .terms-contact-btn i {
+            font-size: 14px;
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .terms-hero { padding: 70px 16px 48px; }
+            .terms-hero-icon { width: 60px; height: 60px; font-size: 26px; }
+            .terms-index-grid { grid-template-columns: 1fr; }
+            .terms-card { padding: 24px; }
+            .terms-card-header { gap: 12px; }
+            .terms-card-header h2 { font-size: 18px; }
+            .terms-contact { padding: 32px 20px; }
+        }
+    </style>
 </head>
 <body>
     <div class="donate-banner">
@@ -50,103 +425,276 @@
     </nav>
 
     <main class="main-content">
-        <section class="legal-page">
-            <h1>Termos de <span class="blue">Uso</span></h1>
-            <p class="legal-update">Ultima atualizacao: 17 de Setembro de 2026</p>
-
-            <div class="legal-content">
-                <div class="legal-section">
-                    <h2>1. Aceitacao dos Termos</h2>
-                    <p>Ao acessar e utilizar o CINE BOSS, voce concorda com estes Termos de Uso. Se nao concorda com algum termo, nao utilize o servico.</p>
-                </div>
-
-                <div class="legal-section">
-                    <h2>2. Descricao do Servico</h2>
-                    <p>O CINE BOSS e uma plataforma de streaming que disponibiliza filmes, series e canais de TV ao vivo (IPTV) para assinantes. O servico e acessivel via navegador web em dispositivos como computadores, celulares, tablets e Smart TVs.</p>
-                </div>
-
-                <div class="legal-section">
-                    <h2>3. Cadastro e Conta</h2>
-                    <p>Para utilizar o servico, voce precisa criar uma conta com dados verdadeiros. Voce e responsavel por manter a seguranca da sua senha. O CINE BOSS se reserva o direito de encerrar contas que violem estes termos.</p>
-                </div>
-
-                <div class="legal-section">
-                    <h2>4. Planos e Pagamentos</h2>
-                    <p>O CINE BOSS oferece planos de assinatura com precos acessiveis. Os pagamentos sao processados via <strong>Mercado Pago</strong> com seguranca total. Os planos sao pagos uma vez e duram pelo periodo informado (30 ou 90 dias), sem renovacao automatica.</p>
-                    <ul>
-                        <li>Plano Mensal: R$ 6,99 por 30 dias</li>
-                        <li>Plano Trimestral: R$ 15,99 por 90 dias</li>
-                    </ul>
-                </div>
-
-                <div class="legal-section">
-                    <h2>5. Limite de Dispositivos</h2>
-                    <p>Cada conta pode estar logada em ate <strong>2 dispositivos simultaneamente</strong>. Isso garante uso justo e protege sua conta contra acessos nao autorizados.</p>
-                </div>
-
-                <div class="legal-section">
-                    <h2>6. Uso Aceitavel</h2>
-                    <p>Ao utilizar o CINE BOSS, voce concorda em NAO:</p>
-                    <ul>
-                        <li>Compartilhar sua senha com terceiros</li>
-                        <li>Usar o servico para fins comerciais nao autorizados</li>
-                        <li>Tentar acessar areas restritas sem autorizacao</li>
-                        <li>Realizar engenharia reversa ou modificar o servico</li>
-                        <li>Usar bots ou scripts automatizados</li>
-                    </ul>
-                </div>
-
-                <div class="legal-section">
-                    <h2>7. Propriedade Intelectual</h2>
-                    <p>Todo o conteudo disponivel no CINE BOSS, incluindo filmes, series, graficos e interface, e protegido por leis de direitos autorais. Voce recebe apenas uma licenca limitada para uso pessoal e nao comercial.</p>
-                </div>
-
-                <div class="legal-section">
-                    <h2>8. Disponibilidade do Servico</h2>
-                    <p>O CINE BOSS faz esforcos razoaveis para manter o servico disponivel 24/7. No entanto, podem ocorrer interrupcoes para manutencao. Nao garantimos disponibilidade ininterrupta.</p>
-                </div>
-
-                <div class="legal-section">
-                    <h2>9. Limitacao de Responsabilidade</h2>
-                    <p>O CINE BOSS nao se responsabiliza por danos indiretos, incidentais ou consequenciais decorrentes do uso do servico. Nossa responsabilidade total e limitada ao valor pago pela assinatura.</p>
-                </div>
-
-                <div class="legal-section">
-                    <h2>10. Alteracoes nos Termos</h2>
-                    <p>O CINE BOSS reserva-se o direito de alterar estes termos a qualquer momento. Alteracoes significativas serao comunicadas por email ou notificacao na plataforma.</p>
-                </div>
-
-                <div class="legal-section">
-                    <h2>11. Contato</h2>
-                    <p>Em caso de duvidas sobre estes termos, entre em contato:</p>
-                    <a href="mailto:williannunes31994@gmail.com" class="contact-email">
-                        <i class="fas fa-envelope"></i> williannunes31994@gmail.com
-                    </a>
-                </div>
+        <section class="terms-hero">
+            <div class="terms-hero-icon">
+                <i class="fas fa-scroll"></i>
+            </div>
+            <div class="terms-hero-badge">
+                <i class="fas fa-shield-alt"></i>
+                Documento Oficial
+            </div>
+            <h1 class="terms-hero-title">
+                <span class="gold">Termos</span> de Uso
+            </h1>
+            <p class="terms-hero-desc">
+                Leia com atencao os termos e condicoes que regem o uso da plataforma CINE BOSS. Ao utilizar nosso servico, voce concorda com todos os itens descritos neste documento.
+            </p>
+            <div class="terms-hero-date">
+                <i class="fas fa-calendar-alt"></i>
+                Ultima atualizacao: 17 de setembro de 2026
             </div>
         </section>
+
+        <div class="terms-index">
+            <div class="terms-index-box">
+                <div class="terms-index-title">
+                    <i class="fas fa-list-ol"></i>
+                    Sumario dos Termos
+                </div>
+                <div class="terms-index-grid">
+                    <a href="#secao-1" class="terms-index-link"><span class="num">1</span> Aceitacao dos Termos</a>
+                    <a href="#secao-2" class="terms-index-link"><span class="num">2</span> Descricao do Servico</a>
+                    <a href="#secao-3" class="terms-index-link"><span class="num">3</span> Cadastro e Conta</a>
+                    <a href="#secao-4" class="terms-index-link"><span class="num">4</span> Planos e Pagamentos</a>
+                    <a href="#secao-5" class="terms-index-link"><span class="num">5</span> Limite de Dispositivos</a>
+                    <a href="#secao-6" class="terms-index-link"><span class="num">6</span> Uso Aceitavel</a>
+                    <a href="#secao-7" class="terms-index-link"><span class="num">7</span> Propriedade Intelectual</a>
+                    <a href="#secao-8" class="terms-index-link"><span class="num">8</span> Disponibilidade do Servico</a>
+                    <a href="#secao-9" class="terms-index-link"><span class="num">9</span> Limitacao de Responsabilidade</a>
+                    <a href="#secao-10" class="terms-index-link"><span class="num">10</span> Alteracoes nos Termos</a>
+                    <a href="#secao-11" class="terms-index-link"><span class="num">11</span> Contato</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="terms-content">
+
+            <div class="terms-warning">
+                <h3><i class="fas fa-exclamation-triangle"></i> Atencao: Leitura Obrigatoria</h3>
+                <p>Antes de utilizar a plataforma CINE BOSS, e fundamental que voce leia e compreenda todos os termos descritos abaixo. O uso continuado do servico implica na aceitacao integral deste documento. Caso nao concorde com algum dos itens, solicitamos que nao utilize a plataforma.</p>
+            </div>
+
+            <section class="terms-card" id="secao-1">
+                <div class="terms-card-header">
+                    <div class="terms-card-badge">1</div>
+                    <h2><i class="fas fa-check-circle"></i> Aceitacao dos Termos</h2>
+                </div>
+                <p>Ao acessar, cadastrar-se ou utilizar qualquer funcionalidade da plataforma CINE BOSS, voce declara que leu, compreendeu e concorda integralmente com os presentes Termos de Uso. Este documento constitui um acordo legal e vinculante entre voce (o usuario) e o CINE BOSS (a plataforma).</p>
+                <p>Se voce estiver aceitando estes termos em nome de uma empresa ou outra entidade juridica, declara ter autoridade para vincular essa entidade a estes termos. Caso nao concorde com algum dos dispositivos aqui apresentados, nao utilize o servico.</p>
+                <div class="highlight-box">
+                    <h4><i class="fas fa-info-circle"></i> Importante</h4>
+                    <p>Estes termos podem ser atualizados a qualquer momento sem aviso previo. Recomendamos que voce revise esta pagina periodicamente para se manter informado sobre eventuais alteracoes.</p>
+                </div>
+            </section>
+
+            <section class="terms-card" id="secao-2">
+                <div class="terms-card-header">
+                    <div class="terms-card-badge">2</div>
+                    <h2><i class="fas fa-play-circle"></i> Descricao do Servico</h2>
+                </div>
+                <p>O CINE BOSS e uma plataforma brasileira de streaming que oferece acesso a conteudo audiovisual sob demanda, incluindo:</p>
+                <ul>
+                    <li>Filmes nacionais e internacionais com informacoes atualizadas via TMDB</li>
+                    <li>Series completas com temporadas e episodios organizados</li>
+                    <li>Conteudo IPTV ao vivo com canais nacionais e internacionais</li>
+                    <li>Player embutido que roda diretamente no navegador, sem necessidade de downloads</li>
+                    <li>Interface premium com tema escuro cinematografico</li>
+                    <li>Compatibilidade com computadores, celulares, tablets e Smart TVs</li>
+                </ul>
+                <p>A plataforma utiliza dados em tempo real do The Movie Database (TMDB) para exibir informacoes atualizadas sobre catalogo, elenco, avaliacoes e imagens. O servico de IPTV e fornecido por terceiros e disponibilizado de forma integrada na interface do CINE BOSS.</p>
+            </section>
+
+            <section class="terms-card" id="secao-3">
+                <div class="terms-card-header">
+                    <div class="terms-card-badge">3</div>
+                    <h2><i class="fas fa-user-plus"></i> Cadastro e Conta</h2>
+                </div>
+                <p>Para acessar o conteudo da plataforma, e necessario realizar o cadastro e criar uma conta pessoal. Ao se registrar, voce concorda com as seguintes condicoes:</p>
+                <ul>
+                    <li>Voce deve fornecer informacoes verdadeiras, precisas e atualizadas durante o cadastro</li>
+                    <li>Voce e responsavel por manter a seguranca de sua senha e de sua conta</li>
+                    <li>Voce notificara imediatamente o CINE BOSS sobre qualquer uso nao autorizado de sua conta</li>
+                    <li>Uma unica conta por pessoa. Contas duplicadas poderao ser desativadas sem aviso</li>
+                    <li>Voce deve ter pelo menos 18 anos de idade ou a maioridade legal em sua jurisdicao para criar uma conta</li>
+                    <li>O CINE BOSS reserva-se o direito de suspender ou excluir contas que violem estes termos</li>
+                </ul>
+                <div class="highlight-box">
+                    <h4><i class="fas fa-lock"></i> Seguranca da Conta</h4>
+                    <p>Suas credenciais sao protegidas com criptografia bcrypt e autenticacao JWT. Nunca compartilhe suas credenciais de acesso com terceiros.</p>
+                </div>
+            </section>
+
+            <section class="terms-card" id="secao-4">
+                <div class="terms-card-header">
+                    <div class="terms-card-badge">4</div>
+                    <h2><i class="fas fa-credit-card"></i> Planos e Pagamentos</h2>
+                </div>
+                <p>O CINE BOSS oferece planos de assinatura com preços acessiveis e transparentes:</p>
+                <ul>
+                    <li><strong>Plano Mensal:</strong> R$ 6,99 por mes — acesso completo a toda a plataforma</li>
+                    <li><strong>Plano Trimestral:</strong> R$ 15,99 por trimestre — economia de mais de 25%</li>
+                </ul>
+                <p>Os pagamentos sao processados exclusivamente via Mercado Pago, uma das maiores plataformas de pagamentos do Brasil. Voce pode pagar com cartao de credito, boleto bancario ou PIX.</p>
+                <ul>
+                    <li>Nao existe renovacao automatica. Ao final do periodo, sua conta retorna automaticamente para o plano gratuito</li>
+                    <li>Para manter o acesso, voce precisara efetuar um novo pagamento ao final do periodo contratado</li>
+                    <li>Nao oferecemos reembolso parcial para cancelamentos antecipados, exceto em casos previstos em lei</li>
+                    <li>Os preços podem ser alterados mediante aviso com pelo menos 30 dias de antecedencia</li>
+                </ul>
+                <div class="highlight-box">
+                    <h4><i class="fas fa-receipt"></i> Transparencia Total</h4>
+                    <p>Você sempre sabera exatamente quanto esta pagando e por quanto tempo. Sem surpresas, sem cobrancas ocultas, sem renovação automatica.</p>
+                </div>
+            </section>
+
+            <section class="terms-card" id="secao-5">
+                <div class="terms-card-header">
+                    <div class="terms-card-badge">5</div>
+                    <h2><i class="fas fa-mobile-alt"></i> Limite de Dispositivos</h2>
+                </div>
+                <p>Para proteger o uso justo da plataforma e garantir a melhor experiencia possivel para todos os usuarios, o CINE BOSS estabelece as seguintes restricoes:</p>
+                <ul>
+                    <li><strong>Limite simultaneo:</strong> cada conta pode estar conectada em no maximo 2 dispositivos ao mesmo tempo</li>
+                    <li>Se uma terceira conexao for detectada, a conexao mais antiga sera desconectada automaticamente</li>
+                    <li>O registro de dispositivos e realizado de forma automatica pelo sistema</li>
+                    <li>Voce pode trocar de dispositivos normalmente, respeitando o limite de 2 simultaneos</li>
+                </ul>
+                <p>Este limite existe para prevenir o compartilhamento indevido de contas e para manter a estabilidade do servico para todos os assinantes.</p>
+            </section>
+
+            <section class="terms-card" id="secao-6">
+                <div class="terms-card-header">
+                    <div class="terms-card-badge">6</div>
+                    <h2><i class="fas fa-gavel"></i> Uso Aceitavel</h2>
+                </div>
+                <p>Ao utilizar o CINE BOSS, voce se compromete a NAO realizar nenhuma das seguintes acoes:</p>
+                <ul>
+                    <li>Compartilhar credenciais de acesso com terceiros fora do seu ambiente domestico</li>
+                    <li>Usar a plataforma para fins comerciais sem autorizacao expressa</li>
+                    <li>Tentar acessar, modificar ou contornar qualquer mecanismo de seguranca da plataforma</li>
+                    <li>Realizar engenharia reversa, descompilar ou desmontar qualquer parte do servico</li>
+                    <li>Usar bots, scripts automatizados ou qualquer ferramenta que interaja com a plataforma sem autorizacao</li>
+                    <li>Transmitir conteudo com virus, malware ou qualquer codigo nocivo</li>
+                    <li>Reproduzir, distribuir ou criar trabalhos derivados baseados no conteudo da plataforma</li>
+                    <li>Gravar, capturar ou fazer download de conteudo protegido por direitos autorais</li>
+                    <li>Interromper ou sobrecarregar intencionalmente a infraestrutura do servico</li>
+                </ul>
+                <p>A violacao destas regras podera resultar na suspensao ou exclusao permanente da conta, sem aviso previo e sem direito a reembolso.</p>
+            </section>
+
+            <section class="terms-card" id="secao-7">
+                <div class="terms-card-header">
+                    <div class="terms-card-badge">7</div>
+                    <h2><i class="fas fa-copyright"></i> Propriedade Intelectual</h2>
+                </div>
+                <p>Todo o conteudo disponivel na plataforma CINE BOSS, incluindo mas nao se limitando a:</p>
+                <ul>
+                    <li>Interface do usuario, layout, design, cores, tipografia e elementos visuais</li>
+                    <li>Codigo-fonte, scripts, algoritmos e funcionalidades da plataforma</li>
+                    <li>Logotipos, marcas registrados e identidade visual do CINE BOSS</li>
+                    <li>Textos, descricoes, organizacao do catalogo e curadoria de conteudo</li>
+                </ul>
+                <p>Sao protegidos por leis de propriedade intelectual brasileiras e internacionais. O uso do servico nao concede ao usuario qualquer direito de propriedade sobre estes elementos.</p>
+                <p>As informacoes sobre filmes e series (incluindo imagens, sinopses e dados tecnicos) sao fornecidas pelo The Movie Database (TMDB) e estao sujeitas aos termos de uso dessa API. Os direitos autorais do conteudo audiovisual sao de propriedade de seus respectivos detentores.</p>
+            </section>
+
+            <section class="terms-card" id="secao-8">
+                <div class="terms-card-header">
+                    <div class="terms-card-badge">8</div>
+                    <h2><i class="fas fa-signal"></i> Disponibilidade do Servico</h2>
+                </div>
+                <p>O CINE BOSS faz esforcos razoaveis para manter o servico disponivel 24 horas por dia, 7 dias por semana. No entanto, voce compreende e concorda que:</p>
+                <ul>
+                    <li>Manutencoes programadas poderao ocorrer com aviso previo quando possivel</li>
+                    <li>Interrupcoes temporarias podem ocorrer por motivos tecnicos, atualizacoes ou problemas na infraestrutura</li>
+                    <li>A disponibilidade do servico pode ser afetada por fatores fora do controle do CINE BOSS, como problemas de conexao do usuario ou instabilidades na internet</li>
+                    <li>O conteudo IPTV ao vivo depende de canais de terceiros e sua disponibilidade pode variar</li>
+                    <li>O acesso ao TMDB para atualizacao do catalogo pode sofrer intermittenncias temporarias</li>
+                </ul>
+                <p>Nosso objetivo e garantir a maior disponibilidade possivel, mas nao garantimos uptime de 100% em circunstancias excepcionais.</p>
+            </section>
+
+            <section class="terms-card" id="secao-9">
+                <div class="terms-card-header">
+                    <div class="terms-card-badge">9</div>
+                    <h2><i class="fas fa-shield-alt"></i> Limitacao de Responsabilidade</h2>
+                </div>
+                <p>Na maxima extensao permitida pela legislacao brasileira vigente, o CINE BOSS nao sera responsabilizado por:</p>
+                <ul>
+                    <li>Danos indiretos, incidentais, especiais, consequenciais ou punitivos decorrentes do uso da plataforma</li>
+                    <li>Perda de dados, lucros ou oportunidades causada por interrupcoes ou falhas no servico</li>
+                    <li>Conteudo de terceiros disponibilizado atraves da plataforma, incluindo videos IPTV</li>
+                    <li>Acoes ou omissoes de outros usuarios da plataforma</li>
+                    <li>Problemas de conexao ou velocidade de internet do usuario</li>
+                    <li>Incompatibilidade do servico com dispositivos ou navegadores especificos</li>
+                </ul>
+                <p>A responsabilidade total do CINE BOSS, em qualquer circunstancia, sera limitada ao valor efetivamente pago pelo usuario nos 12 meses imediatamente anteriores ao evento que deu origem a reclamacao.</p>
+                <div class="highlight-box">
+                    <h4><i class="fas fa-balance-scale"></i> Protecao Legal</h4>
+                    <p>Estas limitacoes nao afetam os direitos irrenunciaveis que a legislacao brasileira confere aos consumidores, incluindo o Codigo de Defesa do Consumidor.</p>
+                </div>
+            </section>
+
+            <section class="terms-card" id="secao-10">
+                <div class="terms-card-header">
+                    <div class="terms-card-badge">10</div>
+                    <h2><i class="fas fa-sync-alt"></i> Alteracoes nos Termos</h2>
+                </div>
+                <p>O CINE BOSS reserva-se o direito de alterar, modificar ou substituir estes Termos de Uso a qualquer momento, a seu unico criterio. As alteracoes entrarao em vigor imediatamente apos a publicizacao na pagina do servico.</p>
+                <ul>
+                    <li>Alteracoes relevantes serao comunicadas por meio de notificacao na plataforma ou por e-mail</li>
+                    <li>O uso continuado da plataforma apos a publicacao de alteracoes implica na aceitacao dos novos termos</li>
+                    <li>Caso voce nao concorde com as alteracoes, deve descontinuar o uso do servico e solicitar a exclusao de sua conta</li>
+                    <li>Recomendamos que voce revise periodicamente esta pagina para se manter informado</li>
+                </ul>
+                <p>Mantemos um historico de versoes dos termos para transparencia. As versoes anteriores podem ser solicitadas atraves do nosso canal de contato.</p>
+            </section>
+
+            <section class="terms-card" id="secao-11">
+                <div class="terms-card-header">
+                    <div class="terms-card-badge">11</div>
+                    <h2><i class="fas fa-envelope"></i> Contato</h2>
+                </div>
+                <p>Se voce tiver duvidas, sugestoes ou reclamacoes referentes a estes Termos de Uso ou ao funcionamento da plataforma, entre em contato conosco:</p>
+                <ul>
+                    <li><strong>E-mail:</strong> williannunes31994@gmail.com</li>
+                    <li><strong>Assunto:</strong> Termos de Uso — [descreva brevemente sua questionamento]</li>
+                    <li><strong>Prazo de resposta:</strong> faremos nosso melhor para responder em ate 48 horas uteis</li>
+                </ul>
+                <p>Nosso time de suporte esta disponivel para esclarecer qualquer ponto destes termos e garantir que voce tenha a melhor experiencia possivel na plataforma.</p>
+            </section>
+
+            <div class="terms-contact">
+                <div class="terms-contact-icon">
+                    <i class="fas fa-headset"></i>
+                </div>
+                <h3>Precisa de Ajuda?</h3>
+                <p>Se voce tem duvidas sobre estes termos ou precisa de assistencia, nossa equipe esta pronta para atender voce.</p>
+                <a href="mailto:williannunes31994@gmail.com" class="terms-contact-btn">
+                    <i class="fas fa-paper-plane"></i> Enviar Mensagem
+                </a>
+            </div>
+
+        </div>
     </main>
 
     <footer class="footer">
         <div class="footer-content">
             <div class="footer-brand">
-                <img src="https://imgur.com/6opzHhy.png" alt="CINE BOSS" class="footer-logo">
-                <p class="footer-tagline">Streaming premium brasileiro.</p>
+                <span class="logo-text">CINE <span class="accent">BOSS</span></span>
+                <p>Sua experiencia de streaming definitiva</p>
             </div>
             <div class="footer-links">
-                <h4>Links</h4>
-                <a href="about.html">Sobre</a>
-                <a href="terms.html">Termos de Uso</a>
-                <a href="privacy.html">Politica de Privacidade</a>
-                <a href="payment.html">Planos e Precos</a>
-                <a href="donate.html">Doe para ajudar</a>
+                <a href="/about.html">Sobre</a>
+                <a href="/terms.html">Termos de Uso</a>
+                <a href="/privacy.html">Politica de Privacidade</a>
+                <a href="/payment.html">Planos e Precos</a>
+                <a href="/donate.html">Doe para ajudar</a>
                 <a href="mailto:williannunes31994@gmail.com">Contato</a>
             </div>
-            <div class="footer-legal">
-                <h4>Legal</h4>
-                <p>2026 CINE BOSS. Todos os direitos reservados.</p>
-                <p>Feito com <i class="fas fa-heart" style="color: var(--gold);"></i> no Brasil.</p>
-            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 CINE BOSS. Todos os direitos reservados. Dados fornecidos por TMDB.</p>
         </div>
     </footer>
 
