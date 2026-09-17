@@ -5,14 +5,19 @@ const {
     jsonError
 } = require('../_lib/security');
 
+const ADMIN_EMAIL = 'williannunes31994@gmail.com';
+
 module.exports = async function handler(req, res) {
     setCors(req, res);
     if (req.method === 'OPTIONS') return handleOptions(res);
 
     try {
         const token = getToken(req);
+        const url = new URL(req.url, 'http://localhost');
+        const isStatsRequest = url.searchParams.get('stats') === 'true';
+
         if (!token) {
-            if (req.method === 'GET') return res.status(200).json({ loggedIn: false });
+            if (req.method === 'GET' && !isStatsRequest) return res.status(200).json({ loggedIn: false });
             return jsonError(res, 401, 'Login obrigatorio');
         }
 
@@ -33,6 +38,19 @@ module.exports = async function handler(req, res) {
             .limit(1);
         const user = users && users.length > 0 ? users[0] : null;
         if (!user) return res.status(401).json({ error: 'Usuario nao encontrado', loggedIn: false });
+
+        // Admin stats endpoint
+        if (isStatsRequest && user.email === ADMIN_EMAIL) {
+            const { count: totalUsers } = await supabase.from('users').select('*', { count: 'exact', head: true });
+            const { count: activeSubs } = await supabase.from('subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'active').gt('expires_at', new Date().toISOString());
+            const allSessions = await getActiveSessions(user.id);
+            return res.status(200).json({
+                totalUsers: totalUsers || 0,
+                activeSubs: activeSubs || 0,
+                activeSessions: allSessions.length,
+                monthlyRevenue: 'R$ ' + ((activeSubs || 0) * 6.99).toFixed(2).replace('.', ',')
+            });
+        }
 
         // DELETE = logout from a specific device
         if (req.method === 'DELETE') {

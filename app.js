@@ -644,6 +644,7 @@ document.addEventListener('DOMContentLoaded', function() {
         auth.onAuthChange(function(user, subscription, loggedIn) {
             var authBtns = document.getElementById('authButtons');
             var userMenu = document.getElementById('userMenu');
+            var adminBtn = document.getElementById('adminPanelBtn');
             if (loggedIn && user) {
                 if (authBtns) authBtns.classList.add('hidden');
                 if (userMenu) {
@@ -658,6 +659,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         } else {
                             subEl.textContent = 'Sem assinatura';
                             subEl.style.color = '#ff4444';
+                        }
+                    }
+                    if (adminBtn) {
+                        if (user.email === 'williannunes31994@gmail.com') {
+                            adminBtn.style.display = 'block';
+                            adminBtn.onclick = function(e) { e.preventDefault(); window.open('/admin.html', '_blank'); };
+                        } else {
+                            adminBtn.style.display = 'none';
                         }
                     }
                 }

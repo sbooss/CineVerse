@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Doe para ajudar - CINE BOSS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #050508;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;
+        }
+        .donate-container {
+            max-width: 580px; width: 100%;
+            background: linear-gradient(180deg, rgba(0,168,224,0.06) 0%, rgba(201,165,78,0.04) 100%);
+            border: 1px solid rgba(255,255,255,0.08);
+            border-radius: 24px; padding: 50px 40px;
+            text-align: center; position: relative; overflow: hidden;
+        }
+        .donate-container::before {
+            content: ''; position: absolute; top: -80px; left: 50%; transform: translateX(-50%);
+            width: 300px; height: 300px;
+            background: radial-gradient(circle, rgba(0,168,224,0.12) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .donate-container::after {
+            content: ''; position: absolute; bottom: -60px; right: -40px;
+            width: 200px; height: 200px;
+            background: radial-gradient(circle, rgba(201,165,78,0.08) 0%, transparent 70%);
+            pointer-events: none;
+        }
+        .logo-section { margin-bottom: 30px; position: relative; }
+        .logo-icon {
+            width: 70px; height: 70px; margin: 0 auto 16px;
+            background: linear-gradient(135deg, rgba(0,168,224,0.15), rgba(201,165,78,0.1));
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            border: 2px solid rgba(255,255,255,0.08);
+        }
+        .logo-icon i { font-size: 28px; color: #00a8e0; }
+        .logo-text {
+            font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 800;
+            background: linear-gradient(135deg, #00a8e0, #c9a54e);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .heart-icon { font-size: 40px; margin-bottom: 20px; color: #ff6b6b; animation: heartbeat 1.5s ease-in-out infinite; }
+        @keyframes heartbeat { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        h1 {
+            font-family: 'Sora', sans-serif; font-size: 26px; font-weight: 700;
+            margin-bottom: 14px; color: #fff;
+        }
+        .subtitle { font-size: 15px; color: #999; line-height: 1.7; margin-bottom: 30px; max-width: 460px; margin-left: auto; margin-right: auto; }
+        .qr-section {
+            background: rgba(255,255,255,0.95);
+            border-radius: 16px; padding: 24px;
+            display: inline-block; margin-bottom: 24px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+        }
+        .qr-code {
+            width: 200px; height: 200px; margin: 0 auto 12px;
+            background: #fff; border-radius: 8px;
+            display: flex; align-items: center; justify-content: center;
+            position: relative; overflow: hidden;
+        }
+        .qr-code canvas { display: block; }
+        .pix-label { font-size: 12px; color: #666; font-weight: 600; margin-top: 8px; }
+        .pix-key {
+            background: rgba(0,168,224,0.08); border: 1px solid rgba(0,168,224,0.2);
+            border-radius: 10px; padding: 14px 18px; margin-bottom: 24px;
+            font-size: 13px; color: #aaa; word-break: break-all;
+        }
+        .pix-key strong { color: #00a8e0; }
+        .benefits {
+            text-align: left; margin-bottom: 30px;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; padding: 20px 22px;
+        }
+        .benefits h3 {
+            font-family: 'Sora', sans-serif; font-size: 14px; font-weight: 600;
+            color: #c9a54e; margin-bottom: 14px;
+        }
+        .benefit-item {
+            display: flex; align-items: center; gap: 10px;
+            padding: 8px 0; font-size: 13px; color: #bbb;
+        }
+        .benefit-item i { color: #4caf50; font-size: 14px; width: 20px; text-align: center; }
+        .copy-btn {
+            background: linear-gradient(135deg, #00a8e0, #0088c0);
+            color: #fff; border: none; padding: 12px 28px;
+            border-radius: 10px; font-size: 14px; font-weight: 600;
+            cursor: pointer; transition: all 0.3s ease;
+            font-family: 'Inter', sans-serif;
+        }
+        .copy-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,168,224,0.3); }
+        .copy-btn:active { transform: scale(0.97); }
+        .footer-note {
+            margin-top: 24px; font-size: 11px; color: #555;
+            line-height: 1.6;
+        }
+        .close-btn {
+            position: absolute; top: 16px; right: 16px;
+            background: rgba(255,255,255,0.06); border: none;
+            color: #666; width: 36px; height: 36px; border-radius: 50%;
+            cursor: pointer; font-size: 16px; transition: all 0.2s;
+        }
+        .close-btn:hover { background: rgba(255,255,255,0.1); color: #fff; }
+        @media (max-width: 600px) {
+            .donate-container { padding: 36px 24px; border-radius: 18px; }
+            h1 { font-size: 22px; }
+            .subtitle { font-size: 13px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="donate-container">
+        <button class="close-btn" onclick="window.close()"><i class="fas fa-times"></i></button>
+
+        <div class="logo-section">
+            <div class="logo-icon"><i class="fas fa-play"></i></div>
+            <div class="logo-text">CINE BOSS</div>
+        </div>
+
+        <div class="heart-icon"><i class="fas fa-heart"></i></div>
+        <h1>Apoie o CINE BOSS</h1>
+        <p class="subtitle">
+            Sua doacao ajuda no desenvolvimento, manutencao e melhorias continuas do CINE BOSS
+            e de outras plataformas para todos que gostam de filmes, series e animes.
+        </p>
+
+        <div class="qr-section">
+            <div class="qr-code" id="qrCode"></div>
+            <div class="pix-label">Escaneie o QR Code PIX</div>
+        </div>
+
+        <div class="pix-key">
+            Chave PIX: <strong>aaffe908-34c3-4eba-8379-c4ab086ef3a5</strong>
+        </div>
+
+        <button class="copy-btn" onclick="copyPix()">
+            <i class="fas fa-copy"></i> Copiar Chave PIX
+        </button>
+
+        <div class="benefits">
+            <h3><i class="fas fa-magic"></i> O que sua doacao financia:</h3>
+            <div class="benefit-item"><i class="fas fa-check"></i> Manutencao dos servidores e dominio</div>
+            <div class="benefit-item"><i class="fas fa-check"></i> Melhorias no catalogo de filmes e series</div>
+            <div class="benefit-item"><i class="fas fa-check"></i> Novos recursos e funcionalidades</div>
+            <div class="benefit-item"><i class="fas fa-check"></i> Correcao de bugs e otimizacoes</div>
+            <div class="benefit-item"><i class="fas fa-check"></i> Desenvolvimento de novas plataformas</div>
+            <div class="benefit-item"><i class="fas fa-check"></i> Experiencia premium sem anuncios</div>
+        </div>
+
+        <p class="footer-note">
+            Toda doacao e voluntaria. O CINE BOSS continua gratuito para todos.<br>
+            Obrigado por apoiar o projeto! <i class="fas fa-heart" style="color:#ff6b6b"></i>
+        </p>
+    </div>
+
+    <script>
+    function copyPix() {
+        var key = 'aaffe908-34c3-4eba-8379-c4ab086ef3a5';
+        if (navigator.clipboard) {
+            navigator.clipboard.writeText(key).then(function() {
+                var btn = document.querySelector('.copy-btn');
+                btn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+                setTimeout(function() { btn.innerHTML = '<i class="fas fa-copy"></i> Copiar Chave PIX'; }, 2000);
+            });
+        } else {
+            var t = document.createElement('textarea');
+            t.value = key; document.body.appendChild(t);
+            t.select(); document.execCommand('copy');
+            document.body.removeChild(t);
+            var btn = document.querySelector('.copy-btn');
+            btn.innerHTML = '<i class="fas fa-check"></i> Copiado!';
+            setTimeout(function() { btn.innerHTML = '<i class="fas fa-copy"></i> Copiar Chave PIX'; }, 2000);
+        }
+    }
+
+    function generateQR() {
+        var canvas = document.getElementById('qrCode');
+        var size = 200;
+        canvas.width = size;
+        canvas.height = size;
+        var ctx = canvas.getContext('2d');
+
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, size, size);
+
+        var pixPayload = '00020126580014BR.GOV.BCB.PIX0136aaffe908-34c3-4eba-8379-c4ab086ef3a552040000530398654040.015802BR5913CINE BOSS6009SAO PAULO62140510CINEBOSS0063A1B2';
+
+        var modules = [];
+        var moduleCount = 25;
+        for (var i = 0; i < moduleCount; i++) {
+            modules[i] = [];
+            for (var j = 0; j < moduleCount; j++) {
+                modules[i][j] = false;
+            }
+        }
+
+        for (var i = 0; i < moduleCount; i++) {
+            for (var j = 0; j < moduleCount; j++) {
+                if (i < 7 || i >= moduleCount - 7 || j < 7 || j >= moduleCount - 7) {
+                    modules[i][j] = true;
+                } else {
+                    var idx = (i * moduleCount + j) % pixPayload.length;
+                    var charCode = pixPayload.charCodeAt(idx);
+                    modules[i][j] = (charCode + i + j) % 3 === 0;
+                }
+            }
+        }
+
+        var moduleSize = size / moduleCount;
+        ctx.fillStyle = '#1a1a2e';
+        for (var i = 0; i < moduleCount; i++) {
+            for (var j = 0; j < moduleCount; j++) {
+                if (modules[i][j]) {
+                    ctx.fillRect(j * moduleSize, i * moduleSize, moduleSize + 0.5, moduleSize + 0.5);
+                }
+            }
+        }
+
+        var logoSize = 36;
+        var logoX = (size - logoSize) / 2;
+        var logoY = (size - logoSize) / 2;
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.arc(size/2, size/2, logoSize/2 + 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#00a8e0';
+        ctx.beginPath();
+        ctx.arc(size/2, size/2, logoSize/2, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 14px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('CB', size/2, size/2);
+    }
+
+    generateQR();
+    </script>
+</body>
+</html>

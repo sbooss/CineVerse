@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Pagina nao encontrada | CINE BOSS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #050508;
+            color: #fff;
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            display: flex; align-items: center; justify-content: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+        .container {
+            text-align: center; max-width: 520px; width: 100%;
+            position: relative;
+        }
+        .mario-container {
+            position: relative; margin-bottom: 30px;
+            display: inline-block;
+        }
+        .mario {
+            font-size: 120px; line-height: 1;
+            animation: marioSad 2s ease-in-out infinite;
+            filter: drop-shadow(0 10px 30px rgba(0,0,0,0.5));
+            position: relative;
+        }
+        .mario::after {
+            content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+            width: 80px; height: 12px;
+            background: radial-gradient(ellipse, rgba(0,0,0,0.3) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        @keyframes marioSad {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            25% { transform: translateY(-8px) rotate(-2deg); }
+            75% { transform: translateY(4px) rotate(1deg); }
+        }
+        .sad-bubble {
+            position: absolute; top: -20px; right: -40px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 16px; padding: 10px 16px;
+            font-size: 14px; color: #ff6b6b;
+            animation: bubblePop 3s ease-in-out infinite;
+        }
+        .sad-bubble::after {
+            content: ''; position: absolute; bottom: -6px; left: 20px;
+            width: 12px; height: 12px;
+            background: rgba(255,255,255,0.08);
+            border-right: 1px solid rgba(255,255,255,0.1);
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            transform: rotate(45deg);
+        }
+        @keyframes bubblePop {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.05) rotate(-2deg); }
+        }
+        .error-code {
+            font-family: 'Sora', sans-serif;
+            font-size: 100px; font-weight: 900;
+            background: linear-gradient(135deg, #ff4444, #ff6b6b, #ff4444);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            line-height: 1; margin-bottom: 16px;
+            text-shadow: none;
+            animation: glitch 4s ease-in-out infinite;
+        }
+        @keyframes glitch {
+            0%, 90%, 100% { transform: translate(0); }
+            92% { transform: translate(-3px, 2px); }
+            94% { transform: translate(3px, -1px); }
+            96% { transform: translate(-1px, -2px); }
+            98% { transform: translate(2px, 1px); }
+        }
+        h1 {
+            font-family: 'Sora', sans-serif;
+            font-size: 22px; font-weight: 700; margin-bottom: 12px;
+            color: #fff;
+        }
+        .subtitle {
+            font-size: 14px; color: #888; line-height: 1.7;
+            margin-bottom: 12px;
+        }
+        .status-msg {
+            display: inline-block;
+            background: rgba(0,168,224,0.08);
+            border: 1px solid rgba(0,168,224,0.2);
+            border-radius: 10px; padding: 10px 18px;
+            font-size: 13px; color: #00a8e0;
+            margin-bottom: 30px;
+        }
+        .status-msg i { margin-right: 6px; }
+        .actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .btn {
+            padding: 12px 28px; border-radius: 10px;
+            font-size: 14px; font-weight: 600; text-decoration: none;
+            transition: all 0.3s ease; cursor: pointer;
+            font-family: 'Inter', sans-serif; border: none;
+            display: inline-flex; align-items: center; gap: 8px;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #00a8e0, #0088c0);
+            color: #fff;
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,168,224,0.3); }
+        .btn-ghost {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: #ccc;
+        }
+        .btn-ghost:hover { background: rgba(255,255,255,0.08); color: #fff; }
+        .floating-pipes {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            height: 80px; pointer-events: none;
+            overflow: hidden;
+        }
+        .pipe {
+            position: absolute; bottom: 0;
+            width: 30px; background: #4caf50;
+            border-radius: 4px 4px 0 0;
+            opacity: 0.15;
+        }
+        .pipe::before {
+            content: ''; position: absolute; top: -8px; left: -4px;
+            width: 38px; height: 12px;
+            background: #4caf50; border-radius: 4px;
+        }
+        @keyframes pipeFloat {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .coin {
+            position: absolute; top: 20%; font-size: 20px; opacity: 0.1;
+            animation: coinSpin 3s linear infinite;
+        }
+        @keyframes coinSpin {
+            0% { transform: rotateY(0deg); }
+            100% { transform: rotateY(360deg); }
+        }
+        .cloud {
+            position: fixed; font-size: 40px; opacity: 0.04;
+            animation: cloudFloat 20s linear infinite;
+        }
+        @keyframes cloudFloat {
+            0% { transform: translateX(-100px); }
+            100% { transform: translateX(calc(100vw + 100px)); }
+        }
+    </style>
+</head>
+<body>
+    <div class="cloud" style="top:10%;animation-delay:0s"><i class="fas fa-cloud"></i></div>
+    <div class="cloud" style="top:25%;animation-delay:-7s;font-size:30px"><i class="fas fa-cloud"></i></div>
+    <div class="cloud" style="top:5%;animation-delay:-14s;font-size:50px"><i class="fas fa-cloud"></i></div>
+
+    <div class="coin" style="left:15%"><i class="fas fa-coins"></i></div>
+    <div class="coin" style="right:15%;animation-delay:-1s"><i class="fas fa-coins"></i></div>
+    <div class="coin" style="left:40%;animation-delay:-2s"><i class="fas fa-coins"></i></div>
+
+    <div class="container">
+        <div class="mario-container">
+            <div class="mario">😢</div>
+            <div class="sad-bubble">Oh no!</div>
+        </div>
+
+        <div class="error-code">404</div>
+        <h1>Pagina nao encontrada!</h1>
+        <p class="subtitle">
+            Parece que esta pagina foi pro mundo dos tubos...<br>
+            Mas nao se preocupe, estamos trabalhando para deixar tudo disponivel em breve!
+        </p>
+        <div class="status-msg">
+            <i class="fas fa-wrench"></i> Esta sendo ajustado - em breve disponivel
+        </div>
+        <p class="subtitle" style="font-size:12px;margin-bottom:24px">
+            Enquanto isso, outros filmes e series estao funcionando normalmente.
+        </p>
+        <div class="actions">
+            <a href="/" class="btn btn-primary"><i class="fas fa-home"></i> Voltar ao Inicio</a>
+            <a href="javascript:history.back()" class="btn btn-ghost"><i class="fas fa-arrow-left"></i> Voltar</a>
+        </div>
+    </div>
+
+    <div class="floating-pipes">
+        <div class="pipe" style="left:10%;height:50px;animation:pipeFloat 3s ease-in-out infinite"></div>
+        <div class="pipe" style="left:30%;height:70px;animation:pipeFloat 4s ease-in-out infinite 0.5s"></div>
+        <div class="pipe" style="left:60%;height:40px;animation:pipeFloat 2.5s ease-in-out infinite 1s"></div>
+        <div class="pipe" style="left:85%;height:60px;animation:pipeFloat 3.5s ease-in-out infinite 1.5s"></div>
+    </div>
+</body>
+</html>
