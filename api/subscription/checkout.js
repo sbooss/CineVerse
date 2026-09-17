@@ -38,7 +38,7 @@ module.exports = async function handler(req, res) {
         if (existing && existing.length > 0) return jsonError(res, 400, 'Voce ja possui assinatura ativa');
 
         const planInfo = PLANS[plan];
-        const siteUrl = process.env.SITE_URL || 'https://cine-boss-80xzp7o6p-william-ns-projects-ffa32c68.vercel.app';
+        const siteUrl = process.env.SITE_URL || 'https://cineboss.online';
 
         const preferenceBody = {
             items: [{

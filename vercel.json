@@ -1,6 +1,9 @@
 {
     "version": 2,
     "outputDirectory": ".",
+    "redirects": [
+        { "source": "/(.*)", "destination": "https://cineboss.online/$1", "permanent": true, "has": [{"type": "host", "value": "www.cineboss.online"}] }
+    ],
     "functions": {
         "api/webhook/mercadopago.js": {
             "maxDuration": 30

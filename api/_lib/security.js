@@ -8,6 +8,8 @@ const JWT_SECRET = process.env.JWT_SECRET;
 function setCors(req, res) {
     const origin = req.headers.origin;
     const allowed = (origin && (
+        origin === 'https://cineboss.online' ||
+        origin === 'https://www.cineboss.online' ||
         origin === 'https://cineboss.vercel.app' ||
         origin.endsWith('.vercel.app') && origin.includes('cineboss') ||
         origin.startsWith('http://localhost') ||
