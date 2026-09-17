@@ -8,13 +8,8 @@ const CONFIG = {
             },
             {
                 name: 'Servidor 2',
-                movie: function(id) { return 'https://vidcore.org/embed/movie/' + id + '?lang=pt'; },
-                tv: function(id, s, e) { return 'https://vidcore.org/embed/tv/' + id + '/' + s + '/' + e + '?lang=pt'; }
-            },
-            {
-                name: 'Servidor 3',
-                movie: function(id) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1'; },
-                tv: function(id, s, e) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1&s=' + s + '&e=' + e; }
+                movie: function(id) { return 'https://www.2embed.stream/embed/movie/' + id; },
+                tv: function(id, s, e) { return 'https://www.2embed.stream/embed/tv/' + id + '/' + s + '/' + e; }
             }
         ]
     },
