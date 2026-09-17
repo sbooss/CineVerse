@@ -138,8 +138,32 @@
             border-color: rgba(255,68,102,0.3);
         }
         .loading { text-align: center; padding: 60px; color: var(--text-muted); }
+        .device-item {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 12px 14px;
+            background: rgba(255,255,255,0.02);
+            border: 1px solid var(--border-subtle);
+            border-radius: 10px;
+            margin-bottom: 8px;
+        }
+        .device-info { display: flex; align-items: center; gap: 10px; flex: 1; }
+        .device-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(0,168,224,0.08); display: flex; align-items: center; justify-content: center; color: var(--accent-blue); font-size: 14px; flex-shrink: 0; }
+        .device-icon.current { background: rgba(0,168,224,0.15); border: 1px solid rgba(0,168,224,0.3); }
+        .device-name { font-size: 13px; font-weight: 600; color: var(--text-primary); }
+        .device-details { font-size: 11px; color: var(--text-muted); margin-top: 2px; }
+        .device-remove {
+            background: rgba(255,68,102,0.08); border: 1px solid rgba(255,68,102,0.15);
+            border-radius: 6px; padding: 6px 10px; color: #ff4466;
+            font-size: 11px; font-weight: 600; cursor: pointer; transition: all 0.2s;
+        }
+        .device-remove:hover { background: rgba(255,68,102,0.15); border-color: rgba(255,68,102,0.3); }
+        .device-current-badge { font-size: 10px; color: var(--accent-blue); font-weight: 600; background: rgba(0,168,224,0.1); padding: 2px 8px; border-radius: 4px; }
+        .devices-limit { font-size: 11px; color: var(--text-muted); margin-top: 12px; text-align: center; }
+        .devices-limit i { color: var(--accent-gold); margin-right: 4px; }
         @media (max-width: 600px) {
             .info-grid { grid-template-columns: 1fr; }
+            .device-item { flex-direction: column; align-items: flex-start; gap: 10px; }
+            .device-remove { width: 100%; text-align: center; }
         }
     </style>
 </head>
@@ -173,6 +197,7 @@
         function renderAccount(data) {
             const user = data.user;
             const sub = data.subscription;
+            const devices = data.devices || [];
             const content = document.getElementById('accountContent');
 
             let subHTML = '';
@@ -232,6 +257,29 @@
                 `;
             }
 
+            let devicesHTML = '<div class="account-card"><div class="card-label">Dispositivos Ativos (' + devices.length + '/2)</div>';
+            if (devices.length === 0) {
+                devicesHTML += '<div style="text-align:center;padding:20px;color:var(--text-muted);font-size:13px">Nenhum dispositivo ativo</div>';
+            } else {
+                devices.forEach(function(d) {
+                    const iconClass = d.name.includes('Android') || d.name.includes('Celular') ? 'fa-mobile-screen' :
+                                     d.name.includes('iOS') || d.name.includes('iPhone') || d.name.includes('iPad') ? 'fa-mobile-screen' :
+                                     d.name.includes('TV') || d.name.includes('Smart') ? 'fa-tv' : 'fa-desktop';
+                    const isCurrent = d.id === devices[0].id;
+                    devicesHTML += '<div class="device-item">' +
+                        '<div class="device-info">' +
+                            '<div class="device-icon' + (isCurrent ? ' current' : '') + '"><i class="fas ' + iconClass + '"></i></div>' +
+                            '<div>' +
+                                '<div class="device-name">' + d.name + (isCurrent ? ' <span class="device-current-badge">Este dispositivo</span>' : '') + '</div>' +
+                                '<div class="device-details">' + (d.os || '') + (d.browser ? ' - ' + d.browser : '') + '</div>' +
+                            '</div>' +
+                        '</div>' +
+                        (isCurrent ? '' : '<button class="device-remove" onclick="removeDevice(\'' + d.id + '\')"><i class="fas fa-times"></i> Remover</button>') +
+                    '</div>';
+                });
+            }
+            devicesHTML += '<div class="devices-limit"><i class="fas fa-info-circle"></i> Limite de 2 dispositivos por conta. Remova um dispositivo para logar em outro.</div></div>';
+
             content.innerHTML = `
                 <div class="account-card">
                     <div class="card-label">Dados Pessoais</div>
@@ -251,9 +299,25 @@
                     </div>
                 </div>
                 ${subHTML}
+                ${devicesHTML}
                 <button class="logout-btn" onclick="logout()">Sair da conta</button>
             `;
         }
+
+        window.removeDevice = async function(deviceId) {
+            if (!confirm('Remover este dispositivo?')) return;
+            try {
+                const r = await fetch(`${API}/auth/me`, {
+                    method: 'DELETE',
+                    headers: { 'Content-Type': 'application/json' },
+                    credentials: 'include',
+                    body: JSON.stringify({ deviceId })
+                });
+                const d = await r.json();
+                if (!r.ok) throw new Error(d.error);
+                location.reload();
+            } catch(e) { alert(e.message || 'Erro ao remover dispositivo'); }
+        };
 
         window.logout = async function() {
             await fetch(`${API}/auth/logout`, { method: 'POST', credentials: 'include' });

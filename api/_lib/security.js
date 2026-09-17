@@ -134,30 +134,91 @@ async function cleanupRateLimits() {
 }
 
 /* ===================== SESSION AUDIT ===================== */
+const MAX_DEVICES = 2;
+
+function parseDeviceInfo(userAgent) {
+    if (!userAgent) return { device: 'Desconhecido', os: '', browser: '' };
+    let device = 'Computador';
+    let os = '';
+    let browser = '';
+
+    if (/Android/i.test(userAgent)) { device = 'Celular Android'; os = 'Android'; }
+    else if (/iPhone|iPad|iPod/i.test(userAgent)) { device = 'iOS'; os = 'iOS'; }
+    else if (/Windows/i.test(userAgent)) { os = 'Windows'; }
+    else if (/Mac OS/i.test(userAgent)) { os = 'macOS'; }
+    else if (/Linux/i.test(userAgent)) { os = 'Linux'; }
+    else if (/SmartTV|Tizen|webOS|TV/i.test(userAgent)) { device = 'Smart TV'; os = 'TV'; }
+
+    if (/Chrome/i.test(userAgent) && !/Edge|Edg/i.test(userAgent)) browser = 'Chrome';
+    else if (/Firefox/i.test(userAgent)) browser = 'Firefox';
+    else if (/Safari/i.test(userAgent) && !/Chrome/i.test(userAgent)) browser = 'Safari';
+    else if (/Edge|Edg/i.test(userAgent)) browser = 'Edge';
+    else if (/SamsungBrowser/i.test(userAgent)) browser = 'Samsung';
+
+    return { device, os, browser };
+}
+
 async function createSession(userId, token, expiryDays, ip, userAgent) {
     const expiresAt = new Date(Date.now() + expiryDays * 24 * 60 * 60 * 1000);
-    const sessionData = {
-        id: crypto.randomUUID(),
-        user_id: userId,
-        token,
-        expires_at: expiresAt.toISOString(),
-        created_at: new Date().toISOString()
-    };
+    const deviceInfo = parseDeviceInfo(userAgent);
+    const sessionId = crypto.randomUUID();
+
     try {
-        await supabase.from('sessions').insert(sessionData);
+        const { data: activeSessions } = await supabase
+            .from('sessions')
+            .select('id, created_at')
+            .eq('user_id', userId)
+            .gt('expires_at', new Date().toISOString())
+            .order('created_at', { ascending: true });
+
+        if (activeSessions && activeSessions.length >= MAX_DEVICES) {
+            const toRemove = activeSessions.slice(0, activeSessions.length - MAX_DEVICES + 1);
+            const removeIds = toRemove.map(s => s.id);
+            await supabase.from('sessions').delete().in('id', removeIds);
+        }
+
+        await supabase.from('sessions').insert({
+            id: sessionId,
+            user_id: userId,
+            token,
+            expires_at: expiresAt.toISOString(),
+            created_at: new Date().toISOString(),
+            device_name: deviceInfo.device,
+            device_os: deviceInfo.os,
+            device_browser: deviceInfo.browser,
+            ip_address: ip
+        });
     } catch {
         try {
             await supabase.from('sessions').insert({
-                id: sessionData.id,
+                id: sessionId,
                 user_id: userId,
                 token,
                 expires_at: expiresAt.toISOString(),
-                created_at: sessionData.created_at
+                created_at: new Date().toISOString()
             });
         } catch {
             // Sessions table may not exist - JWT cookie is the real auth
         }
     }
+}
+
+async function getActiveSessions(userId) {
+    try {
+        const { data: sessions } = await supabase
+            .from('sessions')
+            .select('id, device_name, device_os, device_browser, ip_address, created_at, expires_at')
+            .eq('user_id', userId)
+            .gt('expires_at', new Date().toISOString())
+            .order('created_at', { ascending: false });
+        return sessions || [];
+    } catch {
+        return [];
+    }
+}
+
+async function destroySessionById(sessionId) {
+    try { await supabase.from('sessions').delete().eq('id', sessionId); } catch {}
 }
 
 async function validateSession(token) {
@@ -223,6 +284,8 @@ module.exports = {
     recordRateLimitAttempt,
     cleanupRateLimits,
     createSession,
+    getActiveSessions,
+    destroySessionById,
     validateSession,
     destroySession,
     destroyAllUserSessions,

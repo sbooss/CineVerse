@@ -4,7 +4,8 @@ const {
     supabase, setCors, handleOptions, setAuthCookie,
     sanitizeEmail, isValidEmail,
     checkRateLimit, recordRateLimitAttempt,
-    createSession, jsonError, jsonSuccess
+    createSession, getActiveSessions, destroySessionById,
+    jsonError, jsonSuccess
 } = require('../_lib/security');
 
 module.exports = async function handler(req, res) {
@@ -62,9 +63,19 @@ module.exports = async function handler(req, res) {
         const subscription = subs && subs.length > 0 ? subs[0] : null;
 
         setAuthCookie(res, token, expiryDays * 24 * 60 * 60);
+
+        const activeSessions = await getActiveSessions(user.id);
+
         return jsonSuccess(res, {
             user: { id: user.id, name: user.name, email: user.email, created_at: user.created_at },
-            subscription
+            subscription,
+            devices: activeSessions.map(s => ({
+                id: s.id,
+                name: s.device_name || 'Dispositivo',
+                os: s.device_os || '',
+                browser: s.device_browser || '',
+                lastAccess: s.created_at
+            }))
         });
     } catch (error) {
         console.error('Login error:', error);

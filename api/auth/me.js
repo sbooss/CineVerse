@@ -1,17 +1,20 @@
 const {
     supabase, setCors, handleOptions,
     getToken, verifyToken, validateSession,
+    getActiveSessions, destroySessionById,
     jsonError
 } = require('../_lib/security');
 
 module.exports = async function handler(req, res) {
     setCors(req, res);
     if (req.method === 'OPTIONS') return handleOptions(res);
-    if (req.method !== 'GET') return jsonError(res, 405, 'Method not allowed');
 
     try {
         const token = getToken(req);
-        if (!token) return res.status(200).json({ loggedIn: false });
+        if (!token) {
+            if (req.method === 'GET') return res.status(200).json({ loggedIn: false });
+            return jsonError(res, 401, 'Login obrigatorio');
+        }
 
         let decoded;
         try {
@@ -31,6 +34,19 @@ module.exports = async function handler(req, res) {
         const user = users && users.length > 0 ? users[0] : null;
         if (!user) return res.status(401).json({ error: 'Usuario nao encontrado', loggedIn: false });
 
+        // DELETE = logout from a specific device
+        if (req.method === 'DELETE') {
+            const { deviceId } = req.body || {};
+            if (!deviceId) return jsonError(res, 400, 'deviceId obrigatorio');
+            const devices = await getActiveSessions(decoded.userId);
+            const target = devices.find(d => d.id === deviceId);
+            if (!target) return jsonError(res, 404, 'Dispositivo nao encontrado');
+            await destroySessionById(deviceId);
+            return res.status(200).json({ success: true, message: 'Dispositivo removido' });
+        }
+
+        if (req.method !== 'GET') return jsonError(res, 405, 'Method not allowed');
+
         const { data: subs } = await supabase.from('subscriptions')
             .select('*')
             .eq('user_id', user.id)
@@ -40,7 +56,21 @@ module.exports = async function handler(req, res) {
             .limit(1);
         const subscription = subs && subs.length > 0 ? subs[0] : null;
 
-        return res.status(200).json({ loggedIn: true, user, subscription, hasSubscription: !!subscription });
+        const activeSessions = await getActiveSessions(user.id);
+
+        return res.status(200).json({
+            loggedIn: true,
+            user,
+            subscription,
+            hasSubscription: !!subscription,
+            devices: activeSessions.map(s => ({
+                id: s.id,
+                name: s.device_name || 'Dispositivo',
+                os: s.device_os || '',
+                browser: s.device_browser || '',
+                lastAccess: s.created_at
+            }))
+        });
     } catch (error) {
         return res.status(401).json({ error: 'Token invalido', loggedIn: false });
     }

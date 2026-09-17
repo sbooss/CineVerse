@@ -35,7 +35,8 @@ class AuthManager {
                 const r = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
                 const d = await r.json();
                 this.loggedIn = d.loggedIn || false; this.user = d.user || null; this.subscription = d.subscription || null;
-            } catch { this.loggedIn = false; this.user = null; this.subscription = null; }
+                this.devices = d.devices || [];
+            } catch { this.loggedIn = false; this.user = null; this.subscription = null; this.devices = []; }
             this.checked = true; this.checking = false; this.notify();
         })();
         return this._readyPromise;
@@ -44,7 +45,7 @@ class AuthManager {
     async login(email, password, remember) {
         const r = await fetch(`${API_BASE}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ email, password, remember }) });
         const d = await r.json(); if (!r.ok) throw new Error(d.error);
-        this.loggedIn = true; this.user = d.user; this.subscription = d.subscription; this.notify(); return d;
+        this.loggedIn = true; this.user = d.user; this.subscription = d.subscription; this.devices = d.devices || []; this.notify(); return d;
     }
 
     async register(name, email, password) {
@@ -55,7 +56,36 @@ class AuthManager {
 
     async logout() {
         await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
-        this.loggedIn = false; this.user = null; this.subscription = null; this.notify();
+        this.loggedIn = false; this.user = null; this.subscription = null; this.devices = []; this.notify();
+    }
+
+    async removeDevice(deviceId) {
+        const r = await fetch(`${API_BASE}/auth/me`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ deviceId })
+        });
+        const d = await r.json();
+        if (!r.ok) throw new Error(d.error);
+        this.devices = this.devices.filter(dev => dev.id !== deviceId);
+        this.notify();
+        return d;
+    }
+
+    getDeviceIcon(device) {
+        const name = (device.name || '').toLowerCase();
+        if (name.includes('android') || name.includes('celular')) return 'fa-mobile-screen';
+        if (name.includes('ios') || name.includes('iphone') || name.includes('ipad')) return 'fa-mobile-screen';
+        if (name.includes('tv') || name.includes('smart')) return 'fa-tv';
+        return 'fa-desktop';
+    }
+
+    formatDeviceName(device) {
+        const parts = [device.name || 'Dispositivo'];
+        if (device.os) parts.push(device.os);
+        if (device.browser) parts.push(device.browser);
+        return parts.join(' - ');
     }
 
     hasActiveSubscription() { return !!this.subscription && this.subscription.status === 'active'; }
