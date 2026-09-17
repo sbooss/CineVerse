@@ -443,9 +443,9 @@
 
     <!-- SCRIPTS -->
     <script>
-    // TV BROWSER POLYFILLS - Smart TVs (Tizen, webOS, Android TV) lack ES6+ support
+    // TV BROWSER POLYFILLS
     (function(){
-        if(!window.Promise){window.Promise=function(e){var t={resolve:null,reject:null,state:0,value:null,callbacks:[]};t.then=function(n){if(t.state===0){t.callbacks.push(n)}else{n(t.value)}return t};t.catch=function(n){return t};t.resolve=function(v){t.state=1;t.value=v;t.callbacks.forEach(function(c){c(v)})};t.reject=function(e){t.state=2};e(t);return t};window.Promise.resolve=function(v){return new Promise(function(r){r(v)})};window.Promise.reject=function(e){return new Promise(function(_,j){j(e)})}}
+        if(!window.Promise){window.Promise=function(e){var t={state:0,value:null,callbacks:[]};t.then=function(n){t.state===0?t.callbacks.push(n):n(t.value);return t};t.catch=function(){return t};t.resolve=function(v){t.state=1;t.value=v;t.callbacks.forEach(function(c){c(v)})};e(t);return t}}
         if(!window.fetch){window.fetch=function(u,o){return new Promise(function(r,j){var x=new XMLHttpRequest();x.open((o&&o.method)||'GET',u);if(o&&o.headers){Object.keys(o.headers).forEach(function(k){x.setRequestHeader(k,o.headers[k])})}x.onload=function(){r({ok:x.status>=200&&x.status<300,text:function(){return Promise.resolve(x.responseText)},json:function(){return Promise.resolve(JSON.parse(x.responseText))},status:x.status})};x.onerror=function(){j(new Error('Network error'))};x.send(o&&o.body)})}}
         if(!Array.prototype.find){Array.prototype.find=function(f){for(var i=0;i<this.length;i++){if(f(this[i],i,this))return this[i]}return undefined}}
         if(!Array.prototype.findIndex){Array.prototype.findIndex=function(f){for(var i=0;i<this.length;i++){if(f(this[i],i,this))return i}return-1}}
@@ -458,77 +458,13 @@
         if(!Element.prototype.closest){Element.prototype.closest=function(s){var el=this;while(el&&el!==document){if(el.matches(s))return el;el=el.parentElement}return null}}
         if(!Element.prototype.matches){Element.prototype.matches=Element.prototype.msMatchesSelector||Element.prototype.webkitMatchesSelector}
         if(!Array.from){Array.from=function(a){return Array.prototype.slice.call(a)}}
-        // Check if ES6+ syntax is supported (class, async, arrow)
-        try { eval('class X{}'); } catch(e) {
-            // ES6 not supported - load Babel transpiler for TV browsers
-            var s = document.createElement('script');
-            s.src = 'https://cdn.jsdelivr.net/npm/@babel/standalone@7.26.10/babel.min.js';
-            s.onload = function() {
-                window._useBabel = true;
-                console.log('TV Browser detected - Babel transpiler loaded');
-            };
-            document.head.appendChild(s);
-        }
     })();
     </script>
-    <script src="config.js?v=36"></script>
-    <script id="tmdb-script" type="text/plain" src="tmdb.js?v=37"></script>
-    <script id="auth-script" type="text/plain" src="auth.js?v=37"></script>
-    <script id="player-script" type="text/plain" src="player.js?v=37"></script>
-    <script>
-    // Load scripts - transpile with Babel if ES6 not supported (TV browsers)
-    (function(){
-        var scripts = ['tmdb-script','auth-script','player-script'];
-        function loadScript(id, cb) {
-            var el = document.getElementById(id);
-            if (!el) return cb();
-            var src = el.getAttribute('src');
-            fetch(src).then(function(r){return r.text()}).then(function(code) {
-                if (window._useBabel && window.Babel) {
-                    try {
-                        var transformed = Babel.transform(code, { presets: ['env'] }).code;
-                        var s = document.createElement('script');
-                        s.textContent = transformed;
-                        document.head.appendChild(s);
-                    } catch(e) {
-                        console.error('Babel transform failed for ' + id, e);
-                        var s = document.createElement('script');
-                        s.src = src;
-                        document.head.appendChild(s);
-                    }
-                } else {
-                    var s = document.createElement('script');
-                    s.src = src;
-                    document.head.appendChild(s);
-                }
-                setTimeout(cb, 50);
-            }).catch(function() {
-                var s = document.createElement('script');
-                s.src = src;
-                document.head.appendChild(s);
-                setTimeout(cb, 50);
-            });
-        }
-        // Check if Babel is still loading, wait for it
-        function waitForBabel(cb) {
-            if (window._useBabel === false || window._useBabel === true) return cb();
-            if (window._useBabel === undefined && document.getElementById('tmdb-script')) {
-                setTimeout(function(){ waitForBabel(cb); }, 100);
-            } else { cb(); }
-        }
-        waitForBabel(function() {
-            loadScript('tmdb-script', function() {
-                loadScript('auth-script', function() {
-                    loadScript('player-script', function() {
-                        var s = document.createElement('script');
-                        s.src = 'app.js?v=37';
-                        document.head.appendChild(s);
-                    });
-                });
-            });
-        });
-    })();
-    </script>
+    <script src="config.js?v=38"></script>
+    <script src="tmdb.js?v=38"></script>
+    <script src="auth.js?v=38"></script>
+    <script src="player.js?v=38"></script>
+    <script src="app.js?v=38"></script>
     <script>
         // CINEMATIC POSTER BACKGROUND
         (function(){
