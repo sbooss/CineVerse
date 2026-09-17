@@ -2,14 +2,14 @@ const CONFIG = {
     EMBED: {
         PROVIDERS: [
             {
-                name: 'Servidor 1',
-                movie: function(id) { return 'https://cinesrc.st/embed/movie/' + id; },
-                tv: function(id, s, e) { return 'https://cinesrc.st/embed/tv/' + id + '?s=' + s + '&e=' + e; }
+                name: 'Fembed',
+                movie: function(id) { return 'https://fembed.lol/filme/' + id; },
+                tv: function(id, s, e) { return 'https://fembed.lol/serie/' + id + '/' + s + '/' + e; }
             },
             {
-                name: 'Servidor 2',
-                movie: function(id) { return 'https://www.2embed.stream/embed/movie/' + id; },
-                tv: function(id, s, e) { return 'https://www.2embed.stream/embed/tv/' + id + '/' + s + '/' + e; }
+                name: 'CineSrc',
+                movie: function(id) { return 'https://cinesrc.st/embed/movie/' + id; },
+                tv: function(id, s, e) { return 'https://cinesrc.st/embed/tv/' + id + '?s=' + s + '&e=' + e; }
             }
         ]
     },
