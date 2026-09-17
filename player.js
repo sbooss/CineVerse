@@ -145,7 +145,16 @@ class VideoPlayer {
             iframe.setAttribute('loading', 'eager');
             iframe.style.opacity = '0';
             iframe.style.transition = 'opacity 0.3s';
-            iframe.onload = function() { this.style.opacity = '1'; };
+            let loaded = false;
+            iframe.onload = function() {
+                loaded = true;
+                this.style.opacity = '1';
+            };
+            setTimeout(() => {
+                if (!loaded && index < providers.length - 1) {
+                    this._nextProvider();
+                }
+            }, 8000);
 
             this.wrapper.innerHTML = '';
             this.wrapper.appendChild(iframe);
