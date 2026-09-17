@@ -70,7 +70,21 @@ class VideoPlayer {
         this.titleEl.textContent = item.title;
         this.overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
+        this._showAdWarning();
         this._loadEmbed(item, season, episode);
+    }
+
+    _showAdWarning() {
+        const existing = document.getElementById('playerAdWarning');
+        if (existing) existing.remove();
+
+        const warning = document.createElement('div');
+        warning.id = 'playerAdWarning';
+        warning.style.cssText = 'position:absolute;top:56px;left:50%;transform:translateX(-50%);z-index:10;background:rgba(255,200,0,0.12);border:1px solid rgba(255,200,0,0.25);border-radius:8px;padding:8px 16px;display:flex;align-items:center;gap:8px;max-width:90%;animation:adWarnFade 0.3s ease';
+        warning.innerHTML = '<i class="fas fa-info-circle" style="color:#ffc800;font-size:12px;flex-shrink:0"></i><span style="font-size:11px;color:#e8e8f0;line-height:1.4">Se uma aba indesejada abrir, feche e volte ao filme. Use os servidores abaixo para trocar.</span>';
+        this.overlay.querySelector('.player-container').insertBefore(warning, this.overlay.querySelector('.server-bar'));
+        setTimeout(() => { if (warning.parentNode) warning.style.opacity = '0.6'; }, 5000);
+        setTimeout(() => { if (warning.parentNode) warning.remove(); }, 10000);
     }
 
     close() {

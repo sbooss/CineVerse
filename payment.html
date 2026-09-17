@@ -42,30 +42,55 @@
             padding: 20px;
         }
         .payment-card {
-            width: 100%; max-width: 480px;
+            width: 100%; max-width: 520px;
             background: var(--bg-elevated);
             border: 1px solid var(--border-medium);
-            border-radius: 16px; padding: 36px 28px;
+            border-radius: 16px; padding: 40px 32px;
             text-align: center;
         }
         .payment-logo {
             font-family: 'Sora', sans-serif;
-            font-size: 20px; font-weight: 800;
-            letter-spacing: 2px; margin-bottom: 24px;
+            font-size: 22px; font-weight: 800;
+            letter-spacing: 2px; margin-bottom: 20px;
         }
         .payment-logo .accent { color: var(--accent-blue); }
         .payment-title {
             font-family: 'Sora', sans-serif;
-            font-size: 22px; font-weight: 700;
-            margin-bottom: 6px;
+            font-size: 24px; font-weight: 700;
+            margin-bottom: 8px;
         }
         .payment-subtitle {
-            font-size: 13px; color: var(--text-muted);
-            margin-bottom: 28px;
+            font-size: 14px; color: var(--text-secondary);
+            margin-bottom: 16px; line-height: 1.5;
         }
-        .plans { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 24px; }
+        .payment-access-info {
+            background: linear-gradient(135deg, rgba(0,168,224,0.08), rgba(201,165,78,0.06));
+            border: 1px solid rgba(0,168,224,0.15);
+            border-radius: 12px; padding: 16px 18px;
+            margin-bottom: 24px; text-align: left;
+        }
+        .payment-access-info h3 {
+            font-family: 'Sora', sans-serif;
+            font-size: 13px; font-weight: 700;
+            color: var(--accent-blue); margin-bottom: 8px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .payment-access-info ul {
+            list-style: none; margin: 0;
+        }
+        .payment-access-info li {
+            font-size: 12px; color: var(--text-secondary);
+            padding: 4px 0; padding-left: 18px; position: relative;
+            line-height: 1.4;
+        }
+        .payment-access-info li::before {
+            content: '\f00c'; font-family: 'Font Awesome 6 Free';
+            font-weight: 900; position: absolute; left: 0;
+            color: var(--accent-blue); font-size: 10px;
+        }
+        .plans { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
         .plan {
-            padding: 18px 14px;
+            padding: 20px 16px;
             background: rgba(255,255,255,0.02);
             border: 1px solid var(--border-subtle);
             border-radius: 12px; cursor: pointer;
@@ -79,16 +104,16 @@
             position: absolute; top: -8px; right: 10px;
             background: linear-gradient(135deg, #c9a54e, #e0be6a);
             color: #000; font-size: 9px; font-weight: 700;
-            padding: 2px 8px; border-radius: 8px;
+            padding: 3px 10px; border-radius: 8px;
         }
         .plan-name {
             font-family: 'Sora', sans-serif;
-            font-size: 11px; color: var(--text-muted);
+            font-size: 12px; color: var(--text-muted);
             margin-bottom: 6px; letter-spacing: 0.5px;
         }
         .plan-price {
-            font-size: 22px; font-weight: 800;
-            color: var(--accent-blue); margin-bottom: 8px;
+            font-size: 24px; font-weight: 800;
+            color: var(--accent-blue); margin-bottom: 10px;
         }
         .plan-price span { font-size: 11px; color: var(--text-muted); font-weight: 400; }
         .plan-features { list-style: none; }
@@ -102,10 +127,10 @@
             color: var(--accent-blue); font-size: 9px;
         }
         .pay-btn {
-            width: 100%; padding: 14px;
+            width: 100%; padding: 16px;
             background: var(--accent-blue);
             border: none; border-radius: 10px;
-            color: #fff; font-size: 14px; font-weight: 700;
+            color: #fff; font-size: 15px; font-weight: 700;
             letter-spacing: 0.5px; cursor: pointer;
             transition: all 0.25s;
         }
@@ -118,14 +143,35 @@
         .secure { margin-top: 16px; font-size: 11px; color: var(--text-muted); }
         .secure i { color: var(--accent-blue); margin-right: 4px; }
         .error-msg { color: #ff4466; font-size: 12px; margin-top: 12px; min-height: 16px; }
-        @media (max-width: 500px) { .plans { grid-template-columns: 1fr; } }
+        @media (max-width: 540px) {
+            .payment-card { padding: 28px 20px; }
+            .payment-title { font-size: 20px; }
+            .plans { grid-template-columns: 1fr; }
+        }
+        @media (min-width: 1200px) {
+            .payment-card { max-width: 560px; padding: 48px 40px; }
+        }
     </style>
 </head>
 <body>
     <div class="payment-card">
         <div class="payment-logo">CINE <span class="accent">BOSS</span></div>
         <h1 class="payment-title">Escolha seu plano</h1>
-        <p class="payment-subtitle">Pagamento unico. Sem renovação automatica.</p>
+        <p class="payment-subtitle">Pagamento unico. Sem renovacao automatica.</p>
+
+        <div class="payment-access-info">
+            <h3><i class="fas fa-film"></i> O que voce tera acesso:</h3>
+            <ul>
+                <li>Acesso completo a todos os filmes e series do catalogo</li>
+                <li>Todos os generos: acao, comedia, drama, terror, romance e muito mais</li>
+                <li>Filmes e series dublados e legendados em portugues</li>
+                <li>Qualidade de video em ate 1080p (Full HD)</li>
+                <li>Assista no celular, computador, tablet e Smart TV</li>
+                <li>Sem anuncios durante a reproducao</li>
+                <li>Troca livre entre servidores de reproducao</li>
+            </ul>
+        </div>
+
         <div class="plans">
             <div class="plan" data-plan="monthly">
                 <div class="plan-name">CINE BOSS</div>
@@ -134,6 +180,7 @@
                     <li>Todos os filmes e series</li>
                     <li>Qualidade ate 1080p</li>
                     <li>Sem anuncios</li>
+                    <li>Suporte por email</li>
                 </ul>
             </div>
             <div class="plan featured selected" data-plan="quarterly">
@@ -144,6 +191,7 @@
                     <li>Tudo do mensal</li>
                     <li>Economia de R$ 4,98</li>
                     <li>Suporte prioritario</li>
+                    <li>3 meses de acesso</li>
                 </ul>
             </div>
         </div>

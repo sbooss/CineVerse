@@ -212,13 +212,26 @@ class AuthManager {
         m.id = 'paywallModal'; m.className = 'cb-modal';
         m.innerHTML = `
         <div class="cb-modal-bg"></div>
-        <div class="cb-modal-card" style="max-width:600px">
+        <div class="cb-modal-card" style="max-width:640px;width:95%">
             <div class="cb-modal-inner" style="padding:0">
-                <div style="padding:32px 28px 20px;text-align:center;background:linear-gradient(180deg,rgba(0,168,224,0.06) 0%,transparent 100%);position:relative">
-                    <div style="position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:180px;height:180px;background:radial-gradient(circle,rgba(0,168,224,0.15),transparent 70%);pointer-events:none"></div>
-                    <i class="fas fa-play" style="font-size:28px;color:#00a8e0;margin-bottom:14px;position:relative;z-index:1"></i>
-                    <h2 style="font-family:Sora,sans-serif;font-size:20px;font-weight:800;color:#fff;margin-bottom:6px;position:relative;z-index:1">Seu proximo filme esta pronto.</h2>
-                    <p style="font-size:13px;color:#8a8aa0;position:relative;z-index:1">Ative seu acesso CINE BOSS para comecar a assistir.</p>
+                <div style="padding:36px 28px 24px;text-align:center;background:linear-gradient(180deg,rgba(0,168,224,0.06) 0%,transparent 100%);position:relative">
+                    <div style="position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:200px;height:200px;background:radial-gradient(circle,rgba(0,168,224,0.15),transparent 70%);pointer-events:none"></div>
+                    <i class="fas fa-play" style="font-size:30px;color:#00a8e0;margin-bottom:14px;position:relative;z-index:1"></i>
+                    <h2 style="font-family:Sora,sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:6px;position:relative;z-index:1">Seu proximo filme esta pronto.</h2>
+                    <p style="font-size:13px;color:#8a8aa0;position:relative;z-index:1;max-width:420px;margin:0 auto;line-height:1.5">Ative seu acesso CINE BOSS e tenha acesso completo a todo o catalogo de filmes, series e animes.</p>
+                </div>
+                <div style="padding:0 24px 16px">
+                    <div style="background:linear-gradient(135deg,rgba(0,168,224,0.06),rgba(201,165,78,0.04));border:1px solid rgba(0,168,224,0.12);border-radius:10px;padding:14px 16px;margin-bottom:16px">
+                        <div style="font-size:12px;font-weight:700;color:#00a8e0;margin-bottom:8px;display:flex;align-items:center;gap:6px"><i class="fas fa-film"></i> Seu acesso inclui:</div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px">
+                            <div style="font-size:11px;color:#8a8aa0;padding:2px 0;padding-left:14px;position:relative"><i class="fas fa-check" style="color:#00a8e0;font-size:8px;position:absolute;left:0;top:5px"></i>Todos os filmes e series</div>
+                            <div style="font-size:11px;color:#8a8aa0;padding:2px 0;padding-left:14px;position:relative"><i class="fas fa-check" style="color:#00a8e0;font-size:8px;position:absolute;left:0;top:5px"></i>Dublado e legendado</div>
+                            <div style="font-size:11px;color:#8a8aa0;padding:2px 0;padding-left:14px;position:relative"><i class="fas fa-check" style="color:#00a8e0;font-size:8px;position:absolute;left:0;top:5px"></i>Qualidade ate 1080p</div>
+                            <div style="font-size:11px;color:#8a8aa0;padding:2px 0;padding-left:14px;position:relative"><i class="fas fa-check" style="color:#00a8e0;font-size:8px;position:absolute;left:0;top:5px"></i>Sem anuncios</div>
+                            <div style="font-size:11px;color:#8a8aa0;padding:2px 0;padding-left:14px;position:relative"><i class="fas fa-check" style="color:#00a8e0;font-size:8px;position:absolute;left:0;top:5px"></i>Celular, PC e TV</div>
+                            <div style="font-size:11px;color:#8a8aa0;padding:2px 0;padding-left:14px;position:relative"><i class="fas fa-check" style="color:#00a8e0;font-size:8px;position:absolute;left:0;top:5px"></i>Suporte prioritario</div>
+                        </div>
+                    </div>
                 </div>
                 <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 24px 24px">
                     <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:22px 18px;position:relative">
@@ -231,10 +244,10 @@ class AuthManager {
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Sem anuncios</li>
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Suporte por email</li>
                         </ul>
-                        <button class="pw-select-btn" onclick="auth._selectPlan('monthly')" style="width:100%;padding:11px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e8e8f0;font-size:12px;font-weight:600;cursor:pointer;transition:all .25s;font-family:Inter,sans-serif">Assinar</button>
+                        <button class="pw-select-btn" onclick="auth._selectPlan('monthly')" style="width:100%;padding:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e8e8f0;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s;font-family:Inter,sans-serif">Assinar</button>
                     </div>
                     <div style="background:rgba(0,168,224,0.04);border:1px solid rgba(0,168,224,0.3);border-radius:12px;padding:22px 18px;position:relative">
-                        <div style="position:absolute;top:-9px;right:14px;background:#00a8e0;color:#fff;font-size:9px;font-weight:700;padding:2px 8px;border-radius:8px;letter-spacing:.5px">MAIS POPULAR</div>
+                        <div style="position:absolute;top:-9px;right:14px;background:#00a8e0;color:#fff;font-size:9px;font-weight:700;padding:3px 10px;border-radius:8px;letter-spacing:.5px">MAIS POPULAR</div>
                         <div style="font-family:Sora,sans-serif;font-size:11px;font-weight:700;color:#e8e8f0;letter-spacing:1px;margin-bottom:2px">CINE BOSS</div>
                         <div style="font-size:10px;color:#4a4a60;margin-bottom:10px">90 dias</div>
                         <div style="font-family:Sora,sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:2px">R$ 15,99</div>
@@ -245,10 +258,10 @@ class AuthManager {
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Suporte prioritario</li>
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>R$ 5,02 de economia</li>
                         </ul>
-                        <button class="pw-select-btn gold" onclick="auth._selectPlan('quarterly')" style="width:100%;padding:11px;background:linear-gradient(135deg,#c9a54e,#e0be6a);border:none;border-radius:8px;color:#0a0a12;font-size:12px;font-weight:700;cursor:pointer;transition:all .25s;font-family:Inter,sans-serif">Assinar agora</button>
+                        <button class="pw-select-btn gold" onclick="auth._selectPlan('quarterly')" style="width:100%;padding:12px;background:linear-gradient(135deg,#c9a54e,#e0be6a);border:none;border-radius:8px;color:#0a0a12;font-size:13px;font-weight:700;cursor:pointer;transition:all .25s;font-family:Inter,sans-serif">Assinar agora</button>
                     </div>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:14px 24px;border-top:1px solid rgba(255,255,255,0.04);font-size:10px;color:#4a4a60">
+                <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:14px 24px;border-top:1px solid rgba(255,255,255,0.04);font-size:11px;color:#4a4a60">
                     <i class="fas fa-shield-halved" style="color:#00a8e0"></i>
                     Pagamento unico via Mercado Pago. Sem renovacao automatica.
                 </div>
