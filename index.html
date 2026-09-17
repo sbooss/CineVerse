@@ -326,6 +326,13 @@
         </div>
     </div>
 
+    <!-- DONATE BANNER -->
+    <a href="/donate.html" class="donate-banner" id="donateBanner">
+        <i class="fas fa-heart"></i>
+        <span>Doe para ajudar o CINE BOSS</span>
+        <i class="fas fa-heart"></i>
+    </a>
+
     <!-- NAVBAR -->
     <nav class="navbar" id="mainNav">
         <div class="nav-container">
@@ -580,8 +587,6 @@
                 bootScreen.classList.add('fade-out');
                 setTimeout(function() {
                     if (bootScreen && bootScreen.parentNode) bootScreen.remove();
-                    if (mainNav) mainNav.style.opacity = '1';
-                    if (mainContent) mainContent.style.opacity = '1';
                 }, 600);
             }
 
