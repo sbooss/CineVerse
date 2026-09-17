@@ -4,7 +4,7 @@ const {
 } = require('../_lib/security');
 
 const MP_TOKEN = process.env.MP_ACCESS_TOKEN;
-const MP_WEBHOOK_SECRET = process.env.MP_WEBHOOK_SECRET || 'cineboss_mp_webhook_2026';
+const MP_WEBHOOK_SECRET = process.env.MP_WEBHOOK_SECRET;
 if (!MP_TOKEN) console.error('CRITICAL: MP_ACCESS_TOKEN not set');
 const MP_API = 'https://api.mercadopago.com';
 

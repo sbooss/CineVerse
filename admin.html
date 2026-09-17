@@ -185,7 +185,7 @@
             });
 
         function loadStats() {
-            fetch(API + '/admin/stats', { credentials: 'include' })
+            fetch(API + '/auth/me?stats=true', { credentials: 'include' })
                 .then(function(r) { return r.json(); })
                 .then(function(d) {
                     if (d.totalUsers !== undefined) document.getElementById('totalUsers').textContent = d.totalUsers;
