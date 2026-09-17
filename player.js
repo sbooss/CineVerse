@@ -121,7 +121,6 @@ class VideoPlayer {
         var serverBar = document.getElementById('serverBar');
         var self = this;
         var currentIndex = 0;
-        var loadTimeout = null;
 
         var buildServerBar = function(activeIndex) {
             var html = '<span class="server-label">Servidor:</span>';
@@ -136,17 +135,16 @@ class VideoPlayer {
             self.wrapper.innerHTML =
                 '<div class="player-error">' +
                 '<i class="fas fa-exclamation-triangle"></i>' +
-                '<p>' + (msg || 'Nenhum servidor disponivel') + '</p>' +
+                '<p>' + (msg || 'Servidor indisponivel. Tente outro servidor.') + '</p>' +
                 '<button class="btn-secondary" id="playerErrorBack" style="margin-top:15px">' +
                 '<i class="fas fa-arrow-left"></i> Voltar</button></div>';
             document.getElementById('playerErrorBack').addEventListener('click', function() { self.close(); });
         };
 
         var tryProvider = function(index) {
-            if (loadTimeout) clearTimeout(loadTimeout);
             if (index >= providers.length) {
                 serverBar.innerHTML = '';
-                showError('Todos os servidores estao fora no momento. Tente novamente mais tarde.');
+                showError('Todos os servidores estao fora. Tente novamente mais tarde.');
                 return;
             }
 
@@ -164,20 +162,12 @@ class VideoPlayer {
             iframe.loading = 'eager';
             iframe.style.opacity = '0';
             iframe.style.transition = 'opacity 0.3s';
-            var loaded = false;
             iframe.onload = function() {
-                loaded = true;
                 this.style.opacity = '1';
             };
 
             self.wrapper.innerHTML = '';
             self.wrapper.appendChild(iframe);
-
-            loadTimeout = setTimeout(function() {
-                if (!loaded && index < providers.length - 1) {
-                    self._nextProvider();
-                }
-            }, 10000);
 
             serverBar.querySelectorAll('.server-chip').forEach(function(btn) {
                 btn.addEventListener('click', function(e) {
@@ -195,13 +185,6 @@ class VideoPlayer {
             self._currentTmdbId = tmdbId;
             self._currentSeason = season;
             self._currentEpisode = episode;
-        };
-
-        this._nextProvider = function() {
-            if (currentIndex < providers.length - 1) {
-                currentIndex++;
-                tryProvider(currentIndex);
-            }
         };
 
         tryProvider(0);
