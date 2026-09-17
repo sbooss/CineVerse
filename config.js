@@ -3,13 +3,13 @@ const CONFIG = {
         PROVIDERS: [
             {
                 name: 'Servidor 1',
-                movie: function(id) { return 'https://www.2embed.cc/embed/' + id; },
-                tv: function(id, s, e) { return 'https://www.2embed.cc/embedtv/' + id + '&s=' + s + '&e=' + e; }
+                movie: function(id) { return 'https://cinesrc.st/embed/movie/' + id; },
+                tv: function(id, s, e) { return 'https://cinesrc.st/embed/tv/' + id + '?s=' + s + '&e=' + e; }
             },
             {
                 name: 'Servidor 2',
-                movie: function(id) { return 'https://embed.filmu.in/movie/' + id; },
-                tv: function(id, s, e) { return 'https://embed.filmu.in/tv/' + id + '/' + s + '/' + e; }
+                movie: function(id) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1'; },
+                tv: function(id, s, e) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1&s=' + s + '&e=' + e; }
             }
         ]
     },
