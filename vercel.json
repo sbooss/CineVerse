@@ -1,9 +1,6 @@
 {
     "version": 2,
     "outputDirectory": ".",
-    "rewrites": [
-        { "source": "/(.*)", "destination": "/404.html", "status": 404 }
-    ],
     "redirects": [
         { "source": "/(.*)", "destination": "https://cineboss.online/$1", "permanent": true, "has": [{"type": "host", "value": "www.cineboss.online"}] }
     ],
