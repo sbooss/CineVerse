@@ -1005,7 +1005,6 @@ input { font-family: inherit; }
 .footer {
     padding: 32px 40px 20px;
     max-width: 1400px; margin: 0 auto;
-    opacity: 0; transition: opacity 0.5s ease;
 }
 .footer-content {
     display: flex; justify-content: space-between;
