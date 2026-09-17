@@ -12,6 +12,14 @@ class VideoPlayer {
     }
 
     _setupNuclearAntiAds() {
+        // Override window.open to block popups globally
+        var originalOpen = window.open;
+        this._originalOpen = originalOpen;
+        window.open = function() {
+            return null;
+        };
+
+        // Intercept clicks to prevent new tab behavior
         this.overlay.addEventListener('click', (e) => {
             if (!this.isOpen()) return;
             var t = e.target;
@@ -21,18 +29,30 @@ class VideoPlayer {
                        t.closest('#playerErrorBack') ||
                        t.closest('.player-header');
             if (!isUI) {
+                // Prevent default behavior that might open new tabs
                 e.preventDefault();
                 e.stopPropagation();
-                if (t.tagName === 'IFRAME' || t.style?.position === 'fixed') {
+                
+                // Block clicks on links that would open new tabs
+                if (t.tagName === 'A' && (t.target === '_blank' || t.getAttribute('rel') === 'noopener')) {
+                    t.target = '_self';
+                    t.removeAttribute('rel');
+                }
+                
+                // Block clicks that might trigger popup behavior
+                if (t.tagName === 'IFRAME' || t.style?.position === 'fixed' || 
+                    t.style?.position === 'absolute' || t.style?.zIndex > 9999) {
                     return false;
                 }
             }
         }, true);
 
+        // Block middle-click (auxclick) which often opens new tabs
         this.overlay.addEventListener('auxclick', (e) => {
             if (this.isOpen()) { e.preventDefault(); return false; }
         }, true);
 
+        // Block touchstart on non-UI elements to prevent ad interactions
         this.overlay.addEventListener('touchstart', (e) => {
             if (!this.isOpen()) return;
             var t = e.target;
@@ -46,29 +66,43 @@ class VideoPlayer {
             }
         }, { passive: false, capture: true });
 
+        // Observer to remove ad elements injected by Fembed
         this._popupObserver = new MutationObserver((mutations) => {
             if (!this.isOpen()) return;
             for (var m of mutations) {
                 for (var node of m.addedNodes) {
                     if (node.nodeType !== 1) continue;
+                    
+                    // Remove iframes that aren't our video iframe
                     if (node.tagName === 'IFRAME' && !node.classList.contains('video-iframe')) {
                         node.remove(); continue;
                     }
-                    if (node.style && node.style.position === 'fixed' && parseInt(node.style.zIndex || 0) > 9999) {
+                    
+                    // Remove fixed/absolute positioned ad overlays
+                    if (node.style && (node.style.position === 'fixed' || node.style.position === 'absolute') && 
+                        parseInt(node.style.zIndex || 0) > 9999) {
                         node.remove(); continue;
                     }
+                    
+                    // Remove elements with ad-related attributes
                     if (node.querySelectorAll) {
                         node.querySelectorAll('iframe:not(.video-iframe)').forEach(f => f.remove());
-                        node.querySelectorAll('div[style*="position: fixed"]').forEach(f => {
+                        node.querySelectorAll('div[style*="position: fixed"], div[style*="position: absolute"]').forEach(f => {
                             if (parseInt(f.style.zIndex || 0) > 9999) f.remove();
                         });
-                        node.querySelectorAll('[onclick], [data-href], [data-url]').forEach(f => f.remove());
+                        node.querySelectorAll('[onclick], [data-href], [data-url], [target="_blank"]').forEach(f => {
+                            f.removeAttribute('onclick');
+                            f.removeAttribute('data-href');
+                            f.removeAttribute('data-url');
+                            f.target = '_self';
+                        });
                     }
                 }
             }
         });
         this._popupObserver.observe(document.body, { childList: true, subtree: true });
 
+        // Block messages that might trigger popups or navigation
         window.addEventListener('message', (e) => {
             if (!this.isOpen()) return;
             var d = e.data;
