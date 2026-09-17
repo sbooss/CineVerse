@@ -3,13 +3,18 @@ const CONFIG = {
         PROVIDERS: [
             {
                 name: 'Servidor 1',
-                movie: function(id) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1'; },
-                tv: function(id, s, e) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1&s=' + s + '&e=' + e; }
+                movie: function(id) { return 'https://mgeb.top/embed/movie/' + id; },
+                tv: function(id, s, e) { return 'https://mgeb.top/embed/tv/' + id + '/' + s + '/' + e; }
             },
             {
                 name: 'Servidor 2',
-                movie: function(id) { return 'https://vidsrc.io/embed/movie?tmdb=' + id; },
-                tv: function(id, s, e) { return 'https://vidsrc.io/embed/tv?tmdb=' + id + '&season=' + s + '&episode=' + e; }
+                movie: function(id) { return 'https://nhdapi.com/movie/' + id; },
+                tv: function(id, s, e) { return 'https://nhdapi.com/tv/' + id + '/' + s + '/' + e; }
+            },
+            {
+                name: 'Servidor 3',
+                movie: function(id) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1'; },
+                tv: function(id, s, e) { return 'https://multiembed.mov/?video_id=' + id + '&tmdb=1&s=' + s + '&e=' + e; }
             }
         ]
     },

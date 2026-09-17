@@ -106,6 +106,7 @@ class VideoPlayer {
         const providers = CONFIG.EMBED.PROVIDERS;
         const serverBar = document.getElementById('serverBar');
         let currentIndex = 0;
+        let loadTimeout = null;
 
         const buildServerBar = (activeIndex) => {
             let html = '<span class="server-label">Servidor:</span>';
@@ -116,18 +117,23 @@ class VideoPlayer {
             return html;
         };
 
+        const showError = (msg) => {
+            this.wrapper.innerHTML = `
+                <div class="player-error">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>${msg || 'Nenhum servidor disponivel'}</p>
+                    <button class="btn-secondary" id="playerErrorBack" style="margin-top:15px">
+                        <i class="fas fa-arrow-left"></i> Voltar
+                    </button>
+                </div>`;
+            document.getElementById('playerErrorBack').addEventListener('click', () => this.close());
+        };
+
         const tryProvider = (index) => {
+            if (loadTimeout) clearTimeout(loadTimeout);
             if (index >= providers.length) {
                 serverBar.innerHTML = '';
-                this.wrapper.innerHTML = `
-                    <div class="player-error">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <p>Nenhum servidor disponivel</p>
-                        <button class="btn-secondary" id="playerErrorBack" style="margin-top:15px">
-                            <i class="fas fa-arrow-left"></i> Voltar
-                        </button>
-                    </div>`;
-                document.getElementById('playerErrorBack').addEventListener('click', () => this.close());
+                showError('Todos os servidores estao fora no momento. Tente novamente mais tarde.');
                 return;
             }
 
@@ -150,14 +156,15 @@ class VideoPlayer {
                 loaded = true;
                 this.style.opacity = '1';
             };
-            setTimeout(() => {
-                if (!loaded && index < providers.length - 1) {
-                    this._nextProvider();
-                }
-            }, 8000);
 
             this.wrapper.innerHTML = '';
             this.wrapper.appendChild(iframe);
+
+            loadTimeout = setTimeout(() => {
+                if (!loaded && index < providers.length - 1) {
+                    this._nextProvider();
+                }
+            }, 10000);
 
             serverBar.querySelectorAll('.server-chip').forEach(btn => {
                 btn.addEventListener('click', (e) => {
