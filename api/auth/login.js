@@ -8,6 +8,8 @@ const {
     jsonError, jsonSuccess
 } = require('../_lib/security');
 
+const ADMIN_EMAIL = 'williannunes31994@gmail.com';
+
 module.exports = async function handler(req, res) {
     setCors(req, res);
     if (req.method === 'OPTIONS') return handleOptions(res);
@@ -69,6 +71,7 @@ module.exports = async function handler(req, res) {
         return jsonSuccess(res, {
             user: { id: user.id, name: user.name, email: user.email, created_at: user.created_at },
             subscription,
+            isAdmin: user.email === ADMIN_EMAIL,
             devices: activeSessions.map(s => ({
                 id: s.id,
                 name: s.device_name || 'Dispositivo',

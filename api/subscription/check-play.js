@@ -4,6 +4,8 @@ const {
     jsonError
 } = require('../_lib/security');
 
+const ADMIN_EMAIL = 'williannunes31994@gmail.com';
+
 module.exports = async function handler(req, res) {
     setCors(req, res);
     if (req.method === 'OPTIONS') return handleOptions(res);
@@ -22,8 +24,13 @@ module.exports = async function handler(req, res) {
         const session = await validateSession(token);
         if (!session) return res.status(401).json({ canPlay: false, reason: 'session_expired', error: 'Sessao expirada' });
 
-        const { data: users } = await supabase.from('users').select('id').eq('id', decoded.userId).limit(1);
+        const { data: users } = await supabase.from('users').select('id, email').eq('id', decoded.userId).limit(1);
         if (!users || users.length === 0) return res.status(401).json({ canPlay: false, reason: 'user_not_found', error: 'Usuario nao encontrado' });
+
+        // Admin bypass - always allow play
+        if (users[0].email === ADMIN_EMAIL) {
+            return res.status(200).json({ canPlay: true, admin: true });
+        }
 
         const { data: subs } = await supabase.from('subscriptions')
             .select('*').eq('user_id', decoded.userId).eq('status', 'active')

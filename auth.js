@@ -20,7 +20,7 @@ const sounds = new SoundManager();
 
 class AuthManager {
     constructor() {
-        this.user = null; this.subscription = null; this.loggedIn = false;
+        this.user = null; this.subscription = null; this.loggedIn = false; this.isAdmin = false;
         this.listeners = []; this.checking = false; this.checked = false;
         this._readyPromise = null;
     }
@@ -35,7 +35,7 @@ class AuthManager {
                 const r = await fetch(`${API_BASE}/auth/me`, { credentials: 'include' });
                 const d = await r.json();
                 this.loggedIn = d.loggedIn || false; this.user = d.user || null; this.subscription = d.subscription || null;
-                this.devices = d.devices || [];
+                this.devices = d.devices || []; this.isAdmin = d.isAdmin || false;
             } catch { this.loggedIn = false; this.user = null; this.subscription = null; this.devices = []; }
             this.checked = true; this.checking = false; this.notify();
         })();
@@ -45,7 +45,7 @@ class AuthManager {
     async login(email, password, remember) {
         const r = await fetch(`${API_BASE}/auth/login`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ email, password, remember }) });
         const d = await r.json(); if (!r.ok) throw new Error(d.error);
-        this.loggedIn = true; this.user = d.user; this.subscription = d.subscription; this.devices = d.devices || []; this.notify(); return d;
+        this.loggedIn = true; this.user = d.user; this.subscription = d.subscription; this.devices = d.devices || []; this.isAdmin = d.isAdmin || false; this.notify(); return d;
     }
 
     async register(name, email, password) {
@@ -56,7 +56,7 @@ class AuthManager {
 
     async logout() {
         await fetch(`${API_BASE}/auth/logout`, { method: 'POST', credentials: 'include' });
-        this.loggedIn = false; this.user = null; this.subscription = null; this.devices = []; this.notify();
+        this.loggedIn = false; this.user = null; this.subscription = null; this.devices = []; this.isAdmin = false; this.notify();
     }
 
     async removeDevice(deviceId) {
@@ -99,6 +99,7 @@ class AuthManager {
     async requireSubscription() {
         if (!this.checked) await this.check();
         if (!this.loggedIn) { this.showRegister(); return false; }
+        if (this.isAdmin) return true;
         if (!this.hasActiveSubscription()) { this.showPaywall(); return false; }
         return true;
     }

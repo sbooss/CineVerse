@@ -662,7 +662,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                     if (adminBtn) {
-                        if (user.email === 'williannunes31994@gmail.com') {
+                        if (auth.isAdmin) {
                             adminBtn.style.display = 'block';
                             adminBtn.onclick = function(e) { e.preventDefault(); window.open('/admin.html', '_blank'); };
                         } else {

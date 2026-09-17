@@ -81,6 +81,7 @@ module.exports = async function handler(req, res) {
             user,
             subscription,
             hasSubscription: !!subscription,
+            isAdmin: user.email === ADMIN_EMAIL,
             devices: activeSessions.map(s => ({
                 id: s.id,
                 name: s.device_name || 'Dispositivo',
