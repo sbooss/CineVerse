@@ -3,8 +3,8 @@ const CONFIG = {
         PROVIDERS: [
             {
                 name: 'Servidor 1',
-                movie: function(id) { return 'https://vixsrc.to/movie/' + id + '?lang=pt&autoplay=true'; },
-                tv: function(id, s, e) { return 'https://vixsrc.to/tv/' + id + '/' + s + '/' + e + '?lang=pt&autoplay=true'; }
+                movie: function(id) { return 'https://mgeb.top/embed/' + id; },
+                tv: function(id, s, e) { return 'https://mgeb.top/embed/' + id + '/' + s + '/' + e; }
             },
             {
                 name: 'Servidor 2',

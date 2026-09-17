@@ -173,7 +173,6 @@ class VideoPlayer {
             iframe.setAttribute('allow', 'autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen');
             iframe.setAttribute('class', 'video-iframe');
             iframe.setAttribute('loading', 'eager');
-            iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-presentation allow-downloads');
             iframe.style.opacity = '0';
             iframe.style.transition = 'opacity 0.3s';
             let loaded = false;
@@ -301,7 +300,6 @@ class VideoPlayer {
             iframe.setAttribute('allowfullscreen', 'true');
             iframe.setAttribute('allow', 'autoplay; encrypted-media');
             iframe.setAttribute('class', 'video-iframe');
-            iframe.setAttribute('sandbox', 'allow-scripts allow-same-origin allow-popups allow-presentation');
             this.wrapper.appendChild(iframe);
         } else {
             this.wrapper.innerHTML = `
