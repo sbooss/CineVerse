@@ -301,21 +301,14 @@
 </head>
 <body>
 
-    <!-- NUCLEAR ANTI-ADS - Bloqueia TODO popup/redirect/navegacao -->
+    <!-- NUCLEAR ANTI-ADS - Bloqueia popups/redirects, preserva UI do site -->
     <script>
     (function(){
         var deadFn = function(){ return null; };
         try { window.open = deadFn; Object.defineProperty(window,'open',{value:deadFn,writable:false,configurable:false}); } catch(e){}
-        try { window.location.assign = function(){}; window.location.replace = function(){}; } catch(e){}
 
         document.addEventListener('click', function(e){
             var t = e.target;
-            var a = t.closest ? t.closest('a[target="_blank"]') : null;
-            if(a){ e.preventDefault(); e.stopPropagation(); return false; }
-            if(t.tagName==='A' && t.target==='_blank'){ e.preventDefault(); return false; }
-            if(t.onclick || t.getAttribute('onclick') || t.dataset.href || t.dataset.url){
-                e.preventDefault(); e.stopPropagation(); return false;
-            }
             if(t.style && t.style.position==='fixed' && parseInt(t.style.zIndex||0)>9000){
                 e.preventDefault(); e.stopPropagation(); t.remove(); return false;
             }
@@ -325,33 +318,11 @@
             if(e.button===1){ e.preventDefault(); return false; }
         }, true);
 
-        new MutationObserver(function(muts){
-            muts.forEach(function(m){
-                m.addedNodes.forEach(function(n){
-                    if(n.nodeType!==1) return;
-                    if(n.tagName==='IFRAME' && !n.classList.contains('video-iframe')){
-                        try{ n.remove(); }catch(ex){}
-                    }
-                    if(n.tagName==='DIV' && n.style){
-                        var z = parseInt(n.style.zIndex||0);
-                        var p = n.style.position;
-                        if((p==='fixed'||p==='absolute') && z>9000){ try{ n.remove(); }catch(ex){} }
-                    }
-                    if(n.querySelectorAll){
-                        n.querySelectorAll('iframe:not(.video-iframe)').forEach(function(f){ try{ f.remove(); }catch(ex){} });
-                        n.querySelectorAll('[style*="position: fixed"]').forEach(function(f){
-                            if(parseInt(f.style.zIndex||0)>9000) try{ f.remove(); }catch(ex){}
-                        });
-                    }
-                });
-            });
-        }).observe(document.body, {childList:true, subtree:true});
-
         window.addEventListener('message', function(e){
             var d = e.data;
             if(typeof d === 'string'){
                 var l = d.toLowerCase();
-                if(l.indexOf('open')!==-1 || l.indexOf('popup')!==-1 || l.indexOf('redirect')!==-1 || l.indexOf('navigate')!==-1 || l.indexOf('popunder')!==-1 || l.indexOf('onclick')!==-1){
+                if(l.indexOf('popunder')!==-1 || l.indexOf('acscdn')!==-1 || l.indexOf('aclib')!==-1 || l.indexOf('onclickperformance')!==-1){
                     e.stopImmediatePropagation();
                     return false;
                 }
