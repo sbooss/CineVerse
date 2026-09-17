@@ -6,15 +6,17 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 /* ===================== CORS ===================== */
 function setCors(req, res) {
-    const allowedOrigins = [
-        'https://cineboss.vercel.app',
-        'https://cineboss-l258p6ylt-william-ns-projects-ffa32c68.vercel.app',
-        'http://localhost:3000',
-        'http://localhost:8080'
-    ];
     const origin = req.headers.origin;
-    const allowed = allowedOrigins.includes(origin) ? origin : allowedOrigins[0];
-    res.setHeader('Access-Control-Allow-Origin', allowed);
+    const allowed = (origin && (
+        origin === 'https://cineboss.vercel.app' ||
+        origin.endsWith('.vercel.app') && origin.includes('cineboss') ||
+        origin.startsWith('http://localhost') ||
+        origin.startsWith('http://127.0.0.1')
+    )) ? origin : null;
+
+    if (allowed) {
+        res.setHeader('Access-Control-Allow-Origin', allowed);
+    }
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     res.setHeader('Access-Control-Allow-Credentials', 'true');

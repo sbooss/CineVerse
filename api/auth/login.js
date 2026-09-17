@@ -64,8 +64,7 @@ module.exports = async function handler(req, res) {
         setAuthCookie(res, token, expiryDays * 24 * 60 * 60);
         return jsonSuccess(res, {
             user: { id: user.id, name: user.name, email: user.email, created_at: user.created_at },
-            subscription,
-            token
+            subscription
         });
     } catch (error) {
         console.error('Login error:', error);

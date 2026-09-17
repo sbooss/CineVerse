@@ -229,7 +229,7 @@ class AuthManager {
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Todos os filmes e series</li>
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Qualidade ate 1080p</li>
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Sem anuncios</li>
-                            <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Sem anuncios</li>
+                            <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Suporte por email</li>
                         </ul>
                         <button class="pw-select-btn" onclick="auth._selectPlan('monthly')" style="width:100%;padding:11px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e8e8f0;font-size:12px;font-weight:600;cursor:pointer;transition:all .25s;font-family:Inter,sans-serif">Assinar</button>
                     </div>

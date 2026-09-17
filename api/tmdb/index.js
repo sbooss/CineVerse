@@ -2,7 +2,9 @@ export default async function handler(req, res) {
     const { path, ...params } = req.query;
     if (!path) return res.status(400).json({ error: 'Missing path parameter' });
 
-    const API_KEY = process.env.TMDB_API_KEY || 'eb9690431d1dd3d86de35def2b1b0a2c';
+    const API_KEY = process.env.TMDB_API_KEY;
+    if (!API_KEY) return res.status(500).json({ error: 'TMDB API key not configured' });
+
     const BASE_URL = 'https://api.themoviedb.org/3';
 
     try {
@@ -23,7 +25,6 @@ export default async function handler(req, res) {
 
         const data = await response.json();
         res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=300');
-        res.setHeader('Access-Control-Allow-Origin', '*');
         res.status(200).json(data);
     } catch (err) {
         res.status(500).json({ error: 'Proxy error', details: err.message });

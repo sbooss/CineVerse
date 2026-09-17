@@ -68,7 +68,7 @@ module.exports = async function handler(req, res) {
         sendWelcomeEmail(cleanEmail, cleanName).catch(() => {});
 
         setAuthCookie(res, token, 30 * 24 * 60 * 60);
-        return jsonSuccess(res, { user: { id: userId, name: cleanName, email: cleanEmail }, token });
+        return jsonSuccess(res, { user: { id: userId, name: cleanName, email: cleanEmail } });
     } catch (error) {
         console.error('Register error:', error);
         return jsonError(res, 500, 'Erro ao criar conta');
