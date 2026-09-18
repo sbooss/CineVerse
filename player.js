@@ -8,93 +8,49 @@ class VideoPlayer {
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape' && this.isOpen()) this.close();
         });
-        this._setupNuclearAntiAds();
+        this._popupObserver = null;
+        this._messageHandler = null;
+        this._auxclickHandler = null;
+        this._touchHandler = null;
     }
 
-    _setupNuclearAntiAds() {
-        // Override window.open to block popups globally
-        var originalOpen = window.open;
-        this._originalOpen = originalOpen;
-        window.open = function() {
-            return null;
-        };
+    _startAntiAds() {
+        var self = this;
+        if (this._observerActive) return;
+        this._observerActive = true;
 
-        // Intercept clicks to prevent new tab behavior
-        this.overlay.addEventListener('click', (e) => {
-            if (!this.isOpen()) return;
+        this._auxclickHandler = function(e) { e.preventDefault(); return false; };
+        this.overlay.addEventListener('auxclick', this._auxclickHandler, true);
+
+        this._touchHandler = function(e) {
             var t = e.target;
             var isUI = t.closest('#playerBack') ||
                        t.closest('.server-chip') ||
                        t.closest('.server-bar') ||
                        t.closest('#playerErrorBack') ||
-                       t.closest('.player-header');
-            if (!isUI) {
-                // Prevent default behavior that might open new tabs
-                e.preventDefault();
-                e.stopPropagation();
-                
-                // Block clicks on links that would open new tabs
-                if (t.tagName === 'A' && (t.target === '_blank' || t.getAttribute('rel') === 'noopener')) {
-                    t.target = '_self';
-                    t.removeAttribute('rel');
-                }
-                
-                // Block clicks that might trigger popup behavior
-                if (t.tagName === 'IFRAME' || t.style?.position === 'fixed' || 
-                    t.style?.position === 'absolute' || t.style?.zIndex > 9999) {
-                    return false;
-                }
-            }
-        }, true);
+                       t.closest('.player-header') ||
+                       t.closest('.player-wrapper');
+            if (!isUI) { e.preventDefault(); return false; }
+        };
+        this.overlay.addEventListener('touchstart', this._touchHandler, { passive: false, capture: true });
 
-        // Block middle-click (auxclick) which often opens new tabs
-        this.overlay.addEventListener('auxclick', (e) => {
-            if (this.isOpen()) { e.preventDefault(); return false; }
-        }, true);
-
-        // Block touchstart on non-UI elements to prevent ad interactions
-        this.overlay.addEventListener('touchstart', (e) => {
-            if (!this.isOpen()) return;
-            var t = e.target;
-            var isUI = t.closest('#playerBack') ||
-                       t.closest('.server-chip') ||
-                       t.closest('.server-bar') ||
-                       t.closest('#playerErrorBack');
-            if (!isUI) {
-                e.preventDefault();
-                return false;
-            }
-        }, { passive: false, capture: true });
-
-        // Observer to remove ad elements injected by Fembed
-        this._popupObserver = new MutationObserver((mutations) => {
-            if (!this.isOpen()) return;
-            for (var m of mutations) {
-                for (var node of m.addedNodes) {
+        this._popupObserver = new MutationObserver(function(mutations) {
+            for (var m = 0; m < mutations.length; m++) {
+                var added = mutations[m].addedNodes;
+                for (var i = 0; i < added.length; i++) {
+                    var node = added[i];
                     if (node.nodeType !== 1) continue;
-                    
-                    // Remove iframes that aren't our video iframe
                     if (node.tagName === 'IFRAME' && !node.classList.contains('video-iframe')) {
                         node.remove(); continue;
                     }
-                    
-                    // Remove fixed/absolute positioned ad overlays
-                    if (node.style && (node.style.position === 'fixed' || node.style.position === 'absolute') && 
+                    if (node.style && (node.style.position === 'fixed' || node.style.position === 'absolute') &&
                         parseInt(node.style.zIndex || 0) > 9999) {
                         node.remove(); continue;
                     }
-                    
-                    // Remove elements with ad-related attributes
                     if (node.querySelectorAll) {
-                        node.querySelectorAll('iframe:not(.video-iframe)').forEach(f => f.remove());
-                        node.querySelectorAll('div[style*="position: fixed"], div[style*="position: absolute"]').forEach(f => {
+                        node.querySelectorAll('iframe:not(.video-iframe)').forEach(function(f) { f.remove(); });
+                        node.querySelectorAll('div[style*="position: fixed"], div[style*="position: absolute"]').forEach(function(f) {
                             if (parseInt(f.style.zIndex || 0) > 9999) f.remove();
-                        });
-                        node.querySelectorAll('[onclick], [data-href], [data-url], [target="_blank"]').forEach(f => {
-                            f.removeAttribute('onclick');
-                            f.removeAttribute('data-href');
-                            f.removeAttribute('data-url');
-                            f.target = '_self';
                         });
                     }
                 }
@@ -102,27 +58,34 @@ class VideoPlayer {
         });
         this._popupObserver.observe(document.body, { childList: true, subtree: true });
 
-        // Block messages that might trigger popups or navigation
-        window.addEventListener('message', (e) => {
-            if (!this.isOpen()) return;
+        this._messageHandler = function(e) {
             var d = e.data;
             if (typeof d === 'string') {
                 var l = d.toLowerCase();
-                if (l.includes('open') || l.includes('popup') || l.includes('redirect') ||
-                    l.includes('navigate') || l.includes('popunder') || l.includes('acscdn') ||
-                    l.includes('aclib') || l.includes('onclick') || l.includes('location')) {
+                if (l.includes('popunder') || l.includes('acscdn') || l.includes('aclib')) {
                     e.stopImmediatePropagation();
                     return false;
                 }
             }
-        }, true);
+        };
+        window.addEventListener('message', this._messageHandler, true);
+    }
+
+    _stopAntiAds() {
+        this._observerActive = false;
+        if (this._popupObserver) { this._popupObserver.disconnect(); this._popupObserver = null; }
+        if (this._auxclickHandler) { this.overlay.removeEventListener('auxclick', this._auxclickHandler, true); this._auxclickHandler = null; }
+        if (this._touchHandler) { this.overlay.removeEventListener('touchstart', this._touchHandler, true); this._touchHandler = null; }
+        if (this._messageHandler) { window.removeEventListener('message', this._messageHandler, true); this._messageHandler = null; }
     }
 
     isOpen() {
         return this.overlay.classList.contains('active');
     }
 
-    async open(item, season = 1, episode = 1) {
+    async open(item, season, episode) {
+        season = season || 1;
+        episode = episode || 1;
         if (typeof auth !== 'undefined') {
             var canPlay = await auth.requireSubscription();
             if (!canPlay) {
@@ -133,19 +96,20 @@ class VideoPlayer {
         this.titleEl.textContent = item.title;
         this.overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
+        this._startAntiAds();
         this._loadEmbed(item, season, episode);
     }
 
     close() {
         this.overlay.classList.remove('active');
         document.body.style.overflow = '';
+        this._stopAntiAds();
         var iframes = this.wrapper.querySelectorAll('iframe');
-        iframes.forEach(f => { try { f.src = 'about:blank'; f.remove(); } catch(ex) {} });
+        iframes.forEach(function(f) { try { f.src = 'about:blank'; f.remove(); } catch(ex) {} });
         this.wrapper.innerHTML = '';
         var serverBar = document.getElementById('serverBar');
         if (serverBar) serverBar.innerHTML = '';
-        if (this._popupObserver) this._popupObserver.disconnect();
-        if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+        if (document.fullscreenElement) document.exitFullscreen().catch(function() {});
     }
 
     _loadEmbed(item, season, episode) {
@@ -246,6 +210,7 @@ class VideoPlayer {
         this.titleEl.textContent = channel.title;
         this.overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
+        this._startAntiAds();
         var serverBar = document.getElementById('serverBar');
         serverBar.innerHTML = '<span class="server-label">TV Ao Vivo</span>';
         var self = this;
