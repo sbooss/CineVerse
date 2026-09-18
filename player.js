@@ -34,6 +34,43 @@ class VideoPlayer {
         };
         this.overlay.addEventListener('touchstart', this._touchHandler, { passive: false, capture: true });
 
+        this._beforeUnloadHandler = function(e) {
+            if (self.isOpen()) {
+                e.preventDefault();
+                e.returnValue = '';
+                return '';
+            }
+        };
+        window.addEventListener('beforeunload', this._beforeUnloadHandler);
+
+        this._clickBlockHandler = function(e) {
+            var t = e.target;
+            if (t && (t.tagName === 'A' || t.closest('a'))) {
+                var a = t.tagName === 'A' ? t : t.closest('a');
+                var href = a.href || '';
+                var adDomains = ['onclickperformance','acscdn','aclib','popads','clickadu','propellerads','adsterra','exoclick','hilltopads','monetag','evadav','richpush','popcash','poptm'];
+                for (var i = 0; i < adDomains.length; i++) {
+                    if (href.includes(adDomains[i])) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        return false;
+                    }
+                }
+                if (href && href !== '#' && !href.startsWith('javascript:')) {
+                    var isAd = false;
+                    for (var j = 0; j < adDomains.length; j++) {
+                        if (href.includes(adDomains[j])) { isAd = true; break; }
+                    }
+                    if (!isAd && (e.ctrlKey || e.metaKey || e.shiftKey || a.target === '_blank')) {
+                        e.preventDefault();
+                        window.open(href, '_self');
+                        return false;
+                    }
+                }
+            }
+        };
+        this.overlay.addEventListener('click', this._clickBlockHandler, true);
+
         this._popupObserver = new MutationObserver(function(mutations) {
             for (var m = 0; m < mutations.length; m++) {
                 var added = mutations[m].addedNodes;
@@ -62,7 +99,7 @@ class VideoPlayer {
             var d = e.data;
             if (typeof d === 'string') {
                 var l = d.toLowerCase();
-                if (l.includes('popunder') || l.includes('acscdn') || l.includes('aclib')) {
+                if (l.includes('popunder') || l.includes('acscdn') || l.includes('aclib') || l.includes('onclickperformance') || l.includes('popads')) {
                     e.stopImmediatePropagation();
                     return false;
                 }
@@ -76,6 +113,8 @@ class VideoPlayer {
         if (this._popupObserver) { this._popupObserver.disconnect(); this._popupObserver = null; }
         if (this._auxclickHandler) { this.overlay.removeEventListener('auxclick', this._auxclickHandler, true); this._auxclickHandler = null; }
         if (this._touchHandler) { this.overlay.removeEventListener('touchstart', this._touchHandler, true); this._touchHandler = null; }
+        if (this._beforeUnloadHandler) { window.removeEventListener('beforeunload', this._beforeUnloadHandler); this._beforeUnloadHandler = null; }
+        if (this._clickBlockHandler) { this.overlay.removeEventListener('click', this._clickBlockHandler, true); this._clickBlockHandler = null; }
         if (this._messageHandler) { window.removeEventListener('message', this._messageHandler, true); this._messageHandler = null; }
     }
 

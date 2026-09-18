@@ -539,10 +539,10 @@
         if(!Array.from){Array.from=function(a){return Array.prototype.slice.call(a)}}
     })();
     </script>
-    <script src="config.js?v=48"></script>
+    <script src="config.js?v=49"></script>
     <script src="tmdb.js?v=41"></script>
     <script src="auth.js?v=41"></script>
-    <script src="player.js?v=48"></script>
+    <script src="player.js?v=49"></script>
     <script src="app.js?v=45"></script>
     <script>
         // CINEMATIC POSTER BACKGROUND
@@ -719,19 +719,54 @@
     <!-- ANTI-ADS: Block popunders and redirects -->
     <script>
     (function() {
-        window.open = function() { return null; };
-        Object.defineProperty(window, 'open', { value: function() { return null; }, writable: false, configurable: false });
+        var deadFn = function() { return null; };
+        
+        window.open = deadFn;
+        try { Object.defineProperty(window, 'open', { value: deadFn, writable: false, configurable: false }); } catch(e) {}
+        
         var origAssign = window.location.assign;
         var origReplace = window.location.replace;
-        window.location.assign = function(url) { if(url && !url.includes('onclickperformance') && !url.includes('acscdn')) origAssign.call(window.location, url); };
-        window.location.replace = function(url) { if(url && !url.includes('onclickperformance') && !url.includes('acscdn')) origReplace.call(window.location, url); };
+        window.location.assign = function(url) { 
+            if(url && !url.includes('onclickperformance') && !url.includes('acscdn') && !url.includes('aclib') && !url.includes('popads')) {
+                origAssign.call(window.location, url); 
+            }
+        };
+        window.location.replace = function(url) { 
+            if(url && !url.includes('onclickperformance') && !url.includes('acscdn') && !url.includes('aclib') && !url.includes('popads')) {
+                origReplace.call(window.location, url); 
+            }
+        };
+        
+        var adDomains = ['onclickperformance','acscdn','aclib','popads','clickadu','propellerads','adsterra','exoclick','hilltopads','monetag','evadav','richpush','popcash','poptm','cdnfacebook','sdkstream'];
+        
         document.addEventListener('click', function(e) {
             var t = e.target;
             if(t && (t.tagName === 'A' || t.closest('a'))) {
                 var a = t.tagName === 'A' ? t : t.closest('a');
                 var href = a.href || '';
-                if(href.includes('onclickperformance') || href.includes('acscdn') || href.includes('aclib') || href.includes('popads') || href.includes('clickadu')) {
-                    e.preventDefault(); e.stopPropagation(); return false;
+                for(var i=0; i<adDomains.length; i++) {
+                    if(href.includes(adDomains[i])) {
+                        e.preventDefault(); e.stopPropagation(); return false;
+                    }
+                }
+            }
+        }, true);
+        
+        document.addEventListener('click', function(e) {
+            var t = e.target;
+            if(t && (t.tagName === 'A' || t.closest('a'))) {
+                var a = t.tagName === 'A' ? t : t.closest('a');
+                var href = a.href || '';
+                if(href && href !== '#' && !href.startsWith('javascript:') && !href.includes('cineboss.online') && !href.includes('tmdb.org') && !href.includes('google')) {
+                    var isAd = false;
+                    for(var i=0; i<adDomains.length; i++) {
+                        if(href.includes(adDomains[i])) { isAd = true; break; }
+                    }
+                    if(!isAd && (e.ctrlKey || e.metaKey || e.shiftKey || a.target === '_blank')) {
+                        e.preventDefault();
+                        window.open(href, '_self');
+                        return false;
+                    }
                 }
             }
         }, true);
