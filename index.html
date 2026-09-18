@@ -105,17 +105,14 @@
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "CINE BOSS",
-        "alternateName": ["CineBoss", "CINE BOSS Streaming", "CINE BOSS Filmes", "CINE BOSS Series", "cine boss", "cineboss online"],
+        "alternateName": ["CineBoss", "CINE BOSS Streaming", "cineboss online"],
         "url": "https://cineboss.online",
-        "description": "Plataforma de streaming gratuita para assistir filmes, series, animes e TV ao vivo online em portugues. Catalogo completo com dublado e legendado em HD.",
+        "description": "Plataforma de streaming gratuita para assistir filmes, series, animes e TV ao vivo online em portugues.",
         "inLanguage": "pt-BR",
         "isAccessibleForFree": true,
         "potentialAction": {
             "@type": "SearchAction",
-            "target": {
-                "@type": "EntryPoint",
-                "urlTemplate": "https://cineboss.online/?search={search_term_string}"
-            },
+            "target": "https://cineboss.online/?search={search_term_string}",
             "query-input": "required name=search_term_string"
         },
         "publisher": {
@@ -127,55 +124,7 @@
                 "url": "https://cineboss.online/icon-512.png",
                 "width": 512,
                 "height": 512
-            },
-            "sameAs": []
-        },
-        "mainEntity": {
-            "@type": "ItemList",
-            "name": "Filmes e Series em Destaque",
-            "description": "Catalogo completo de filmes, series e animes disponiveis para assistir online",
-            "numberOfItems": 10000,
-            "itemListElement": [
-                {
-                    "@type": "ListItem",
-                    "position": 1,
-                    "item": {
-                        "@type": "Movie",
-                        "name": "Filmes Online Gratis",
-                        "description": "Assistir filmes online gratis em portugues. Acao, comedia, drama, terror, romance, ficcao cientifica e mais.",
-                        "genre": ["Acao", "Aventura", "Comedia", "Drama", "Ficcao Cientifica", "Terror", "Romance", "Animacao", "Suspense", "Crime"],
-                        "inLanguage": "pt-BR",
-                        "isAccessibleForFree": true,
-                        "productionCompany": "CINE BOSS"
-                    }
-                },
-                {
-                    "@type": "ListItem",
-                    "position": 2,
-                    "item": {
-                        "@type": "TVSeries",
-                        "name": "Series Online Gratis",
-                        "description": "Assistir series online gratis em portugues. Series populares, series recentes, series completas.",
-                        "genre": ["Drama", "Comedia", "Acao", "Suspense", "Ficcao Cientifica", "Fantasia", "Crime"],
-                        "inLanguage": "pt-BR",
-                        "isAccessibleForFree": true,
-                        "productionCompany": "CINE BOSS"
-                    }
-                },
-                {
-                    "@type": "ListItem",
-                    "position": 3,
-                    "item": {
-                        "@type": "TVSeries",
-                        "name": "Animes Online Gratis",
-                        "description": "Assistir animes online gratis dublado e legendado em portugues. One Piece, Naruto, Dragon Ball e mais.",
-                        "genre": ["Animacao", "Acao", "Aventura", "Comedia", "Drama", "Fantasia"],
-                        "inLanguage": "pt-BR",
-                        "isAccessibleForFree": true,
-                        "productionCompany": "CINE BOSS"
-                    }
-                }
-            ]
+            }
         }
     }
     </script>
@@ -197,7 +146,7 @@
                 "name": "O CINE BOSS e gratuito?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Sim! O CINE BOSS oferece streaming gratuito de filmes, series e animes em portugues. Tambem temos planos premium com beneficios extras."
+                    "text": "Sim! O CINE BOSS oferece streaming gratuito de filmes, series e animes em portugues."
                 }
             },
             {
@@ -213,7 +162,7 @@
                 "name": "Posso assistir no celular e Smart TV?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Sim! O CINE BOSS funciona em celulares, tablets, computadores e Smart TVs. A plataforma e responsiva e se adapta a qualquer tela."
+                    "text": "Sim! O CINE BOSS funciona em celulares, tablets, computadores e Smart TVs."
                 }
             },
             {
@@ -221,31 +170,7 @@
                 "name": "Quais generos de filmes estao disponiveis?",
                 "acceptedAnswer": {
                     "@type": "Answer",
-                    "text": "Temos filmes de acao, aventura, comedia, drama, ficcao cientifica, terror, romance, animacao, suspense, documentarios e muito mais."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Posso assistir series completas no CINE BOSS?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Sim! Todas as temporadas e episodios estao disponiveis. Assista series completas como Breaking Bad, Game of Thrones, Stranger Things e muito mais."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Tem anime dublado em portugues?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Sim! O CINE BOSS tem uma secao completa de animes com dublagem em portugues. One Piece, Naruto, Dragon Ball, Attack on Titan e centenas de outros."
-                }
-            },
-            {
-                "@type": "Question",
-                "name": "Preciso me cadastrar para assistir?",
-                "acceptedAnswer": {
-                    "@type": "Answer",
-                    "text": "Nao e obrigatorio se cadastrar para assistir. Porem, para ter acesso completo e sem anuncios, assine um dos nossos planos a partir de R$ 6,99."
+                    "text": "Temos filmes de acao, aventura, comedia, drama, ficcao cientifica, terror, romance, animacao, suspense e muito mais."
                 }
             }
         ]
