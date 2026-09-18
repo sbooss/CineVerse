@@ -540,7 +540,7 @@ body { padding-top: 36px; }
 .poster-placeholder {
     width: 100%; height: 100%;
     display: flex; align-items: center; justify-content: center;
-    background: var(--bg-card); color: var(--text-muted);
+    background: #1a1a2e; color: #555;
     font-size: 28px;
 }
 .card-rating {

@@ -42,7 +42,7 @@ function createCard(item) {
     var card = document.createElement('div');
     card.className = 'movie-card';
     var posterHTML = item.poster
-        ? '<img src="' + item.poster + '" alt="' + item.title + '" loading="lazy">'
+        ? '<img src="' + item.poster + '" alt="' + item.title + '" loading="lazy" onerror="this.outerHTML=\'<div class=poster-placeholder><i class=fas fa-film></i></div>\'">'
         : '<div class="poster-placeholder"><i class="fas fa-film"></i></div>';
     var year = item.releaseDate ? item.releaseDate.substring(0, 4) : '';
     var rating = item.rating ? (typeof item.rating === 'number' ? item.rating.toFixed(1) : item.rating) : '0';
@@ -145,7 +145,7 @@ function openDetailPage(item) {
 
     bg.style.backgroundImage = item.backdrop ? 'url(' + item.backdrop + ')' : 'none';
     poster.innerHTML = item.poster
-        ? '<img src="' + item.poster + '" alt="' + item.title + '">'
+        ? '<img src="' + item.poster + '" alt="' + item.title + '" onerror="this.outerHTML=\'<div class=poster-placeholder><i class=fas fa-film></i></div>\'">'
         : '<div class="poster-placeholder"><i class="fas fa-film"></i></div>';
     var rating = item.rating ? (typeof item.rating === 'number' ? item.rating.toFixed(1) : item.rating) : '0';
     var year = item.releaseDate ? item.releaseDate.substring(0, 4) : '';
