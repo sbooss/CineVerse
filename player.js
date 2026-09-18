@@ -156,6 +156,7 @@ class VideoPlayer {
             iframe.frameBorder = '0';
             iframe.allowFullscreen = true;
             iframe.allow = 'autoplay; encrypted-media; gyroscope; picture-in-picture; fullscreen';
+            iframe.sandbox = 'allow-scripts allow-same-origin allow-forms allow-presentation';
             iframe.className = 'video-iframe';
             iframe.loading = 'eager';
             iframe.style.opacity = '0';
