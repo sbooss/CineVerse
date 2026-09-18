@@ -2,6 +2,11 @@ const CONFIG = {
     EMBED: {
         PROVIDERS: [
             {
+                name: 'MegaEmbed',
+                movie: function(id) { return 'https://mgeb.top/embed/movie/' + id; },
+                tv: function(id, s, e) { return 'https://mgeb.top/embed/tv/' + id + '/' + s + '/' + e; }
+            },
+            {
                 name: 'Fembed',
                 movie: function(id) { return 'https://fembed.lol/filme/' + id; },
                 tv: function(id, s, e) { return 'https://fembed.lol/serie/' + id + '/' + s + '/' + e; }
