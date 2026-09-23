@@ -10,11 +10,6 @@ const CONFIG = {
                 name: 'Fembed',
                 movie: function(id) { return 'https://fembed.lol/filme/' + id; },
                 tv: function(id, s, e) { return 'https://fembed.lol/serie/' + id + '/' + s + '/' + e; }
-            },
-            {
-                name: 'CineSrc',
-                movie: function(id) { return 'https://cinesrc.st/embed/movie/' + id; },
-                tv: function(id, s, e) { return 'https://cinesrc.st/embed/tv/' + id + '?s=' + s + '&e=' + e; }
             }
         ]
     },

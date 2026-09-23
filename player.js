@@ -6,7 +6,10 @@ class VideoPlayer {
         this.backBtn = document.getElementById('playerBack');
         this.backBtn.addEventListener('click', () => this.close());
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape' && this.isOpen()) this.close();
+            if (e.key === 'Escape' && this.isOpen()) {
+                e.stopImmediatePropagation();
+                this.close();
+            }
         });
         this._popupObserver = null;
         this._messageHandler = null;
@@ -25,6 +28,8 @@ class VideoPlayer {
         this._touchHandler = function(e) {
             var t = e.target;
             var isUI = t.closest('#playerBack') ||
+                       t.closest('#playerBg') ||
+                       t.closest('.player-notice') ||
                        t.closest('.server-chip') ||
                        t.closest('.server-bar') ||
                        t.closest('#playerErrorBack') ||
@@ -48,22 +53,11 @@ class VideoPlayer {
             if (t && (t.tagName === 'A' || t.closest('a'))) {
                 var a = t.tagName === 'A' ? t : t.closest('a');
                 var href = a.href || '';
-                var adDomains = ['onclickperformance','acscdn','aclib','popads','clickadu','propellerads','adsterra','exoclick','hilltopads','monetag','evadav','richpush','popcash','poptm'];
+                var adDomains = ['onclickperformance','acscdn','aclib','popads','clickadu','propellerads','adsterra','exoclick','hilltopads','monetag','evadav','richpush','popcash','poptm','al5sm','llvpn'];
                 for (var i = 0; i < adDomains.length; i++) {
                     if (href.includes(adDomains[i])) {
                         e.preventDefault();
                         e.stopPropagation();
-                        return false;
-                    }
-                }
-                if (href && href !== '#' && !href.startsWith('javascript:')) {
-                    var isAd = false;
-                    for (var j = 0; j < adDomains.length; j++) {
-                        if (href.includes(adDomains[j])) { isAd = true; break; }
-                    }
-                    if (!isAd && (e.ctrlKey || e.metaKey || e.shiftKey || a.target === '_blank')) {
-                        e.preventDefault();
-                        window.open(href, '_self');
                         return false;
                     }
                 }
@@ -141,7 +135,8 @@ class VideoPlayer {
 
     close() {
         this.overlay.classList.remove('active');
-        document.body.style.overflow = '';
+        var detailOpen = document.getElementById('detailPage') && document.getElementById('detailPage').classList.contains('active');
+        if (!detailOpen) document.body.style.overflow = '';
         this._stopAntiAds();
         var iframes = this.wrapper.querySelectorAll('iframe');
         iframes.forEach(function(f) { try { f.src = 'about:blank'; f.remove(); } catch(ex) {} });

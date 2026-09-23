@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <title>CINE BOSS - Assistir Filmes e Series Online Gratis em Portugues | Streaming HD</title>
     <meta name="description" content="CINE BOSS: Assistir filmes, series, animes e TV ao vivo online gratis em portugues. Catalogo completo com dublado e legendado em HD. Streaming premium sem anuncios. Os melhores filmes de acao, comedia, drama, terror, romance e ficcao cientifica. Series populares como Breaking Bad, Game of Thrones, Stranger Things e mais.">
     <meta name="keywords" content="assistir filmes online, filmes gratis, series online, anime online, streaming gratis, filmes dublados, series legendadas, ver filmes, assistir series, cinema online, filmes HD, series HD, anime dublado, tv ao vivo, streaming pt-br, filmes em portugues, series em portugues, watch movies online, free streaming, CINE BOSS, cineboss, filme acao, filme comedia, filme drama, filme terror, serie netflix, serie hbo, anime one piece, anime naruto, assistir breaking bad, assistir game of throne, filme brasileiro, serie brasileira, cinema gratis, pipoca online, filmes 2024, filmes 2025, series recentes, lancamentos filmes, melhores filmes, melhores series">
@@ -72,7 +72,7 @@
     <link rel="dns-prefetch" href="https://api.themoviedb.org">
     <link rel="dns-prefetch" href="https://image.tmdb.org">
     <link rel="dns-prefetch" href="https://fembed.lol">
-    <link rel="dns-prefetch" href="https://cinesrc.st">
+    <link rel="dns-prefetch" href="https://mgeb.top">
     <link rel="dns-prefetch" href="https://fonts.googleapis.com">
     <link rel="dns-prefetch" href="https://fonts.gstatic.com">
     
@@ -80,7 +80,7 @@
     <link rel="preconnect" href="https://api.themoviedb.org" crossorigin>
     <link rel="preconnect" href="https://image.tmdb.org" crossorigin>
     <link rel="preconnect" href="https://fembed.lol" crossorigin>
-    <link rel="preconnect" href="https://cinesrc.st" crossorigin>
+    <link rel="preconnect" href="https://mgeb.top" crossorigin>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     
@@ -93,11 +93,9 @@
     <link rel="apple-touch-icon" sizes="512x512" href="icon-512.png">
     
     <!-- Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Sora:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <link rel="stylesheet" href="style.css?v=48">
+    <link rel="stylesheet" href="style.css?v=50">
     
     <!-- JSON-LD Structured Data -->
     <script type="application/ld+json">
@@ -226,16 +224,30 @@
 </head>
 <body>
 
-    <!-- NUCLEAR ANTI-ADS - Bloqueia popups/redirects, preserva UI do site -->
+    <!-- ANTI-ADS UNIFICADO - Bloqueia popups/redirects/domains, preserva UI -->
     <script>
     (function(){
         var deadFn = function(){ return null; };
         try { window.open = deadFn; Object.defineProperty(window,'open',{value:deadFn,writable:false,configurable:false}); } catch(e){}
 
+        var origAssign = window.location.assign;
+        var origReplace = window.location.replace;
+        var AD_DOMAINS = ['onclickperformance','acscdn','aclib','popads','clickadu','propellerads','adsterra','exoclick','hilltopads','monetag','evadav','richpush','popcash','poptm','cdnfacebook','sdkstream','al5sm','llvpn'];
+        function isAdUrl(u){ if(!u) return false; var l=(''+u).toLowerCase(); for(var i=0;i<AD_DOMAINS.length;i++){ if(l.indexOf(AD_DOMAINS[i])!==-1) return true; } return false; }
+
+        try {
+            window.location.assign = function(url){ if(!isAdUrl(url)) origAssign.call(window.location, url); };
+            window.location.replace = function(url){ if(!isAdUrl(url)) origReplace.call(window.location, url); };
+        } catch(e){}
+
         document.addEventListener('click', function(e){
             var t = e.target;
             if(t.style && t.style.position==='fixed' && parseInt(t.style.zIndex||0)>9000){
                 e.preventDefault(); e.stopPropagation(); t.remove(); return false;
+            }
+            if(t && (t.tagName === 'A' || t.closest('a'))){
+                var a = t.tagName === 'A' ? t : t.closest('a');
+                if(isAdUrl(a.href)){ e.preventDefault(); e.stopPropagation(); return false; }
             }
         }, true);
 
@@ -255,6 +267,9 @@
         }, true);
     })();
     </script>
+
+    <!-- SCROLL PROGRESS BAR -->
+    <div class="scroll-progress" aria-hidden="true"><div class="scroll-progress-bar" id="scrollProgressBar"></div></div>
 
     <!-- CINEMATIC POSTER BACKGROUND -->
     <div class="cinema-bg" id="cinemaBg">
@@ -401,7 +416,7 @@
             </div>
             <div class="detail-section" id="detailSimilarSection">
                 <h2 class="detail-section-title"><i class="fas fa-th-large"></i> Titulos Semelhantes</h2>
-                <div class="movies-row" id="detailSimilar"></div>
+                <div id="detailSimilar"></div>
             </div>
         </div>
     </div>
@@ -464,11 +479,12 @@
         if(!Array.from){Array.from=function(a){return Array.prototype.slice.call(a)}}
     })();
     </script>
-    <script src="config.js?v=49"></script>
-    <script src="tmdb.js?v=41"></script>
+    <script src="config.js?v=50"></script>
+    <script src="tmdb.js?v=42"></script>
     <script src="auth.js?v=41"></script>
-    <script src="player.js?v=49"></script>
-    <script src="app.js?v=45"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js" defer></script>
+    <script src="player.js?v=51"></script>
+    <script src="app.js?v=47"></script>
     <script>
         // CINEMATIC POSTER BACKGROUND
         (function(){
@@ -569,27 +585,18 @@
 
         // Handle payment success redirect
         (function() {
-            var params = new URLSearchParams(window.location.search);
-            if (params.get('payment') === 'success') {
+            var q = window.location.search || '';
+            if (q.indexOf('payment=success') !== -1) {
                 if (typeof auth !== 'undefined') {
                     auth.check().then(function() {
                         showToast('Pagamento confirmado! Assinatura ativada.');
                     });
                 }
-                window.history.replaceState({}, '', window.location.pathname);
             }
-            if (params.get('payment') === 'cancelled') {
-                showToast('Pagamento cancelado.');
-                window.history.replaceState({}, '', window.location.pathname);
-            }
-            if (params.get('payment') === 'failed') {
-                showToast('Pagamento falhou. Tente novamente.');
-                window.history.replaceState({}, '', window.location.pathname);
-            }
-            if (params.get('payment') === 'pending') {
-                showToast('Pagamento pendente. Aguarde a confirmacao.');
-                window.history.replaceState({}, '', window.location.pathname);
-            }
+            if (q.indexOf('payment=cancelled') !== -1) showToast('Pagamento cancelado.');
+            if (q.indexOf('payment=failed') !== -1) showToast('Pagamento falhou. Tente novamente.');
+            if (q.indexOf('payment=pending') !== -1) showToast('Pagamento pendente. Aguarde a confirmacao.');
+            if (q.indexOf('payment=') !== -1) window.history.replaceState({}, '', window.location.pathname);
         })();
     </script>
     <style>
@@ -641,61 +648,6 @@
     })();
     </script>
 
-    <!-- ANTI-ADS: Block popunders and redirects -->
-    <script>
-    (function() {
-        var deadFn = function() { return null; };
-        
-        window.open = deadFn;
-        try { Object.defineProperty(window, 'open', { value: deadFn, writable: false, configurable: false }); } catch(e) {}
-        
-        var origAssign = window.location.assign;
-        var origReplace = window.location.replace;
-        window.location.assign = function(url) { 
-            if(url && !url.includes('onclickperformance') && !url.includes('acscdn') && !url.includes('aclib') && !url.includes('popads')) {
-                origAssign.call(window.location, url); 
-            }
-        };
-        window.location.replace = function(url) { 
-            if(url && !url.includes('onclickperformance') && !url.includes('acscdn') && !url.includes('aclib') && !url.includes('popads')) {
-                origReplace.call(window.location, url); 
-            }
-        };
-        
-        var adDomains = ['onclickperformance','acscdn','aclib','popads','clickadu','propellerads','adsterra','exoclick','hilltopads','monetag','evadav','richpush','popcash','poptm','cdnfacebook','sdkstream'];
-        
-        document.addEventListener('click', function(e) {
-            var t = e.target;
-            if(t && (t.tagName === 'A' || t.closest('a'))) {
-                var a = t.tagName === 'A' ? t : t.closest('a');
-                var href = a.href || '';
-                for(var i=0; i<adDomains.length; i++) {
-                    if(href.includes(adDomains[i])) {
-                        e.preventDefault(); e.stopPropagation(); return false;
-                    }
-                }
-            }
-        }, true);
-        
-        document.addEventListener('click', function(e) {
-            var t = e.target;
-            if(t && (t.tagName === 'A' || t.closest('a'))) {
-                var a = t.tagName === 'A' ? t : t.closest('a');
-                var href = a.href || '';
-                if(href && href !== '#' && !href.startsWith('javascript:') && !href.includes('cineboss.online') && !href.includes('tmdb.org') && !href.includes('google')) {
-                    var isAd = false;
-                    for(var i=0; i<adDomains.length; i++) {
-                        if(href.includes(adDomains[i])) { isAd = true; break; }
-                    }
-                    if(!isAd && (e.ctrlKey || e.metaKey || e.shiftKey || a.target === '_blank')) {
-                        e.preventDefault();
-                        window.open(href, '_self');
-                        return false;
-                    }
-                }
-            }
-        }, true);
-    })();
-    </script>
+    <!-- ANTI-ADS: Protecao extra no player removida (unificada no topo) -->
 </body>
 </html>

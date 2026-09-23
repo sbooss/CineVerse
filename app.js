@@ -22,6 +22,14 @@ function toggleFavorite(item) {
 }
 
 /* ===================== HELPERS ===================== */
+function escapeHtml(s) {
+    var r = ('' + s);
+    r = r.split('&').join('&' + 'amp;');
+    r = r.split('<').join('&' + 'lt;');
+    r = r.split('>').join('&' + 'gt;');
+    r = r.split('"').join('&' + 'quot;');
+    return r;
+}
 function formatRuntime(min) {
     if (!min) return '';
     var h = Math.floor(min / 60), m = min % 60;
@@ -42,7 +50,7 @@ function createCard(item) {
     var card = document.createElement('div');
     card.className = 'movie-card';
     var posterHTML = item.poster
-        ? '<img src="' + item.poster + '" alt="' + item.title + '" loading="lazy" onerror="this.outerHTML=\'<div class=poster-placeholder><i class=fas fa-film></i></div>\'">'
+        ? '<img src="' + item.poster + '" alt="' + escapeHtml(item.title) + '" loading="lazy" onerror="this.outerHTML=\'<div class=poster-placeholder><i class=fas fa-film></i></div>\'">'
         : '<div class="poster-placeholder"><i class="fas fa-film"></i></div>';
     var year = item.releaseDate ? item.releaseDate.substring(0, 4) : '';
     var rating = item.rating ? (typeof item.rating === 'number' ? item.rating.toFixed(1) : item.rating) : '0';
@@ -61,7 +69,7 @@ function createCard(item) {
             '<div class="card-play"><div class="card-play-icon"><i class="fas fa-play"></i></div></div>' +
         '</div>' +
         '<div class="card-info">' +
-            '<div class="card-title">' + item.title + '</div>' +
+            '<div class="card-title">' + escapeHtml(item.title) + '</div>' +
             '<div class="card-year">' + year + '</div>' +
         '</div>';
     card.addEventListener('click', function(e) {
@@ -77,10 +85,45 @@ function createCard(item) {
 }
 
 function createRow(items, container) {
+    var wrap = document.createElement('div');
+    wrap.className = 'row-wrap';
     var row = document.createElement('div');
     row.className = 'movies-row';
     items.forEach(function(item) { row.appendChild(createCard(item)); });
-    container.appendChild(row);
+    var raf = window.requestAnimationFrame || function(cb) { return setTimeout(function() { cb(Date.now()); }, 16); };
+    var _animToken = 0;
+    function smoothScrollRow(amt) {
+        var token = ++_animToken;
+        var start = row.scrollLeft, target = start + amt, t0 = null;
+        function step(ts) {
+            if (token !== _animToken) return;
+            if (!t0) t0 = ts;
+            var p = Math.min(1, (ts - t0) / 420);
+            row.scrollLeft = start + (target - start) * (1 - Math.pow(1 - p, 3));
+            if (p < 1) raf(step);
+        }
+        raf(step);
+    }
+    var prev = document.createElement('button');
+    prev.className = 'row-arrow row-arrow-prev';
+    prev.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    prev.setAttribute('aria-label', 'Anterior');
+    prev.addEventListener('click', function(e) {
+        e.preventDefault(); e.stopPropagation();
+        smoothScrollRow(-Math.max(300, Math.floor(row.clientWidth * 0.85)));
+    });
+    var next = document.createElement('button');
+    next.className = 'row-arrow row-arrow-next';
+    next.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    next.setAttribute('aria-label', 'Proximo');
+    next.addEventListener('click', function(e) {
+        e.preventDefault(); e.stopPropagation();
+        smoothScrollRow(Math.max(300, Math.floor(row.clientWidth * 0.85)));
+    });
+    wrap.appendChild(prev);
+    wrap.appendChild(row);
+    wrap.appendChild(next);
+    container.appendChild(wrap);
 }
 
 function createSection(title, items, container) {
@@ -105,14 +148,14 @@ function setupHero(item) {
         '<div class="hero-bg" style="background-image:url(\'' + backdrop + '\')"></div>' +
         '<div class="hero-content">' +
             '<div class="hero-badge"><i class="fas fa-fire"></i> Destaque da Semana</div>' +
-            '<h1 class="hero-title">' + item.title + '</h1>' +
+            '<h1 class="hero-title">' + escapeHtml(item.title) + '</h1>' +
             '<div class="hero-meta">' +
                 '<div class="meta-item"><i class="fas fa-star"></i> ' + rating + '</div>' +
                 '<div class="meta-dot"></div>' +
                 '<div class="meta-item"><i class="fas fa-calendar"></i> ' + year + '</div>' +
                 (item.runtime ? '<div class="meta-dot"></div><div class="meta-item"><i class="fas fa-clock"></i> ' + formatRuntime(item.runtime) + '</div>' : '') +
             '</div>' +
-            '<p class="hero-desc">' + (item.overview || '') + '</p>' +
+            '<p class="hero-desc">' + escapeHtml(item.overview || '') + '</p>' +
             '<div class="hero-buttons">' +
                 '<button class="btn-primary" id="heroPlayBtn"><i class="fas fa-play"></i> Assistir Agora</button>' +
                 '<button class="btn-secondary" id="heroFavBtn"><i class="fas fa-heart"></i> ' + (isFavorite(item.id) ? 'Favoritado' : 'Favoritar') + '</button>' +
@@ -121,8 +164,8 @@ function setupHero(item) {
     main.appendChild(heroEl);
     document.getElementById('heroPlayBtn').addEventListener('click', function() { openDetailPage(heroData); });
     document.getElementById('heroFavBtn').addEventListener('click', function() {
-        toggleFavorite(heroData);
-        this.innerHTML = '<i class="fas fa-heart"></i> Favoritado';
+        var added = toggleFavorite(heroData);
+        this.innerHTML = '<i class="fas fa-heart"></i> ' + (added ? 'Favoritado' : 'Favoritar');
     });
 }
 
@@ -242,11 +285,11 @@ function loadEpisodes(item, seasonNum) {
                 '</div>' +
                 '<div class="detail-ep-info">' +
                     '<div class="detail-ep-top">' +
-                        '<div class="detail-ep-name">' + (ep.name || 'Episodio ' + ep.episode_number) + '</div>' +
+                        '<div class="detail-ep-name">' + escapeHtml(ep.name || 'Episodio ' + ep.episode_number) + '</div>' +
                         (ep.runtime ? '<div class="detail-ep-runtime">' + ep.runtime + 'min</div>' : '') +
                     '</div>' +
                     (ep.air_date ? '<div class="detail-ep-date">' + ep.air_date + '</div>' : '') +
-                    '<div class="detail-ep-desc">' + (ep.overview || 'Sem descricao.') + '</div>' +
+                    '<div class="detail-ep-desc">' + escapeHtml(ep.overview || 'Sem descricao.') + '</div>' +
                 '</div>';
             card.addEventListener('click', function() {
                 player.open({ id: item.id, title: item.title, mediaType: 'tv' }, seasonNum, ep.episode_number);
@@ -287,9 +330,18 @@ function loadHome() {
 
     sections.forEach(function(pair) {
         var title = pair[0], promise = pair[1];
+        var tl = title.toLowerCase();
+        var fbType = (tl.indexOf('serie') !== -1 || tl.indexOf('hoje') !== -1) ? 'tv' : 'movie';
         promise.then(function(items) {
             if (items && items.length > 0) createSection(title, shuffleArray(items), main);
-        }).catch(function() {});
+            else {
+                var fb = tmdb.fallbackList(fbType);
+                if (fb && fb.length) createSection(title, fb, main);
+            }
+        }).catch(function() {
+            var fb = tmdb.fallbackList(fbType);
+            if (fb && fb.length) createSection(title, fb, main);
+        });
     });
 }
 
@@ -341,7 +393,7 @@ function loadLiveTV(container) {
     CONFIG.IPTV.BRAZIL.forEach(function(ch) {
         var card = document.createElement('div');
         card.className = 'channel-card';
-        card.innerHTML = '<div class="channel-icon"><i class="fas fa-tv"></i></div><div><div class="channel-name">' + ch.name + '</div><div class="channel-live">AO VIVO</div></div>';
+        card.innerHTML = '<div class="channel-icon"><i class="fas fa-tv"></i></div><div><div class="channel-name">' + escapeHtml(ch.name) + '</div><div class="channel-live">AO VIVO</div></div>';
         card.addEventListener('click', function() { player.openLiveTV({ title: ch.name, streamUrl: ch.stream }); });
         grid.appendChild(card);
     });
@@ -355,7 +407,7 @@ function loadLiveTV(container) {
     CONFIG.IPTV.INTERNATIONAL.forEach(function(ch) {
         var card = document.createElement('div');
         card.className = 'channel-card';
-        card.innerHTML = '<div class="channel-icon" style="background:linear-gradient(135deg,#7b2fff,#ff2d78)"><i class="fas fa-globe"></i></div><div><div class="channel-name">' + ch.name + '</div><div class="channel-live">AO VIVO</div></div>';
+        card.innerHTML = '<div class="channel-icon" style="background:linear-gradient(135deg,#7b2fff,#ff2d78)"><i class="fas fa-globe"></i></div><div><div class="channel-name">' + escapeHtml(ch.name) + '</div><div class="channel-live">AO VIVO</div></div>';
         card.addEventListener('click', function() { player.openLiveTV({ title: ch.name, streamUrl: ch.stream }); });
         intlGrid.appendChild(card);
     });
@@ -451,9 +503,8 @@ var tvFocusableElements = [];
 
 function setupTVRemote() {
     // Detect if device is TV (Smart TV, Android TV, Fire TV, etc.)
-    var isTV = /Android|SmartTV|WebTV|TV|Opera|Bear Diploma|三星|LG|Tizen|webOS/i.test(navigator.userAgent) ||
-               (navigator.maxTouchPoints > 0 && window.innerWidth > 1000) ||
-               window.location.search.indexOf('tv') !== -1;
+    var isTV = /SmartTV|Smart-TV|WebTV|Tizen|webOS|HbbTV|NetCast|BRAVIA|FireTV|Android TV|GoogleTV|CrKey/i.test(navigator.userAgent) ||
+               window.location.search.indexOf('tv=1') !== -1;
 
     if (!isTV) return;
 
@@ -562,18 +613,7 @@ function setupTVRemote() {
             case 'OK':
             case ' ':
                 e.preventDefault();
-                if (current) {
-                    current.click();
-                    // If it's a card, open detail
-                    if (current.classList.contains('movie-card')) {
-                        var favBtn = current.querySelector('.card-fav');
-                        if (document.activeElement === favBtn) {
-                            favBtn.click();
-                        } else {
-                            current.click();
-                        }
-                    }
-                }
+                if (current) current.click();
                 return;
             case 'Backspace':
             case 'Back':
@@ -632,13 +672,81 @@ function setupTVRemote() {
     }, 5000);
 }
 
+/* ===================== SCROLL FX (PARALLAX / NAVBAR / PROGRESS) ===================== */
+var _scrollTick = false;
+function initScrollFX() {
+    var nav = document.getElementById('mainNav');
+    var bar = document.getElementById('scrollProgressBar');
+    function onScroll() {
+        if (_scrollTick) return;
+        _scrollTick = true;
+        var raf = window.requestAnimationFrame || function(cb) { return setTimeout(cb, 16); };
+        raf(function() {
+            var y = window.pageYOffset || document.documentElement.scrollTop || 0;
+            var h = (document.documentElement.scrollHeight || 0) - window.innerHeight;
+            if (bar) bar.style.width = (h > 0 ? Math.min(100, (y / h) * 100) : 0) + '%';
+            if (nav) {
+                if (y > 40) nav.classList.add('scrolled');
+                else nav.classList.remove('scrolled');
+            }
+            var heroBg = document.querySelector('.hero-bg');
+            if (heroBg && y < window.innerHeight * 1.4) {
+                if (y > 0) {
+                    heroBg.style.transform = 'translateY(' + (y * 0.3) + 'px) scale(' + (1 + y * 0.00008) + ')';
+                } else {
+                    heroBg.style.transform = '';
+                }
+            }
+            _scrollTick = false;
+        });
+    }
+    window.addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+}
+
+/* ===================== SCROLL REVEAL (INTERSECTION OBSERVER) ===================== */
+function initReveal() {
+    var revealEl = function(el) { el.classList.add('revealed'); };
+    var targets = document.querySelectorAll('.content-section, .hero');
+    var main = document.getElementById('mainContent');
+    var detail = document.getElementById('detailBody');
+    var watchContainers = [main, detail].filter(Boolean);
+
+    if (!('IntersectionObserver' in window)) {
+        for (var i = 0; i < targets.length; i++) revealEl(targets[i]);
+        var fbMo = new MutationObserver(function() {
+            var pending = document.querySelectorAll('.content-section:not(.revealed), .hero:not(.revealed)');
+            for (var k = 0; k < pending.length; k++) revealEl(pending[k]);
+        });
+        watchContainers.forEach(function(c) { fbMo.observe(c, { childList: true, subtree: true }); });
+        return;
+    }
+    var io = new IntersectionObserver(function(entries) {
+        for (var i = 0; i < entries.length; i++) {
+            if (entries[i].isIntersecting) {
+                revealEl(entries[i].target);
+                io.unobserve(entries[i].target);
+            }
+        }
+    }, { threshold: 0.06, rootMargin: '0px 0px -40px 0px' });
+    for (var j = 0; j < targets.length; j++) io.observe(targets[j]);
+    var mo = new MutationObserver(function() {
+        var pending = document.querySelectorAll('.content-section:not(.revealed), .hero:not(.revealed)');
+        for (var k = 0; k < pending.length; k++) io.observe(pending[k]);
+    });
+    watchContainers.forEach(function(c) { mo.observe(c, { childList: true, subtree: true }); });
+}
+
 /* ===================== INIT ===================== */
 document.addEventListener('DOMContentLoaded', function() {
+    document.documentElement.classList.add('js-reveal');
     setupNavigation();
     setupSearch();
     setupMobileMenu();
     setupTVRemote();
     loadHome();
+    initScrollFX();
+    initReveal();
 
     if (typeof auth !== 'undefined') {
         auth.onAuthChange(function(user, subscription, loggedIn) {
