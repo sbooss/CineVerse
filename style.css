@@ -1877,3 +1877,52 @@ html.js-reveal .content-section.revealed .movie-card {
 .movie-card:hover .card-poster {
     box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 168, 224, 0.25);
 }
+
+/* ===================== PLAYER LOADING OVERLAY ===================== */
+.player-loading-overlay {
+    position: absolute; inset: 0; z-index: 5;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 14px;
+    background: #000;
+}
+.player-loading-overlay .loading-spinner {
+    width: 44px; height: 44px;
+    border: 3px solid rgba(255, 255, 255, 0.08);
+    border-top-color: var(--accent-blue);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+.player-loading-text {
+    font-family: 'Sora', 'Inter', sans-serif;
+    font-size: 13px; font-weight: 600;
+    color: rgba(255, 255, 255, 0.55);
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+}
+
+/* ===================== TV PERFORMANCE MODE ===================== */
+html.tv-device .cinema-bg .poster-row,
+html.tv-device .cinema-bg .orb { display: none !important; }
+html.tv-device .navbar,
+html.tv-device .mobile-menu {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    background: rgba(5, 5, 8, 0.95) !important;
+}
+html.tv-device .hero-bg { transition: none !important; will-change: auto; }
+html.tv-device .hero-content { animation: none !important; }
+html.tv-device .hero,
+html.tv-device .content-section {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+}
+html.tv-device .content-section .movie-card { opacity: 1 !important; animation: none !important; }
+html.tv-device .movie-card,
+html.tv-device .card-poster,
+html.tv-device .card-poster img { transition: none !important; }
+html.tv-device .movie-card:hover { transform: none !important; }
+html.tv-device .scroll-progress { display: none !important; }
+html.tv-device .btn-primary,
+html.tv-device .detail-btn-play { box-shadow: none !important; }

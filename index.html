@@ -69,6 +69,15 @@
     <meta name="apple-touch-fullscreen" content="yes">
     
     <!-- DNS Prefetch for Performance -->
+    <script>
+    (function(){
+        var ua = navigator.userAgent || '';
+        var isTV = /SmartTV|Smart-TV|WebTV|Tizen|webOS|HbbTV|NetCast|BRAVIA|FireTV|Android TV|GoogleTV|CrKey/i.test(ua);
+        if (isTV || (window.location.search || '').indexOf('tv=1') !== -1) {
+            document.documentElement.classList.add('tv-device');
+        }
+    })();
+    </script>
     <link rel="dns-prefetch" href="https://api.themoviedb.org">
     <link rel="dns-prefetch" href="https://image.tmdb.org">
     <link rel="dns-prefetch" href="https://fembed.lol">
@@ -480,11 +489,11 @@
     })();
     </script>
     <script src="config.js?v=50"></script>
-    <script src="tmdb.js?v=42"></script>
+    <script src="tmdb.js?v=43"></script>
     <script src="auth.js?v=41"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js" defer></script>
-    <script src="player.js?v=51"></script>
-    <script src="app.js?v=47"></script>
+    <script src="player.js?v=52"></script>
+    <script src="app.js?v=48"></script>
     <script>
         // CINEMATIC POSTER BACKGROUND
         (function(){
@@ -570,12 +579,13 @@
                 }, 600);
             }
 
-            // Primary: wait for load
+            // Primary: wait for load (TV: mais rapido)
+            var bootDelay = document.documentElement.classList.contains('tv-device') ? 900 : 2200;
             if (document.readyState === 'complete') {
-                setTimeout(removeBoot, 2200);
+                setTimeout(removeBoot, bootDelay);
             } else {
                 window.addEventListener('load', function() {
-                    setTimeout(removeBoot, 2200);
+                    setTimeout(removeBoot, bootDelay);
                 });
             }
 

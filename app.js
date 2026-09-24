@@ -503,7 +503,8 @@ var tvFocusableElements = [];
 
 function setupTVRemote() {
     // Detect if device is TV (Smart TV, Android TV, Fire TV, etc.)
-    var isTV = /SmartTV|Smart-TV|WebTV|Tizen|webOS|HbbTV|NetCast|BRAVIA|FireTV|Android TV|GoogleTV|CrKey/i.test(navigator.userAgent) ||
+    var isTV = document.documentElement.classList.contains('tv-device') ||
+               /SmartTV|Smart-TV|WebTV|Tizen|webOS|HbbTV|NetCast|BRAVIA|FireTV|Android TV|GoogleTV|CrKey/i.test(navigator.userAgent) ||
                window.location.search.indexOf('tv=1') !== -1;
 
     if (!isTV) return;
@@ -677,6 +678,7 @@ var _scrollTick = false;
 function initScrollFX() {
     var nav = document.getElementById('mainNav');
     var bar = document.getElementById('scrollProgressBar');
+    var isTv = document.documentElement.classList.contains('tv-device');
     function onScroll() {
         if (_scrollTick) return;
         _scrollTick = true;
@@ -689,12 +691,14 @@ function initScrollFX() {
                 if (y > 40) nav.classList.add('scrolled');
                 else nav.classList.remove('scrolled');
             }
-            var heroBg = document.querySelector('.hero-bg');
-            if (heroBg && y < window.innerHeight * 1.4) {
-                if (y > 0) {
-                    heroBg.style.transform = 'translateY(' + (y * 0.3) + 'px) scale(' + (1 + y * 0.00008) + ')';
-                } else {
-                    heroBg.style.transform = '';
+            if (!isTv) {
+                var heroBg = document.querySelector('.hero-bg');
+                if (heroBg && y < window.innerHeight * 1.4) {
+                    if (y > 0) {
+                        heroBg.style.transform = 'translateY(' + (y * 0.3) + 'px) scale(' + (1 + y * 0.00008) + ')';
+                    } else {
+                        heroBg.style.transform = '';
+                    }
                 }
             }
             _scrollTick = false;

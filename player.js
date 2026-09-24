@@ -137,6 +137,7 @@ class VideoPlayer {
         this.overlay.classList.remove('active');
         var detailOpen = document.getElementById('detailPage') && document.getElementById('detailPage').classList.contains('active');
         if (!detailOpen) document.body.style.overflow = '';
+        if (this._serverLoadTimeout) { clearTimeout(this._serverLoadTimeout); this._serverLoadTimeout = null; }
         this._stopAntiAds();
         var iframes = this.wrapper.querySelectorAll('iframe');
         iframes.forEach(function(f) { try { f.src = 'about:blank'; f.remove(); } catch(ex) {} });
@@ -185,6 +186,14 @@ class VideoPlayer {
 
             serverBar.innerHTML = buildServerBar(index);
 
+            var isTv = document.documentElement.classList.contains('tv-device');
+
+            self.wrapper.innerHTML =
+                '<div class="player-loading-overlay" id="playerLoadingOverlay">' +
+                    '<div class="loading-spinner"></div>' +
+                    '<div class="player-loading-text">Carregando video</div>' +
+                '</div>';
+
             var iframe = document.createElement('iframe');
             iframe.src = url;
             iframe.frameBorder = '0';
@@ -193,12 +202,29 @@ class VideoPlayer {
             iframe.className = 'video-iframe';
             iframe.loading = 'eager';
             iframe.style.opacity = '0';
-            iframe.style.transition = 'opacity 0.3s';
+            iframe.style.transition = 'opacity 0.4s';
+
+            var settled = false;
+            var loadTimeout = null;
+
             iframe.onload = function() {
+                if (settled) return;
+                settled = true;
+                clearTimeout(loadTimeout);
+                self._serverLoadTimeout = null;
                 this.style.opacity = '1';
+                var loader = document.getElementById('playerLoadingOverlay');
+                if (loader) loader.remove();
             };
 
-            self.wrapper.innerHTML = '';
+            loadTimeout = setTimeout(function() {
+                if (settled || !self.isOpen()) return;
+                settled = true;
+                self._serverLoadTimeout = null;
+                tryProvider(index + 1);
+            }, isTv ? 14000 : 10000);
+            self._serverLoadTimeout = loadTimeout;
+
             self.wrapper.appendChild(iframe);
 
             serverBar.querySelectorAll('.server-chip').forEach(function(btn) {
@@ -224,6 +250,7 @@ class VideoPlayer {
 
     _switchServer(index) {
         if (!this._currentProviders || index < 0 || index >= this._currentProviders.length) return;
+        if (this._serverLoadTimeout) { clearTimeout(this._serverLoadTimeout); this._serverLoadTimeout = null; }
 
         var p = this._currentProviders[index];
         var url = this._currentType === 'tv'

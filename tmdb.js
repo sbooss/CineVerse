@@ -73,11 +73,17 @@ class TMDBAPI {
     }
 
     getPoster(path) {
-        return path ? `${this.imgURL}w500${path}` : null;
+        if (!path) return null;
+        var size = 'w500';
+        try { if (document.documentElement && document.documentElement.classList.contains('tv-device')) size = 'w342'; } catch (e) {}
+        return this.imgURL + size + path;
     }
 
     getBackdrop(path) {
-        return path ? `${this.imgURL}w1280${path}` : null;
+        if (!path) return null;
+        var size = 'w1280';
+        try { if (document.documentElement && document.documentElement.classList.contains('tv-device')) size = 'w780'; } catch (e) {}
+        return this.imgURL + size + path;
     }
 
     formatItem(item, mediaType) {
