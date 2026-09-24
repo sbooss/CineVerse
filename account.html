@@ -160,10 +160,38 @@
         .device-current-badge { font-size: 10px; color: var(--accent-blue); font-weight: 600; background: rgba(0,168,224,0.1); padding: 2px 8px; border-radius: 4px; }
         .devices-limit { font-size: 11px; color: var(--text-muted); margin-top: 12px; text-align: center; }
         .devices-limit i { color: var(--accent-gold); margin-right: 4px; }
+        .avatar-row { display: flex; align-items: center; gap: 20px; }
+        .avatar-big {
+            width: 72px; height: 72px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+        .avatar-big span {
+            font-family: 'Sora', sans-serif;
+            font-size: 26px; font-weight: 800;
+            color: #fff; letter-spacing: 1px;
+        }
+        .avatar-picker-info { flex: 1; min-width: 0; }
+        .avatar-name { font-size: 16px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+        .avatar-hint { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+        .avatar-options { display: flex; gap: 10px; flex-wrap: wrap; }
+        .avatar-swatch {
+            width: 32px; height: 32px; border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer; transition: all 0.2s;
+            flex-shrink: 0;
+        }
+        .avatar-swatch:hover { transform: scale(1.12); }
+        .avatar-swatch.selected {
+            border-color: #fff;
+            box-shadow: 0 0 0 2px var(--accent-blue), 0 0 12px rgba(0, 168, 224, 0.4);
+        }
         @media (max-width: 600px) {
             .info-grid { grid-template-columns: 1fr; }
             .device-item { flex-direction: column; align-items: flex-start; gap: 10px; }
             .device-remove { width: 100%; text-align: center; }
+            .avatar-row { flex-direction: column; align-items: flex-start; }
         }
     </style>
 
@@ -319,6 +347,17 @@
             content.innerHTML = `
                 <div class="account-card">
                     <div class="card-label">Dados Pessoais</div>
+                    <div class="avatar-row">
+                        <div class="avatar-big" id="avatarBig"></div>
+                        <div class="avatar-picker-info">
+                            <div class="avatar-name">${user.name}</div>
+                            <div class="avatar-hint">Escolha uma cor para o seu avatar</div>
+                            <div class="avatar-options" id="avatarOptions"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="account-card">
+                    <div class="card-label">Dados Pessoais</div>
                     <div class="info-grid">
                         <div class="info-item">
                             <div class="info-label">Nome</div>
@@ -338,6 +377,53 @@
                 ${devicesHTML}
                 <button class="logout-btn" onclick="logout()">Sair da conta</button>
             `;
+
+            setupAvatarPicker(user);
+        }
+
+        function getInitials(name) {
+            if (!name) return 'CB';
+            var parts = name.trim().split(/\s+/);
+            var first = parts[0].charAt(0) || '';
+            var last = parts.length > 1 ? parts[parts.length - 1].charAt(0) : '';
+            return ((first + last).toUpperCase()) || 'CB';
+        }
+        function getAvatarGradient(name) {
+            var hash = 0;
+            var s = name || 'cb';
+            for (var i = 0; i < s.length; i++) { hash = (hash * 31 + s.charCodeAt(i)) % 360; }
+            return 'linear-gradient(135deg, hsl(' + hash + ',70%,45%), hsl(' + ((hash + 40) % 360) + ',70%,35%))';
+        }
+        const AVATAR_COLORS = [
+            'linear-gradient(135deg, hsl(200,75%,45%), hsl(240,70%,35%))',
+            'linear-gradient(135deg, hsl(340,70%,45%), hsl(20,70%,35%))',
+            'linear-gradient(135deg, hsl(140,60%,40%), hsl(180,60%,30%))',
+            'linear-gradient(135deg, hsl(45,80%,50%), hsl(30,75%,40%))',
+            'linear-gradient(135deg, hsl(270,60%,50%), hsl(310,60%,40%))',
+            'linear-gradient(135deg, hsl(160,65%,40%), hsl(200,65%,30%))'
+        ];
+
+        function setupAvatarPicker(user) {
+            var big = document.getElementById('avatarBig');
+            var options = document.getElementById('avatarOptions');
+            if (!big || !options) return;
+            var saved = null;
+            try { saved = localStorage.getItem('cineboss_avatar_color'); } catch (e) {}
+            big.innerHTML = '<span>' + getInitials(user.name) + '</span>';
+            big.style.background = saved || getAvatarGradient(user.name);
+            AVATAR_COLORS.forEach(function(color) {
+                var b = document.createElement('button');
+                b.className = 'avatar-swatch' + (saved === color ? ' selected' : '');
+                b.style.background = color;
+                b.setAttribute('aria-label', 'Escolher cor');
+                b.addEventListener('click', function() {
+                    try { localStorage.setItem('cineboss_avatar_color', color); } catch (ex) {}
+                    options.querySelectorAll('.avatar-swatch').forEach(function(s) { s.classList.remove('selected'); });
+                    b.classList.add('selected');
+                    big.style.background = color;
+                });
+                options.appendChild(b);
+            });
         }
 
         window.removeDevice = async function(deviceId) {

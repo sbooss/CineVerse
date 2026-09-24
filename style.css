@@ -1864,6 +1864,77 @@ html.js-reveal .content-section.revealed .movie-card {
     .row-arrow { display: none; }
 }
 
+/* ===================== CONTINUE WATCHING ===================== */
+.cw-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 14px;
+}
+.cw-clear {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 5px 12px;
+    background: rgba(255, 68, 102, 0.06);
+    border: 1px solid rgba(255, 68, 102, 0.15);
+    border-radius: var(--radius-xs);
+    color: #ff4466; font-size: 11px; font-weight: 600;
+    transition: all var(--transition-fast);
+}
+.cw-clear:hover { background: rgba(255, 68, 102, 0.12); border-color: rgba(255, 68, 102, 0.3); }
+.cw-badge {
+    position: absolute; bottom: 8px; left: 8px;
+    padding: 3px 8px;
+    background: rgba(0, 168, 224, 0.85);
+    border-radius: var(--radius-xs);
+    font-size: 10px; font-weight: 700;
+    display: flex; align-items: center; gap: 4px;
+    color: #fff;
+    backdrop-filter: blur(8px);
+}
+.cw-badge i { font-size: 8px; }
+.cw-remove {
+    position: absolute; top: 8px; right: 8px;
+    width: 26px; height: 26px;
+    background: rgba(0, 0, 0, 0.7);
+    border-radius: 50%; display: flex;
+    align-items: center; justify-content: center;
+    font-size: 11px; color: rgba(255, 255, 255, 0.8);
+    opacity: 0; transform: scale(0.8);
+    transition: all var(--transition-fast);
+    backdrop-filter: blur(8px);
+}
+.movie-card:hover .cw-remove { opacity: 1; transform: scale(1); }
+.cw-remove:hover { background: #ff4466; color: #fff; }
+
+/* ===================== NAV BELL (NOTIFICACOES) ===================== */
+.nav-bell {
+    position: relative;
+    width: 34px; height: 34px;
+    display: none; align-items: center; justify-content: center;
+    border-radius: var(--radius-sm);
+    color: var(--text-muted); font-size: 14px;
+    transition: all var(--transition-fast);
+    flex-shrink: 0;
+}
+.nav-bell:hover { color: var(--text-secondary); background: rgba(255, 255, 255, 0.04); }
+.bell-dot {
+    display: none;
+    position: absolute; top: 5px; right: 6px;
+    width: 7px; height: 7px;
+    background: #ff4466;
+    border-radius: 50%;
+    box-shadow: 0 0 6px rgba(255, 68, 102, 0.6);
+}
+
+/* ===================== AVATAR COM INICIAIS ===================== */
+.user-avatar {
+    overflow: hidden;
+}
+.avatar-initials {
+    font-family: 'Sora', 'Inter', sans-serif;
+    font-size: 13px; font-weight: 800;
+    color: #fff; letter-spacing: 0.5px;
+    user-select: none;
+}
+
 /* ===================== CARD 3D POLISH ===================== */
 .movie-card {
     perspective: 700px;

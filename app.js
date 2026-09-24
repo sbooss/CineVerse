@@ -4,6 +4,7 @@
    ===================================================== */
 
 var FAV_KEY = 'cineboss_favorites';
+var CW_KEY = 'cineboss_continue';
 var currentFilter = 'all';
 var heroData = null;
 
@@ -19,6 +20,28 @@ function toggleFavorite(item) {
     if (idx >= 0) favs.splice(idx, 1); else favs.push(item);
     saveFavorites(favs);
     return idx < 0;
+}
+
+/* ===================== CONTINUE WATCHING ===================== */
+function getContinueWatching() {
+    try { return JSON.parse(localStorage.getItem(CW_KEY)) || []; } catch(e) { return []; }
+}
+function saveContinue(item) {
+    if (!item || !item.id) return;
+    var list = getContinueWatching();
+    var idx = list.findIndex(function(f) { return f.id === item.id; });
+    if (idx >= 0) list.splice(idx, 1);
+    item.timestamp = Date.now();
+    list.unshift(item);
+    if (list.length > 20) list = list.slice(0, 20);
+    localStorage.setItem(CW_KEY, JSON.stringify(list));
+}
+function removeContinue(id) {
+    var list = getContinueWatching().filter(function(f) { return f.id !== id; });
+    localStorage.setItem(CW_KEY, JSON.stringify(list));
+}
+function clearContinueWatching() {
+    localStorage.setItem(CW_KEY, '[]');
 }
 
 /* ===================== HELPERS ===================== */
@@ -77,6 +100,54 @@ function createCard(item) {
             e.stopPropagation();
             var added = toggleFavorite(item);
             card.querySelector('.card-fav').classList.toggle('active', added);
+            return;
+        }
+        openDetailPage(item);
+    });
+    return card;
+}
+
+/* ===================== CONTINUE WATCHING CARD ===================== */
+function createCardCW(item) {
+    var fav = isFavorite(item.id);
+    var card = document.createElement('div');
+    card.className = 'movie-card cw-card';
+    var posterHTML = item.poster
+        ? '<img src="' + item.poster + '" alt="' + escapeHtml(item.title) + '" loading="lazy" onerror="this.outerHTML=\'<div class=poster-placeholder><i class=fas fa-film></i></div>\'">'
+        : '<div class="poster-placeholder"><i class="fas fa-film"></i></div>';
+    var progressBadge = '';
+    if (item.mediaType === 'tv' || item.mediaType === 'anime') {
+        progressBadge = '<div class="cw-badge"><i class="fas fa-tv"></i> T' + (item.season || 1) + ' E' + (item.episode || 1) + '</div>';
+    } else {
+        progressBadge = '<div class="cw-badge"><i class="fas fa-play"></i> Assistindo</div>';
+    }
+    card.innerHTML =
+        '<div class="card-poster">' + posterHTML +
+            progressBadge +
+            '<button class="card-fav ' + (fav ? 'active' : '') + '"><i class="fas fa-heart"></i></button>' +
+            '<button class="cw-remove" title="Remover"><i class="fas fa-times"></i></button>' +
+            '<div class="card-play"><div class="card-play-icon"><i class="fas fa-play"></i></div></div>' +
+        '</div>' +
+        '<div class="card-info">' +
+            '<div class="card-title">' + escapeHtml(item.title) + '</div>' +
+            '<div class="card-year">Continuar de onde parou</div>' +
+        '</div>';
+    card.addEventListener('click', function(e) {
+        if (e.target.closest('.card-fav')) {
+            e.stopPropagation();
+            var added = toggleFavorite(item);
+            card.querySelector('.card-fav').classList.toggle('active', added);
+            return;
+        }
+        if (e.target.closest('.cw-remove')) {
+            e.stopPropagation();
+            removeContinue(item.id);
+            card.remove();
+            var remaining = getContinueWatching();
+            if (remaining.length === 0) {
+                var sec = document.querySelector('.continue-section');
+                if (sec) sec.remove();
+            }
             return;
         }
         openDetailPage(item);
@@ -210,6 +281,10 @@ function openDetailPage(item) {
 
     var type = item.mediaType || 'movie';
     document.getElementById('detailBtnPlay').onclick = function() {
+        saveContinue({
+            id: item.id, title: item.title, poster: item.poster, backdrop: item.backdrop,
+            mediaType: type, season: 1, episode: 1
+        });
         player.open({ id: item.id, title: item.title, mediaType: type }, 1, 1);
     };
     document.getElementById('detailBtnFav').onclick = function() {
@@ -292,6 +367,10 @@ function loadEpisodes(item, seasonNum) {
                     '<div class="detail-ep-desc">' + escapeHtml(ep.overview || 'Sem descricao.') + '</div>' +
                 '</div>';
             card.addEventListener('click', function() {
+                saveContinue({
+                    id: item.id, title: item.title, poster: item.poster, backdrop: item.backdrop,
+                    mediaType: 'tv', season: seasonNum, episode: ep.episode_number
+                });
                 player.open({ id: item.id, title: item.title, mediaType: 'tv' }, seasonNum, ep.episode_number);
             });
             grid.appendChild(card);
@@ -305,6 +384,26 @@ function loadEpisodes(item, seasonNum) {
 function loadHome() {
     var main = document.getElementById('mainContent');
     main.innerHTML = '';
+
+    var cw = getContinueWatching();
+    if (cw.length > 0) {
+        var cwSection = document.createElement('div');
+        cwSection.className = 'content-section continue-section';
+        cwSection.innerHTML = '<div class="section-header cw-header"><h2 class="section-title">Continuar Assistindo</h2><button class="cw-clear" id="cwClearBtn"><i class="fas fa-trash-alt"></i> Limpar</button></div>';
+        var wrap = document.createElement('div');
+        wrap.className = 'row-wrap';
+        var row = document.createElement('div');
+        row.className = 'movies-row';
+        cw.forEach(function(item) { row.appendChild(createCardCW(item)); });
+        wrap.appendChild(row);
+        cwSection.appendChild(wrap);
+        main.appendChild(cwSection);
+        cwSection.querySelector('#cwClearBtn').addEventListener('click', function() {
+            clearContinueWatching();
+            var sec = document.querySelector('.continue-section');
+            if (sec) sec.remove();
+        });
+    }
 
     tmdb.getHeroContent().then(function(hero) {
         if (hero) setupHero(hero);
@@ -343,6 +442,55 @@ function loadHome() {
             if (fb && fb.length) createSection(title, fb, main);
         });
     });
+
+    checkNewEpisodes();
+}
+
+/* ===================== NOTIFICACOES DE NOVOS EPISODIOS ===================== */
+function checkNewEpisodes() {
+    var tvIds = {};
+    getFavorites().forEach(function(f) { if ((f.mediaType === 'tv' || f.mediaType === 'anime') && f.id) tvIds[f.id] = f.title; });
+    getContinueWatching().forEach(function(f) { if ((f.mediaType === 'tv' || f.mediaType === 'anime') && f.id) tvIds[f.id] = f.title; });
+    var ids = Object.keys(tvIds).slice(0, 10);
+    if (ids.length === 0) return;
+    var news = [];
+    var pending = ids.length;
+    ids.forEach(function(id) {
+        tmdb.getDetails('tv', id).then(function(d) {
+            try {
+                if (d && d.last_episode_to_air && d.last_episode_to_air.air_date) {
+                    var key = 'cineboss_lastair_' + id;
+                    var stored = localStorage.getItem(key) || null;
+                    var current = d.last_episode_to_air.air_date;
+                    if (stored && current > stored) {
+                        news.push({
+                            id: id, title: tvIds[id], date: current,
+                            season: d.last_episode_to_air.season_number || 1,
+                            episode: d.last_episode_to_air.episode_number || 1
+                        });
+                    }
+                    localStorage.setItem(key, current);
+                }
+            } catch (e) {}
+            pending--;
+            if (pending === 0) showNewEpisodes(news);
+        }).catch(function() {
+            pending--;
+            if (pending === 0) showNewEpisodes(news);
+        });
+    });
+}
+
+function showNewEpisodes(news) {
+    if (!news || news.length === 0) return;
+    var bell = document.getElementById('navBell');
+    var dot = document.getElementById('bellDot');
+    if (bell) bell.style.display = 'flex';
+    if (dot) dot.style.display = 'block';
+    try { localStorage.setItem('cineboss_news', JSON.stringify(news)); } catch(e) {}
+    if (typeof showToast === 'function') {
+        showToast('Novo episodio de ' + news[0].title + ' (T' + news[0].season + ' E' + news[0].episode + ')!');
+    }
 }
 
 /* ===================== LOAD CATEGORY ===================== */
@@ -486,6 +634,21 @@ function setupMobileMenu() {
     document.getElementById('mobileMenu').addEventListener('click', function(e) {
         if (e.target === this) this.classList.remove('open');
     });
+    var bell = document.getElementById('navBell');
+    if (bell) {
+        bell.addEventListener('click', function(e) {
+            e.preventDefault();
+            var dot = document.getElementById('bellDot');
+            if (dot) dot.style.display = 'none';
+            var news = [];
+            try { news = JSON.parse(localStorage.getItem('cineboss_news')) || []; } catch (ex) {}
+            if (news.length > 0) {
+                showToast(news.map(function(n) { return n.title + ' (T' + n.season + ' E' + n.episode + ')'; }).join('  |  '));
+            } else {
+                showToast('Nenhuma novidade');
+            }
+        });
+    }
 }
 
 /* ===================== KEYBOARD ===================== */
@@ -741,6 +904,29 @@ function initReveal() {
     watchContainers.forEach(function(c) { mo.observe(c, { childList: true, subtree: true }); });
 }
 
+/* ===================== AVATAR ===================== */
+function getInitials(name) {
+    if (!name) return 'CB';
+    var parts = name.trim().split(/\s+/);
+    var first = parts[0].charAt(0) || '';
+    var last = parts.length > 1 ? parts[parts.length - 1].charAt(0) : '';
+    return ((first + last).toUpperCase()) || 'CB';
+}
+function getAvatarGradient(name) {
+    var hash = 0;
+    var s = name || 'cb';
+    for (var i = 0; i < s.length; i++) { hash = (hash * 31 + s.charCodeAt(i)) % 360; }
+    return 'linear-gradient(135deg, hsl(' + hash + ',70%,45%), hsl(' + ((hash + 40) % 360) + ',70%,35%))';
+}
+function applyUserAvatar(name) {
+    var avatarEl = document.getElementById('userAvatar');
+    if (!avatarEl) return;
+    var savedColor = null;
+    try { savedColor = localStorage.getItem('cineboss_avatar_color'); } catch (e) {}
+    avatarEl.innerHTML = '<span class="avatar-initials">' + getInitials(name) + '</span>';
+    avatarEl.style.background = savedColor || getAvatarGradient(name);
+}
+
 /* ===================== INIT ===================== */
 document.addEventListener('DOMContentLoaded', function() {
     document.documentElement.classList.add('js-reveal');
@@ -761,6 +947,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (authBtns) authBtns.classList.add('hidden');
                 if (userMenu) {
                     userMenu.classList.remove('hidden');
+                    applyUserAvatar(user.name);
                     var nameEl = document.getElementById('userName');
                     var subEl = document.getElementById('userSubStatus');
                     if (nameEl) nameEl.textContent = user.name;
