@@ -190,6 +190,43 @@
         .bar-subs { fill: #c9a54e; opacity: 0.9; }
         .bar-group:hover .bar-users, .bar-group:hover .bar-subs { opacity: 1; }
 
+        /* ===================== SPARKLINES KPI ===================== */
+        .kpi-spark { width: 100%; height: 34px; display: block; margin-top: 10px; }
+        .kpi-spark-bar { fill: var(--kpi-color, #00a8e0); opacity: 0.45; }
+        .kpi-spark-area { fill: var(--kpi-color, #00a8e0); opacity: 0.22; }
+        .kpi-spark-line { stroke: var(--kpi-color, #00a8e0); stroke-width: 1.5; fill: none; opacity: 0.9; }
+
+        /* ===================== DISTRIBUICAO (POWER BI) ===================== */
+        .distrib-grid { display: grid; grid-template-columns: 1fr 1.25fr; gap: 22px; margin-bottom: 22px; }
+        .distrib-grid .panel { margin-bottom: 0; }
+        .donut-wrap { display: flex; align-items: center; gap: 30px; flex-wrap: wrap; }
+        .donut-box { position: relative; width: 170px; height: 170px; flex-shrink: 0; }
+        .donut-box svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+        .donut-ring { fill: none; stroke: rgba(255,255,255,0.06); stroke-width: 22; }
+        .donut-seg { fill: none; stroke-width: 22; transition: stroke-dasharray 0.9s var(--ease-smooth); }
+        .donut-center {
+            position: absolute; inset: 0;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            pointer-events: none;
+        }
+        .donut-center .dc-value { font-family: 'Sora', sans-serif; font-size: 30px; font-weight: 700; line-height: 1; }
+        .donut-center .dc-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.6px; margin-top: 4px; }
+        .donut-legend { display: flex; flex-direction: column; gap: 13px; min-width: 190px; }
+        .dl-item { display: flex; align-items: center; gap: 10px; }
+        .dl-item .dl-swatch { width: 12px; height: 12px; border-radius: 4px; flex-shrink: 0; }
+        .dl-item .dl-name { font-size: 13px; color: #bbb; }
+        .dl-item .dl-val { font-size: 13px; font-weight: 700; color: #fff; margin-left: auto; font-family: 'Sora', sans-serif; }
+        .dl-item .dl-pct { font-size: 11px; color: #666; min-width: 34px; text-align: right; }
+
+        .dev-rows { display: flex; flex-direction: column; gap: 17px; margin-top: 8px; }
+        .dev-row { display: grid; grid-template-columns: 150px 1fr 44px; align-items: center; gap: 12px; }
+        .dev-label { font-size: 12.5px; color: #bbb; display: flex; align-items: center; gap: 8px; }
+        .dev-label i { color: #00a8e0; width: 15px; text-align: center; font-size: 13px; }
+        .dev-bar-track { height: 12px; background: rgba(255,255,255,0.05); border-radius: 6px; overflow: hidden; }
+        .dev-bar { height: 100%; border-radius: 6px; width: 0%; transition: width 0.9s var(--ease-smooth); }
+        .dev-val { font-size: 13px; font-weight: 700; color: #fff; text-align: right; font-family: 'Sora', sans-serif; }
+        .dev-empty { color: #666; font-size: 12.5px; padding: 12px 0; }
+
         /* ===================== QUICK LINKS ===================== */
         .quick-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
         .quick-link {
@@ -252,6 +289,10 @@
         @media (max-width: 1100px) {
             .kpi-grid { grid-template-columns: repeat(3, 1fr); }
         }
+        @media (max-width: 900px) {
+            .distrib-grid { grid-template-columns: 1fr; }
+            .dev-row { grid-template-columns: 120px 1fr 40px; }
+        }
         @media (max-width: 640px) {
             .admin-container { padding: 18px 12px; }
             .admin-header { padding: 16px 14px; }
@@ -313,6 +354,7 @@
                 <div class="kpi-label">Usuarios Totais</div>
                 <div class="kpi-value" id="kpiTotalUsers">--</div>
                 <div class="kpi-sub" id="kpiTotalUsersSub">&nbsp;</div>
+                <svg class="kpi-spark" id="sparkUsers" viewBox="0 0 120 34" preserveAspectRatio="none"></svg>
             </div>
             <div class="kpi-card" style="--kpi-color:#7b2fff">
                 <div class="kpi-top">
@@ -322,6 +364,7 @@
                 <div class="kpi-label">Novos (30 dias)</div>
                 <div class="kpi-value" id="kpiNewUsers">--</div>
                 <div class="kpi-sub">Cadastros no ultimo mes</div>
+                <svg class="kpi-spark" id="sparkNew" viewBox="0 0 120 34" preserveAspectRatio="none"></svg>
             </div>
             <div class="kpi-card" style="--kpi-color:#c9a54e">
                 <div class="kpi-top">
@@ -331,6 +374,7 @@
                 <div class="kpi-label">Assinaturas Ativas</div>
                 <div class="kpi-value" id="kpiActiveSubs">--</div>
                 <div class="kpi-sub" id="kpiActiveSubsSub">&nbsp;</div>
+                <svg class="kpi-spark" id="sparkSubs" viewBox="0 0 120 34" preserveAspectRatio="none"></svg>
             </div>
             <div class="kpi-card" style="--kpi-color:#4caf50">
                 <div class="kpi-top">
@@ -349,6 +393,7 @@
                 <div class="kpi-label">Receita Ativa</div>
                 <div class="kpi-value" id="kpiRevenue">--</div>
                 <div class="kpi-sub" id="kpiRevenueSub">&nbsp;</div>
+                <svg class="kpi-spark" id="sparkRev" viewBox="0 0 120 34" preserveAspectRatio="none"></svg>
             </div>
             <div class="kpi-card" style="--kpi-color:#00d4ff">
                 <div class="kpi-top">
@@ -370,6 +415,35 @@
                 </div>
             </div>
             <div class="chart-box" id="chartBox"><svg id="growthChart" viewBox="0 0 960 220" preserveAspectRatio="none"></svg></div>
+        </div>
+
+        <div class="distrib-grid">
+            <div class="panel">
+                <div class="panel-head">
+                    <div class="panel-title"><i class="fas fa-chart-pie"></i> Assinantes por Plano</div>
+                </div>
+                <div class="donut-wrap">
+                    <div class="donut-box">
+                        <svg viewBox="0 0 170 170">
+                            <circle class="donut-ring" cx="85" cy="85" r="60"></circle>
+                            <circle class="donut-seg" id="segMonthly" cx="85" cy="85" r="60" stroke="#00a8e0" stroke-dasharray="0 376.99" stroke-dashoffset="0"></circle>
+                            <circle class="donut-seg" id="segQuarterly" cx="85" cy="85" r="60" stroke="#c9a54e" stroke-dasharray="0 376.99" stroke-dashoffset="0"></circle>
+                        </svg>
+                        <div class="donut-center">
+                            <div class="dc-value" id="donutTotal">--</div>
+                            <div class="dc-label">Assinantes</div>
+                        </div>
+                    </div>
+                    <div class="donut-legend" id="donutLegend"></div>
+                </div>
+            </div>
+            <div class="panel">
+                <div class="panel-head">
+                    <div class="panel-title"><i class="fas fa-display"></i> Dispositivos Conectados</div>
+                    <div class="panel-tools muted" style="font-size:11.5px">sessoes ativas por tipo</div>
+                </div>
+                <div class="dev-rows" id="devRows"><div class="dev-empty">Carregando...</div></div>
+            </div>
         </div>
 
         <div class="panel">
@@ -583,6 +657,7 @@
             renderUsers();
             renderSessions(d.sessions || []);
             renderChart(d.series || {});
+            renderVisuals(d);
         }
 
         /* ===================== TABELA DE USUARIOS ===================== */
@@ -709,6 +784,102 @@
                 .catch(function() {})
                 .then(function() { window.location.href = '/'; });
         });
+
+        /* ===================== SPARKLINES + DONUT + DISPOSITIVOS ===================== */
+        function drawSparkBars(svgId, values) {
+            var svg = document.getElementById(svgId);
+            if (!svg) return;
+            var n = values.length || 1;
+            var max = Math.max(1, Math.max.apply(null, values));
+            var step = 120 / n;
+            var bw = Math.max(2, step * 0.55);
+            var html = '';
+            for (var i = 0; i < n; i++) {
+                var h = (values[i] / max) * 30;
+                if (values[i] > 0 && h < 2) h = 2;
+                html += '<rect class="kpi-spark-bar" x="' + (i * step + (step - bw) / 2).toFixed(1) + '" y="' + (34 - h).toFixed(1) + '" width="' + bw.toFixed(1) + '" height="' + h.toFixed(1) + '" rx="1"></rect>';
+            }
+            svg.innerHTML = html;
+        }
+        function drawSparkArea(svgId, values) {
+            var svg = document.getElementById(svgId);
+            if (!svg || values.length === 0) return;
+            var n = values.length;
+            var max = Math.max(1, Math.max.apply(null, values));
+            var step = 120 / (n - 1 || 1);
+            var pts = [];
+            for (var i = 0; i < n; i++) pts.push([(i * step).toFixed(1), (34 - (values[i] / max) * 30 - 2).toFixed(1)]);
+            var line = pts.map(function(p, i) { return (i === 0 ? 'M' : 'L') + p[0] + ',' + p[1]; }).join(' ');
+            var area = line + ' L120,34 L0,34 Z';
+            svg.innerHTML = '<path class="kpi-spark-area" d="' + area + '"></path><path class="kpi-spark-line" d="' + line + '"></path>';
+        }
+        function renderVisuals(d) {
+            var seriesUsers = (d.series && d.series.users) || [];
+            var seriesSubs = (d.series && d.series.subs) || [];
+            if (seriesUsers.length > 0) {
+                var cum = []; var acc = 0;
+                seriesUsers.forEach(function(v) { acc += v; cum.push(acc); });
+                drawSparkArea('sparkUsers', cum);
+            }
+            drawSparkBars('sparkNew', seriesUsers);
+            drawSparkBars('sparkSubs', seriesSubs);
+            drawSparkBars('sparkRev', seriesSubs);
+
+            var dist = d.distrib || {};
+            var m = dist.plans ? (dist.plans.monthly || 0) : 0;
+            var q = dist.plans ? (dist.plans.quarterly || 0) : 0;
+            var totalPlan = m + q;
+            var C = 2 * Math.PI * 60;
+            var mLen = totalPlan ? (m / totalPlan) * C : 0;
+            var qLen = totalPlan ? (q / totalPlan) * C : 0;
+            var segM = document.getElementById('segMonthly');
+            var segQ = document.getElementById('segQuarterly');
+            if (segM) segM.setAttribute('stroke-dasharray', mLen.toFixed(1) + ' ' + (C - mLen).toFixed(1));
+            if (segQ) {
+                segQ.setAttribute('stroke-dasharray', qLen.toFixed(1) + ' ' + (C - qLen).toFixed(1));
+                segQ.setAttribute('stroke-dashoffset', (-mLen).toFixed(1));
+            }
+            var donutTotal = document.getElementById('donutTotal');
+            if (donutTotal) donutTotal.textContent = totalPlan;
+
+            var legend = document.getElementById('donutLegend');
+            if (legend) {
+                legend.innerHTML =
+                    '<div class="dl-item"><span class="dl-swatch" style="background:#00a8e0"></span><span class="dl-name">Mensal</span><span class="dl-val">' + m + '</span><span class="dl-pct">' + (totalPlan ? Math.round(m / totalPlan * 100) : 0) + '%</span></div>' +
+                    '<div class="dl-item"><span class="dl-swatch" style="background:#c9a54e"></span><span class="dl-name">Trimestral</span><span class="dl-val">' + q + '</span><span class="dl-pct">' + (totalPlan ? Math.round(q / totalPlan * 100) : 0) + '%</span></div>' +
+                    '<div class="dl-item"><span class="dl-swatch" style="background:rgba(255,255,255,0.16)"></span><span class="dl-name">Sem plano</span><span class="dl-val">' + (dist.noPlanUsers || 0) + '</span><span class="dl-pct">usuarios</span></div>';
+            }
+
+            renderDevices(dist.devices || {});
+        }
+        function renderDevices(devices) {
+            var rows = document.getElementById('devRows');
+            if (!rows) return;
+            var icons = { 'Computador': 'fa-computer', 'Celular Android': 'fa-mobile-screen', 'iOS': 'fa-mobile-screen-button', 'Smart TV': 'fa-tv', 'Desconhecido': 'fa-circle-question' };
+            var colors = ['#00a8e0', '#c9a54e', '#7b2fff', '#4caf50', '#ffaa00', '#ff4444'];
+            var keys = Object.keys(devices);
+            keys.sort(function(a, b) { return devices[b] - devices[a]; });
+            if (keys.length === 0) {
+                rows.innerHTML = '<div class="dev-empty">Nenhuma sessao ativa no momento.</div>';
+                return;
+            }
+            var dmax = 1;
+            keys.forEach(function(k) { dmax = Math.max(dmax, devices[k]); });
+            rows.innerHTML = keys.map(function(k, i) {
+                var pct = Math.round(devices[k] / dmax * 100);
+                return '<div class="dev-row">' +
+                    '<div class="dev-label"><i class="fas ' + (icons[k] || 'fa-devices') + '"></i> ' + esc(k) + '</div>' +
+                    '<div class="dev-bar-track"><div class="dev-bar" style="background:' + colors[i % colors.length] + '" data-w="' + pct + '"></div></div>' +
+                    '<div class="dev-val">' + devices[k] + '</div>' +
+                '</div>';
+            }).join('');
+            requestAnimationFrame(function() {
+                requestAnimationFrame(function() {
+                    var bars = rows.querySelectorAll('.dev-bar');
+                    for (var i = 0; i < bars.length; i++) bars[i].style.width = bars[i].getAttribute('data-w') + '%';
+                });
+            });
+        }
 
         /* ===================== GRAFICO SVG ===================== */
         function renderChart(series) {

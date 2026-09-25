@@ -299,6 +299,12 @@ function renderHeroSlide(idx, animate) {
         content.classList.add('hero-swap');
     }
 
+    var nextItem = heroSlides[(idx + 1) % heroSlides.length];
+    if (nextItem && nextItem.backdrop) {
+        var pre = new Image();
+        pre.src = nextItem.backdrop;
+    }
+
     enrichHeroSlide(idx);
 }
 
@@ -370,6 +376,20 @@ function setupHero(items, slot) {
     heroEl.querySelector('#heroNext').addEventListener('click', function(e) { e.stopPropagation(); goHero(heroIndex + 1, true); });
     heroEl.addEventListener('mouseenter', function() { heroPaused = true; });
     heroEl.addEventListener('mouseleave', function() { heroPaused = false; });
+
+    var touchX = null;
+    heroEl.addEventListener('touchstart', function(e) {
+        if (e.touches.length === 1) touchX = e.touches[0].clientX;
+    }, { passive: true });
+    heroEl.addEventListener('touchend', function(e) {
+        if (touchX === null) return;
+        var dx = e.changedTouches[0].clientX - touchX;
+        if (Math.abs(dx) > 50) {
+            if (dx < 0) goHero(heroIndex + 1, true);
+            else goHero(heroIndex - 1, true);
+        }
+        touchX = null;
+    }, { passive: true });
 
     renderHeroSlide(0, false);
     startHeroCarousel();

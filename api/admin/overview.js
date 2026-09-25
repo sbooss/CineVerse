@@ -2,6 +2,7 @@ const {
     supabase, setCors, handleOptions,
     getToken, verifyToken, validateSession,
     destroySessionById,
+    checkRateLimit, recordRateLimitAttempt,
     jsonError
 } = require('../_lib/security');
 
@@ -57,6 +58,14 @@ module.exports = async function handler(req, res) {
     try {
         const auth = await requireAdmin(req, res);
         if (!auth) return;
+
+        res.setHeader('Cache-Control', 'no-store');
+
+        /* Rate limit anti-forca-bruta: 60 req/min por admin */
+        const rlKey = 'admin_ovw_' + auth.user.id;
+        const rl = await checkRateLimit(rlKey, 60, 1);
+        if (rl.blocked) return jsonError(res, 429, 'Muitas requisicoes. Tente novamente em instantes.');
+        recordRateLimitAttempt(rlKey);
 
         /* DELETE = encerrar uma sessao remota */
         if (req.method === 'DELETE') {
@@ -154,6 +163,17 @@ module.exports = async function handler(req, res) {
         users.forEach(u => { const k = dayKey(u.created_at); if (usersByDay[k] !== undefined) usersByDay[k]++; });
         subs.forEach(s => { const k = dayKey(s.created_at); if (subsByDay[k] !== undefined) subsByDay[k]++; });
 
+        /* distribuicoes para o dashboard */
+        const planCounts = { monthly: 0, quarterly: 0 };
+        activeSubs.forEach(s => { if (planCounts[s.plan] !== undefined) planCounts[s.plan]++; });
+        let noPlanUsers = 0;
+        userRows.forEach(u => { if (u.status === 'none') noPlanUsers++; });
+        const deviceCounts = {};
+        sessions.forEach(s => {
+            const dk = s.device_name || 'Desconhecido';
+            deviceCounts[dk] = (deviceCounts[dk] || 0) + 1;
+        });
+
         return res.status(200).json({
             kpis: {
                 totalUsers,
@@ -164,6 +184,11 @@ module.exports = async function handler(req, res) {
                 revenueActive: Math.round(revenueActive * 100) / 100,
                 revenue30d: Math.round(revenue30d * 100) / 100,
                 conversion: Math.round(conversion * 10) / 10
+            },
+            distrib: {
+                plans: planCounts,
+                noPlanUsers,
+                devices: deviceCounts
             },
             series: {
                 labels,
