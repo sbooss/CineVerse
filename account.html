@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -187,11 +187,48 @@
             border-color: #fff;
             box-shadow: 0 0 0 2px var(--accent-blue), 0 0 12px rgba(0, 168, 224, 0.4);
         }
+
+        /* ===================== FOOTER PADRAO ===================== */
+        .footer {
+            background: rgba(8, 8, 14, 0.6);
+            border-top: 1px solid var(--border-subtle);
+            padding: 32px 32px 20px;
+            width: 100%;
+            margin-top: 48px;
+        }
+        .footer-content {
+            max-width: 800px; margin: 0 auto;
+            display: flex; justify-content: space-between;
+            align-items: flex-start; gap: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            margin-bottom: 16px;
+        }
+        .footer-brand img.footer-logo {
+            height: 32px; border-radius: 6px;
+            display: block;
+        }
+        .footer-brand .footer-tagline {
+            font-size: 12px; color: var(--text-muted); margin-top: 8px;
+        }
+        .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+        .footer-links a {
+            font-size: 12px; color: var(--text-muted);
+            text-decoration: none; transition: color 0.2s;
+        }
+        .footer-links a:hover { color: var(--accent-blue); }
+        .footer-legal { text-align: right; }
+        .footer-legal p { font-size: 11px; color: var(--text-muted); margin-bottom: 4px; }
+        .footer-legal .footer-heart { color: var(--accent-gold); }
+
         @media (max-width: 600px) {
             .info-grid { grid-template-columns: 1fr; }
             .device-item { flex-direction: column; align-items: flex-start; gap: 10px; }
             .device-remove { width: 100%; text-align: center; }
             .avatar-row { flex-direction: column; align-items: flex-start; }
+            .footer { padding: 24px 20px 16px; }
+            .footer-content { flex-direction: column; gap: 16px; }
+            .footer-legal { text-align: left; }
         }
     </style>
 
@@ -238,7 +275,7 @@
             </div>
             <div class="footer-legal">
                 <p>2026 CINE BOSS. Todos os direitos reservados.</p>
-                <p>Feito com <i class="fas fa-heart" style="color: var(--gold);"></i> no Brasil.</p>
+                <p>Feito com <i class="fas fa-heart footer-heart"></i> no Brasil.</p>
             </div>
         </div>
     </footer>

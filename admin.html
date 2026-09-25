@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -14,6 +14,7 @@
             color: #fff;
             font-family: 'Inter', sans-serif;
             min-height: 100vh;
+            display: flex; flex-direction: column;
         }
         .admin-container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
         .admin-header {
@@ -85,6 +86,57 @@
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* ===================== FOOTER PADRAO ===================== */
+        .footer {
+            background: rgba(8, 8, 14, 0.6);
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 32px 32px 20px;
+            width: 100%;
+            margin-top: auto;
+        }
+        .footer-content {
+            max-width: 1200px; margin: 0 auto;
+            display: flex; justify-content: space-between;
+            align-items: flex-start; gap: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+            margin-bottom: 16px;
+        }
+        .footer-brand img.footer-logo {
+            height: 32px; border-radius: 6px;
+            display: block;
+        }
+        .footer-brand .footer-tagline {
+            font-size: 12px; color: #666; margin-top: 8px;
+        }
+        .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
+        .footer-links a {
+            font-size: 12px; color: #777;
+            text-decoration: none; transition: color 0.2s;
+        }
+        .footer-links a:hover { color: #00a8e0; }
+        .footer-legal { text-align: right; }
+        .footer-legal p { font-size: 11px; color: #666; margin-bottom: 4px; }
+        .footer-legal .footer-heart { color: #c9a54e; }
+        .admin-header h1 { font-family: 'Sora', sans-serif; font-size: 22px; }
+
+        /* ===================== RESPONSIVO ===================== */
+        @media (max-width: 600px) {
+            body { padding-top: 44px; }
+            .admin-container { padding: 20px 14px; }
+            .admin-header { padding: 16px 14px; flex-direction: column; gap: 10px; }
+            .admin-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
+            .stat-card { padding: 18px 14px; }
+            .stat-card .value { font-size: 22px; }
+            .quick-links { grid-template-columns: 1fr; }
+            .footer { padding: 24px 20px 16px; }
+            .footer-content { flex-direction: column; gap: 16px; }
+            .footer-legal { text-align: left; }
+        }
+        @media (max-width: 400px) {
+            .admin-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
 <body>
@@ -220,7 +272,7 @@
             </div>
             <div class="footer-legal">
                 <p>2026 CINE BOSS. Todos os direitos reservados.</p>
-                <p>Feito com <i class="fas fa-heart" style="color: var(--gold);"></i> no Brasil.</p>
+                <p>Feito com <i class="fas fa-heart footer-heart"></i> no Brasil.</p>
             </div>
         </div>
     </footer>

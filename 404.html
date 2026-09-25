@@ -151,6 +151,23 @@
             0% { transform: translateX(-100px); }
             100% { transform: translateX(calc(100vw + 100px)); }
         }
+
+        /* ===================== RESPONSIVO ===================== */
+        @media (max-width: 600px) {
+            .mario { font-size: 80px; }
+            .error-code { font-size: 68px; }
+            h1 { font-size: 18px; }
+            .subtitle { font-size: 13px; }
+            .status-msg { font-size: 12px; padding: 8px 14px; }
+            .btn { padding: 11px 22px; font-size: 13px; }
+            .actions { flex-direction: column; align-items: stretch; }
+            .floating-pipes { height: 50px; }
+            .sad-bubble { right: -10px; font-size: 12px; }
+        }
+        @media (max-width: 360px) {
+            .mario { font-size: 64px; }
+            .error-code { font-size: 54px; }
+        }
     </style>
 </head>
 <body>
