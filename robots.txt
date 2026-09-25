@@ -3,8 +3,9 @@ Allow: /
 Disallow: /api/
 Disallow: /account.html
 Disallow: /expired.html
+Disallow: /admin.html
 
 Sitemap: https://cineboss.online/sitemap.xml
 
 # CINE BOSS - Streaming Premium
-# Filmes, Series, Animes e TV Ao Vivo em Portugues
+# Filmes, Series, Novelas, Animes e TV Ao Vivo em Portugues

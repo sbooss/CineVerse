@@ -656,8 +656,8 @@ function showNewEpisodes(news) {
 }
 
 /* ===================== LOAD CATEGORY ===================== */
-function loadCategory(category) {
-    var main = document.getElementById('mainContent');
+function loadCategory(category, containerOverride) {
+    var main = containerOverride || document.getElementById('mainContent');
     main.innerHTML = '';
 
     if (category === 'favorites') {
@@ -680,14 +680,15 @@ function loadCategory(category) {
     }
 
     var promise;
+    var titles = { movie: 'Filmes Populares', tv: 'Series Populares', anime: 'Animes Populares', novelas: 'Novelas e Telenovelas' };
     switch (category) {
         case 'movie': promise = tmdb.getPopular('movie'); break;
         case 'tv': promise = tmdb.getPopular('tv'); break;
         case 'anime': promise = tmdb.getAnime(); break;
+        case 'novelas': promise = tmdb.getByGenre('tv', 10766); break;
         default: promise = tmdb.getTrending();
     }
     promise.then(function(items) {
-        var titles = { movie: 'Filmes Populares', tv: 'Series Populares', anime: 'Animes Populares' };
         if (items && items.length > 0) createSection(titles[category] || 'Conteudo', items, main);
     }).catch(function() {
         main.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Erro ao carregar</p></div>';
@@ -732,8 +733,15 @@ function setupSearch() {
     var input = document.getElementById('searchInput');
     var mobileInput = document.getElementById('mobileSearchInput');
     function doSearch(query) {
-        var main = document.getElementById('mainContent');
-        if (!query || query.length < 2) { loadHome(); return; }
+        var main = window.__catMain || document.getElementById('mainContent');
+        if (!query || query.length < 2) {
+            if (window.__catMain && window.CINEBOSS_CATEGORY) {
+                loadCategory(window.CINEBOSS_CATEGORY, window.__catMain);
+                return;
+            }
+            loadHome();
+            return;
+        }
         main.innerHTML = '<div class="loading"><div class="loading-spinner"></div></div>';
         tmdb.search(query).then(function(items) {
             main.innerHTML = '';
@@ -779,10 +787,14 @@ function setupNavigation() {
     document.querySelectorAll('.mobile-link').forEach(function(link) {
         link.addEventListener('click', function(e) { e.preventDefault(); navigate(link.dataset.category); });
     });
-    document.getElementById('logoLink').addEventListener('click', function(e) { e.preventDefault(); navigate('home'); });
-    document.getElementById('detailBack').addEventListener('click', closeDetailPage);
-    document.getElementById('playerBack').addEventListener('click', function() { player.close(); });
-    document.getElementById('playerBg').addEventListener('click', function() { player.close(); });
+    var logoLink = document.getElementById('logoLink');
+    if (logoLink) logoLink.addEventListener('click', function(e) { e.preventDefault(); navigate('home'); });
+    var detailBackEl = document.getElementById('detailBack');
+    if (detailBackEl) detailBackEl.addEventListener('click', closeDetailPage);
+    var playerBackEl = document.getElementById('playerBack');
+    if (playerBackEl) playerBackEl.addEventListener('click', function() { player.close(); });
+    var playerBgEl = document.getElementById('playerBg');
+    if (playerBgEl) playerBgEl.addEventListener('click', function() { player.close(); });
 }
 
 /* ===================== MOBILE MENU ===================== */
@@ -1099,7 +1111,26 @@ document.addEventListener('DOMContentLoaded', function() {
     setupSearch();
     setupMobileMenu();
     setupTVRemote();
-    loadHome();
+
+    try {
+        var qs = new URLSearchParams(window.location.search);
+        var searchParam = qs.get('search') || qs.get('q');
+        if (searchParam && searchParam.length >= 2) {
+            var searchInput = document.getElementById('searchInput');
+            if (searchInput) {
+                searchInput.value = searchParam;
+                searchInput.dispatchEvent(new Event('input'));
+            }
+        }
+    } catch (e) {}
+
+    if (window.CINEBOSS_CATEGORY) {
+        window.__catMain = document.getElementById('catResults');
+        if (!window.__catMain) window.__catMain = document.getElementById('mainContent');
+        loadCategory(window.CINEBOSS_CATEGORY, window.__catMain);
+    } else {
+        loadHome();
+    }
     initScrollFX();
     initReveal();
 
