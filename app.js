@@ -206,38 +206,173 @@ function createSection(title, items, container) {
     container.appendChild(section);
 }
 
-/* ===================== HERO ===================== */
-function setupHero(item) {
-    heroData = item;
-    var main = document.getElementById('mainContent');
-    var heroEl = document.createElement('div');
-    heroEl.className = 'hero';
-    var backdrop = item.backdrop || '';
+/* ===================== HERO CARROSSEL - DESTAQUE DA SEMANA ===================== */
+var heroSlides = [];
+var heroIndex = 0;
+var heroTimer = null;
+var heroPaused = false;
+var heroBgToggle = false;
+
+function stopHeroCarousel() {
+    if (heroTimer) { clearInterval(heroTimer); heroTimer = null; }
+}
+
+function startHeroCarousel() {
+    stopHeroCarousel();
+    if (heroSlides.length <= 1) return;
+    var isTv = document.documentElement.classList.contains('tv-device');
+    var interval = isTv ? 12000 : 8000;
+    heroTimer = setInterval(function() {
+        if (document.hidden || heroPaused) return;
+        goHero(heroIndex + 1, false);
+    }, interval);
+}
+
+function goHero(idx, userAction) {
+    if (heroSlides.length === 0) return;
+    var n = heroSlides.length;
+    heroIndex = ((idx % n) + n) % n;
+    renderHeroSlide(heroIndex, userAction);
+    if (userAction) startHeroCarousel();
+}
+
+function renderHeroMeta(item) {
+    var heroEl = document.getElementById('heroRoot');
+    if (!heroEl) return;
     var year = item.releaseDate ? item.releaseDate.substring(0, 4) : '';
     var rating = item.rating ? (typeof item.rating === 'number' ? item.rating.toFixed(1) : item.rating) : '0';
+    var metaHTML =
+        '<div class="meta-item"><i class="fas fa-star"></i> ' + rating + '</div>' +
+        '<div class="meta-dot"></div>' +
+        '<div class="meta-item"><i class="fas fa-calendar"></i> ' + year + '</div>';
+    if (item.runtime) {
+        metaHTML += '<div class="meta-dot"></div><div class="meta-item"><i class="fas fa-clock"></i> ' + formatRuntime(item.runtime) + '</div>';
+    } else if (item.seasons) {
+        metaHTML += '<div class="meta-dot"></div><div class="meta-item"><i class="fas fa-tv"></i> T' + (item.seasons || 1) + (item.episodes ? ' &middot; ' + item.episodes + ' eps' : '') + '</div>';
+    }
+    metaHTML += '<div class="meta-dot"></div><div class="meta-item hero-dub"><i class="fas fa-language"></i> DUBLADO PT-BR</div>';
+    heroEl.querySelector('#heroMeta').innerHTML = metaHTML;
+    heroEl.querySelector('#heroTitle').textContent = item.title || '';
+    heroEl.querySelector('#heroDesc').textContent = item.overview || 'Sinopse nao disponivel.';
+}
+
+function renderHeroSlide(idx, animate) {
+    var item = heroSlides[idx];
+    if (!item) return;
+    heroData = item;
+    var heroEl = document.getElementById('heroRoot');
+    if (!heroEl) return;
+
+    var a = heroEl.querySelector('.hero-bg-a');
+    var b = heroEl.querySelector('.hero-bg-b');
+    var showA = !heroBgToggle;
+    var incoming = showA ? a : b;
+    var outgoing = showA ? b : a;
+    incoming.style.backgroundImage = item.backdrop ? "url('" + item.backdrop + "')" : 'none';
+    incoming.classList.add('visible');
+    outgoing.classList.remove('visible');
+    heroBgToggle = showA;
+
+    renderHeroMeta(item);
+
+    var count = heroEl.querySelector('#heroCount');
+    if (count) count.textContent = (idx + 1) + ' / ' + heroSlides.length;
+
+    var favBtn = heroEl.querySelector('#heroFavBtn');
+    favBtn.innerHTML = '<i class="fas fa-heart"></i> ' + (isFavorite(item.id) ? 'Favoritado' : 'Favoritar');
+    heroEl.querySelector('#heroPlayBtn').onclick = function() { openDetailPage(item); };
+    favBtn.onclick = function() {
+        var added = toggleFavorite(item);
+        this.innerHTML = '<i class="fas fa-heart"></i> ' + (added ? 'Favoritado' : 'Favoritar');
+    };
+
+    var dots = heroEl.querySelectorAll('.hero-dot');
+    for (var i = 0; i < dots.length; i++) {
+        if (i === idx) dots[i].classList.add('active');
+        else dots[i].classList.remove('active');
+    }
+
+    if (animate) {
+        var content = heroEl.querySelector('.hero-content');
+        content.classList.remove('hero-swap');
+        void content.offsetWidth;
+        content.classList.add('hero-swap');
+    }
+
+    enrichHeroSlide(idx);
+}
+
+function enrichHeroSlide(idx) {
+    var item = heroSlides[idx];
+    if (!item || item._heroEnriched) return;
+    item._heroEnriched = true;
+    var type = item.mediaType || 'movie';
+    tmdb.getDetails(type, item.id).then(function(d) {
+        if (!d) return;
+        var f = tmdb.formatItem(d, type);
+        item.runtime = f.runtime || item.runtime || 0;
+        item.seasons = f.seasons || item.seasons || 0;
+        item.episodes = f.episodes || item.episodes || 0;
+        item.cast = (d.credits && d.credits.cast) ? d.credits.cast.slice(0, 5).map(function(c) { return c.name; }) : (item.cast || []);
+        if (heroData === item) renderHeroMeta(item);
+    }).catch(function() {});
+}
+
+function setupHero(items, slot) {
+    stopHeroCarousel();
+    var target = slot || document.getElementById('heroSlot');
+    if (!target) {
+        var main = document.getElementById('mainContent');
+        target = document.createElement('div');
+        target.id = 'heroSlot';
+        main.insertBefore(target, main.firstChild);
+    }
+    if (!items || items.length === 0) { target.style.display = 'none'; return; }
+
+    heroSlides = items;
+    heroIndex = 0;
+    heroBgToggle = false;
+    heroPaused = false;
+
+    var heroEl = document.createElement('div');
+    heroEl.className = 'hero';
+    heroEl.id = 'heroRoot';
     heroEl.innerHTML =
-        '<div class="hero-bg" style="background-image:url(\'' + backdrop + '\')"></div>' +
+        '<div class="hero-bg hero-bg-a"></div>' +
+        '<div class="hero-bg hero-bg-b"></div>' +
         '<div class="hero-content">' +
-            '<div class="hero-badge"><i class="fas fa-fire"></i> Destaque da Semana</div>' +
-            '<h1 class="hero-title">' + escapeHtml(item.title) + '</h1>' +
-            '<div class="hero-meta">' +
-                '<div class="meta-item"><i class="fas fa-star"></i> ' + rating + '</div>' +
-                '<div class="meta-dot"></div>' +
-                '<div class="meta-item"><i class="fas fa-calendar"></i> ' + year + '</div>' +
-                (item.runtime ? '<div class="meta-dot"></div><div class="meta-item"><i class="fas fa-clock"></i> ' + formatRuntime(item.runtime) + '</div>' : '') +
-            '</div>' +
-            '<p class="hero-desc">' + escapeHtml(item.overview || '') + '</p>' +
+            '<div class="hero-badge"><i class="fas fa-fire"></i> Destaque da Semana <span class="hero-badge-count" id="heroCount"></span></div>' +
+            '<h1 class="hero-title" id="heroTitle"></h1>' +
+            '<div class="hero-meta" id="heroMeta"></div>' +
+            '<p class="hero-desc" id="heroDesc"></p>' +
             '<div class="hero-buttons">' +
                 '<button class="btn-primary" id="heroPlayBtn"><i class="fas fa-play"></i> Assistir Agora</button>' +
-                '<button class="btn-secondary" id="heroFavBtn"><i class="fas fa-heart"></i> ' + (isFavorite(item.id) ? 'Favoritado' : 'Favoritar') + '</button>' +
+                '<button class="btn-secondary" id="heroFavBtn"><i class="fas fa-heart"></i> Favoritar</button>' +
             '</div>' +
-        '</div>';
-    main.appendChild(heroEl);
-    document.getElementById('heroPlayBtn').addEventListener('click', function() { openDetailPage(heroData); });
-    document.getElementById('heroFavBtn').addEventListener('click', function() {
-        var added = toggleFavorite(heroData);
-        this.innerHTML = '<i class="fas fa-heart"></i> ' + (added ? 'Favoritado' : 'Favoritar');
+        '</div>' +
+        '<button class="hero-nav hero-nav-prev" id="heroPrev" aria-label="Destaque anterior"><i class="fas fa-chevron-left"></i></button>' +
+        '<button class="hero-nav hero-nav-next" id="heroNext" aria-label="Proximo destaque"><i class="fas fa-chevron-right"></i></button>' +
+        '<div class="hero-dots" id="heroDots"></div>';
+    target.innerHTML = '';
+    target.appendChild(heroEl);
+
+    var dotsEl = heroEl.querySelector('#heroDots');
+    items.forEach(function(item, i) {
+        var d = document.createElement('button');
+        d.className = 'hero-dot' + (i === 0 ? ' active' : '');
+        d.type = 'button';
+        d.setAttribute('aria-label', 'Destaque ' + (i + 1) + ' de ' + items.length);
+        d.addEventListener('click', function(e) { e.stopPropagation(); goHero(i, true); });
+        dotsEl.appendChild(d);
     });
+
+    heroEl.querySelector('#heroPrev').addEventListener('click', function(e) { e.stopPropagation(); goHero(heroIndex - 1, true); });
+    heroEl.querySelector('#heroNext').addEventListener('click', function(e) { e.stopPropagation(); goHero(heroIndex + 1, true); });
+    heroEl.addEventListener('mouseenter', function() { heroPaused = true; });
+    heroEl.addEventListener('mouseleave', function() { heroPaused = false; });
+
+    renderHeroSlide(0, false);
+    startHeroCarousel();
 }
 
 /* ===================== DETAIL PAGE ===================== */
@@ -384,6 +519,13 @@ function loadEpisodes(item, seasonNum) {
 function loadHome() {
     var main = document.getElementById('mainContent');
     main.innerHTML = '';
+    stopHeroCarousel();
+    heroSlides = [];
+    heroPaused = false;
+
+    var heroSlot = document.createElement('div');
+    heroSlot.id = 'heroSlot';
+    main.appendChild(heroSlot);
 
     var cw = getContinueWatching();
     if (cw.length > 0) {
@@ -405,9 +547,9 @@ function loadHome() {
         });
     }
 
-    tmdb.getHeroContent().then(function(hero) {
-        if (hero) setupHero(hero);
-    });
+    tmdb.getHeroCarousel().then(function(items) {
+        if (items && items.length > 0) setupHero(items, heroSlot);
+    }).catch(function() {});
 
     var sections = [
         ['Filmes Populares', tmdb.getPopular('movie')],
@@ -855,12 +997,15 @@ function initScrollFX() {
                 else nav.classList.remove('scrolled');
             }
             if (!isTv) {
-                var heroBg = document.querySelector('.hero-bg');
-                if (heroBg && y < window.innerHeight * 1.4) {
-                    if (y > 0) {
-                        heroBg.style.transform = 'translateY(' + (y * 0.3) + 'px) scale(' + (1 + y * 0.00008) + ')';
-                    } else {
-                        heroBg.style.transform = '';
+                var heroBgs = document.querySelectorAll('.hero-bg');
+                for (var bi = 0; bi < heroBgs.length; bi++) {
+                    var heroBg = heroBgs[bi];
+                    if (heroBg && y < window.innerHeight * 1.4) {
+                        if (y > 0) {
+                            heroBg.style.transform = 'translateY(' + (y * 0.3) + 'px) scale(' + (1 + y * 0.00008) + ')';
+                        } else {
+                            heroBg.style.transform = '';
+                        }
                     }
                 }
             }

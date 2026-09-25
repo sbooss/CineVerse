@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="robots" content="noindex, nofollow">
-    <title>Painel Admin - CINE BOSS</title>
+    <title>Painel Executivo - CINE BOSS</title>
     <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -16,63 +16,197 @@
             min-height: 100vh;
             display: flex; flex-direction: column;
         }
-        .admin-container { max-width: 1200px; margin: 0 auto; padding: 30px 20px; }
+        .admin-container { max-width: 1280px; margin: 0 auto; padding: 24px 20px; width: 100%; }
+
+        /* ===================== HEADER EXECUTIVO ===================== */
         .admin-header {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 20px 30px;
-            background: linear-gradient(135deg, rgba(0,168,224,0.08), rgba(201,165,78,0.05));
-            border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 16px; margin-bottom: 30px;
+            gap: 16px; flex-wrap: wrap;
+            padding: 18px 24px;
+            background: linear-gradient(135deg, rgba(0,168,224,0.09), rgba(201,165,78,0.06));
+            border: 1px solid rgba(255,255,255,0.07);
+            border-radius: 16px; margin-bottom: 22px;
         }
-        .admin-header h1 {
-            font-family: 'Sora', sans-serif; font-size: 22px; font-weight: 700;
+        .ah-left { display: flex; align-items: center; gap: 14px; }
+        .ah-logo {
+            width: 42px; height: 42px; border-radius: 12px;
+            background: linear-gradient(135deg, rgba(0,168,224,0.2), rgba(201,165,78,0.2));
+            border: 1px solid rgba(255,255,255,0.1);
+            display: flex; align-items: center; justify-content: center;
+            color: #00a8e0; font-size: 18px;
+        }
+        .ah-title h1 {
+            font-family: 'Sora', sans-serif; font-size: 20px; font-weight: 700;
             background: linear-gradient(135deg, #00a8e0, #c9a54e);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .admin-header .badge {
-            background: linear-gradient(135deg, #c9a54e, #e8c86a);
-            color: #050508; padding: 6px 14px; border-radius: 20px;
-            font-size: 12px; font-weight: 700;
+        .ah-title .ah-sub { font-size: 11px; color: #777; margin-top: 2px; }
+        .ah-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .ah-clock {
+            font-family: 'Sora', sans-serif; font-size: 13px; color: #aaa;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.08);
+            padding: 8px 14px; border-radius: 10px;
+            display: flex; align-items: center; gap: 8px;
         }
-        .admin-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; margin-bottom: 30px; }
-        .stat-card {
+        .ah-clock i { color: #00a8e0; }
+        .badge-owner {
+            background: linear-gradient(135deg, #c9a54e, #e8c86a);
+            color: #050508; padding: 7px 14px; border-radius: 20px;
+            font-size: 11px; font-weight: 700; letter-spacing: 0.6px;
+        }
+        .ah-btn {
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 8px 16px; border-radius: 10px; cursor: pointer;
+            font-family: 'Inter', sans-serif; font-size: 12px; font-weight: 600;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(255,255,255,0.04); color: #ccc;
+            transition: all 0.25s ease;
+        }
+        .ah-btn:hover { border-color: rgba(0,168,224,0.5); color: #fff; background: rgba(0,168,224,0.08); }
+        .ah-btn.danger:hover { border-color: rgba(255,68,68,0.5); color: #ff4444; background: rgba(255,68,68,0.08); }
+
+        /* ===================== KPIs ===================== */
+        .kpi-grid {
+            display: grid; grid-template-columns: repeat(6, 1fr);
+            gap: 14px; margin-bottom: 22px;
+        }
+        .kpi-card {
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 14px; padding: 24px;
-            transition: all 0.3s ease;
+            border-radius: 14px; padding: 18px 16px;
+            transition: all 0.3s ease; position: relative; overflow: hidden;
         }
-        .stat-card:hover { border-color: rgba(0,168,224,0.3); transform: translateY(-2px); }
-        .stat-card .icon {
-            width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-            font-size: 18px; margin-bottom: 14px;
+        .kpi-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, transparent, var(--kpi-color, #00a8e0), transparent);
+            opacity: 0.6;
         }
-        .stat-card .icon.blue { background: rgba(0,168,224,0.15); color: #00a8e0; }
-        .stat-card .icon.gold { background: rgba(201,165,78,0.15); color: #c9a54e; }
-        .stat-card .icon.green { background: rgba(76,175,80,0.15); color: #4caf50; }
-        .stat-card .icon.purple { background: rgba(123,47,255,0.15); color: #7b2fff; }
-        .stat-card .label { font-size: 13px; color: #888; margin-bottom: 6px; }
-        .stat-card .value { font-size: 28px; font-weight: 700; font-family: 'Sora', sans-serif; }
-        .section-title {
-            font-family: 'Sora', sans-serif; font-size: 16px; font-weight: 600;
-            color: #ccc; margin-bottom: 16px; padding-bottom: 10px;
-            border-bottom: 1px solid rgba(255,255,255,0.06);
+        .kpi-card:hover { border-color: rgba(255,255,255,0.14); transform: translateY(-2px); }
+        .kpi-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+        .kpi-icon {
+            width: 36px; height: 36px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 15px;
+            background: color-mix(in srgb, var(--kpi-color, #00a8e0) 15%, transparent);
+            color: var(--kpi-color, #00a8e0);
         }
-        .quick-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; }
+        .kpi-delta { font-size: 11px; font-weight: 600; color: #4caf50; }
+        .kpi-delta.flat { color: #666; }
+        .kpi-label { font-size: 11px; color: #888; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 6px; }
+        .kpi-value { font-size: 26px; font-weight: 700; font-family: 'Sora', sans-serif; line-height: 1; }
+        .kpi-sub { font-size: 11px; color: #666; margin-top: 7px; }
+
+        /* ===================== CARDS / TABELAS ===================== */
+        .panel {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 14px; padding: 20px; margin-bottom: 22px;
+        }
+        .panel-head {
+            display: flex; align-items: center; justify-content: space-between;
+            gap: 12px; flex-wrap: wrap; margin-bottom: 16px;
+        }
+        .panel-title {
+            font-family: 'Sora', sans-serif; font-size: 15px; font-weight: 600; color: #ddd;
+            display: flex; align-items: center; gap: 9px;
+        }
+        .panel-title i { color: #00a8e0; font-size: 14px; }
+        .panel-tools { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+        .search-input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 9px; padding: 8px 12px 8px 30px;
+            color: #eee; font-size: 12.5px; width: 220px;
+            font-family: 'Inter', sans-serif;
+            outline: none; transition: border-color 0.2s;
+        }
+        .search-input:focus { border-color: rgba(0,168,224,0.5); }
+        .search-wrap { position: relative; }
+        .search-wrap i {
+            position: absolute; left: 10px; top: 50%; transform: translateY(-50%);
+            color: #666; font-size: 12px; pointer-events: none;
+        }
+        .filter-chips { display: flex; gap: 6px; flex-wrap: wrap; }
+        .chip {
+            padding: 7px 13px; border-radius: 8px; font-size: 11.5px; font-weight: 600;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.09);
+            color: #999; cursor: pointer; transition: all 0.2s;
+        }
+        .chip:hover { color: #fff; border-color: rgba(255,255,255,0.2); }
+        .chip.active { background: rgba(0,168,224,0.14); border-color: rgba(0,168,224,0.5); color: #00a8e0; }
+
+        .table-scroll { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; min-width: 720px; }
+        thead th {
+            text-align: left; font-size: 10.5px; font-weight: 600;
+            color: #777; text-transform: uppercase; letter-spacing: 0.7px;
+            padding: 10px 12px; border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        tbody td {
+            padding: 11px 12px; font-size: 13px; color: #bbb;
+            border-bottom: 1px solid rgba(255,255,255,0.045);
+            vertical-align: middle;
+        }
+        tbody tr { transition: background 0.15s; }
+        tbody tr:hover { background: rgba(255,255,255,0.03); }
+        .user-cell { display: flex; align-items: center; gap: 10px; }
+        .avatar {
+            width: 32px; height: 32px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 11px; font-weight: 700; color: #fff; flex-shrink: 0;
+        }
+        .user-cell .u-name { font-weight: 600; color: #e6e6e6; font-size: 13px; }
+        .user-cell .u-email { font-size: 11px; color: #777; }
+        .status-pill {
+            display: inline-flex; align-items: center; gap: 6px;
+            padding: 4px 10px; border-radius: 20px;
+            font-size: 10.5px; font-weight: 700; letter-spacing: 0.4px;
+        }
+        .status-pill::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+        .status-active { background: rgba(76,175,80,0.13); color: #4caf50; }
+        .status-none { background: rgba(255,255,255,0.06); color: #888; }
+        .status-expired { background: rgba(255,68,68,0.12); color: #ff4444; }
+        .status-other { background: rgba(255,170,0,0.12); color: #ffaa00; }
+        .plan-tag { font-size: 11px; color: #c9a54e; font-weight: 600; }
+        .muted { color: #666; font-size: 12px; }
+        .btn-revoke {
+            padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 600;
+            background: rgba(255,68,68,0.1); border: 1px solid rgba(255,68,68,0.3);
+            color: #ff4444; cursor: pointer; transition: all 0.2s;
+        }
+        .btn-revoke:hover { background: rgba(255,68,68,0.22); }
+        .empty-row td { text-align: center; color: #666; padding: 28px; font-size: 13px; }
+        .table-foot { font-size: 11px; color: #666; margin-top: 12px; }
+
+        /* ===================== GRAFICO ===================== */
+        .chart-box { position: relative; width: 100%; height: 220px; }
+        .chart-box svg { width: 100%; height: 100%; display: block; }
+        .chart-legend { display: flex; gap: 16px; align-items: center; }
+        .legend-item { display: flex; align-items: center; gap: 7px; font-size: 11.5px; color: #999; }
+        .legend-swatch { width: 10px; height: 10px; border-radius: 3px; }
+        .chart-grid { stroke: rgba(255,255,255,0.06); stroke-width: 1; }
+        .chart-label { fill: #666; font-size: 9px; font-family: 'Inter', sans-serif; }
+        .bar-users { fill: #00a8e0; opacity: 0.85; }
+        .bar-subs { fill: #c9a54e; opacity: 0.9; }
+        .bar-group:hover .bar-users, .bar-group:hover .bar-subs { opacity: 1; }
+
+        /* ===================== QUICK LINKS ===================== */
+        .quick-links { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
         .quick-link {
             display: flex; align-items: center; gap: 12px;
             background: rgba(255,255,255,0.03);
             border: 1px solid rgba(255,255,255,0.06);
-            border-radius: 12px; padding: 16px 18px;
+            border-radius: 12px; padding: 15px 17px;
             text-decoration: none; color: #ccc;
             transition: all 0.3s ease; cursor: pointer;
         }
         .quick-link:hover { border-color: rgba(0,168,224,0.4); color: #fff; background: rgba(0,168,224,0.05); }
-        .quick-link i { font-size: 20px; color: #00a8e0; width: 24px; text-align: center; }
-        .quick-link .ql-text { font-size: 14px; font-weight: 500; }
+        .quick-link i { font-size: 18px; color: #00a8e0; width: 24px; text-align: center; }
+        .quick-link .ql-text { font-size: 13.5px; font-weight: 500; }
         .quick-link .ql-desc { font-size: 11px; color: #666; }
-        .access-denied {
-            display: none; text-align: center; padding: 100px 20px;
-        }
+
+        /* ===================== ESTADOS ===================== */
+        .access-denied { display: none; text-align: center; padding: 100px 20px; }
         .access-denied i { font-size: 60px; color: #ff4444; margin-bottom: 20px; }
         .access-denied h2 { font-family: 'Sora', sans-serif; font-size: 24px; margin-bottom: 10px; }
         .access-denied p { color: #888; font-size: 14px; }
@@ -86,6 +220,8 @@
             animation: spin 0.8s linear infinite;
         }
         @keyframes spin { to { transform: rotate(360deg); } }
+        .skeleton { animation: pulse 1.4s ease-in-out infinite; }
+        @keyframes pulse { 0%,100% { opacity: 0.4; } 50% { opacity: 0.9; } }
 
         /* ===================== FOOTER PADRAO ===================== */
         .footer {
@@ -96,46 +232,39 @@
             margin-top: auto;
         }
         .footer-content {
-            max-width: 1200px; margin: 0 auto;
+            max-width: 1280px; margin: 0 auto;
             display: flex; justify-content: space-between;
             align-items: flex-start; gap: 24px;
             padding-bottom: 20px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.04);
             margin-bottom: 16px;
         }
-        .footer-brand img.footer-logo {
-            height: 32px; border-radius: 6px;
-            display: block;
-        }
-        .footer-brand .footer-tagline {
-            font-size: 12px; color: #666; margin-top: 8px;
-        }
+        .footer-brand img.footer-logo { height: 32px; border-radius: 6px; display: block; }
+        .footer-brand .footer-tagline { font-size: 12px; color: #666; margin-top: 8px; }
         .footer-links { display: flex; gap: 20px; flex-wrap: wrap; }
-        .footer-links a {
-            font-size: 12px; color: #777;
-            text-decoration: none; transition: color 0.2s;
-        }
+        .footer-links a { font-size: 12px; color: #777; text-decoration: none; transition: color 0.2s; }
         .footer-links a:hover { color: #00a8e0; }
         .footer-legal { text-align: right; }
         .footer-legal p { font-size: 11px; color: #666; margin-bottom: 4px; }
         .footer-legal .footer-heart { color: #c9a54e; }
-        .admin-header h1 { font-family: 'Sora', sans-serif; font-size: 22px; }
 
         /* ===================== RESPONSIVO ===================== */
-        @media (max-width: 600px) {
-            body { padding-top: 44px; }
-            .admin-container { padding: 20px 14px; }
-            .admin-header { padding: 16px 14px; flex-direction: column; gap: 10px; }
-            .admin-grid { grid-template-columns: 1fr 1fr; gap: 12px; }
-            .stat-card { padding: 18px 14px; }
-            .stat-card .value { font-size: 22px; }
-            .quick-links { grid-template-columns: 1fr; }
+        @media (max-width: 1100px) {
+            .kpi-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        @media (max-width: 640px) {
+            .admin-container { padding: 18px 12px; }
+            .admin-header { padding: 16px 14px; }
+            .ah-clock { display: none; }
+            .kpi-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .kpi-value { font-size: 21px; }
+            .panel { padding: 14px; }
+            .search-input { width: 100%; }
+            .search-wrap { width: 100%; }
+            .panel-tools { width: 100%; }
             .footer { padding: 24px 20px 16px; }
             .footer-content { flex-direction: column; gap: 16px; }
             .footer-legal { text-align: left; }
-        }
-        @media (max-width: 400px) {
-            .admin-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -146,6 +275,7 @@
         <i class="fas fa-heart" style="color:#050508;font-size:14px"></i>
     </a>
     <style>@keyframes goldShimmer{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}</style>
+
     <div class="loading-screen" id="loadingScreen">
         <div class="spinner"></div>
         <p style="color:#666;font-size:13px">Verificando acesso...</p>
@@ -159,59 +289,179 @@
 
     <div class="admin-container" id="adminContent" style="display:none">
         <div class="admin-header">
-            <h1><i class="fas fa-shield-alt"></i> Painel Admin</h1>
-            <span class="badge">OWNER</span>
-        </div>
-
-        <div class="admin-grid">
-            <div class="stat-card">
-                <div class="icon blue"><i class="fas fa-users"></i></div>
-                <div class="label">Usuarios Registrados</div>
-                <div class="value" id="totalUsers">--</div>
+            <div class="ah-left">
+                <div class="ah-logo"><i class="fas fa-shield-halved"></i></div>
+                <div class="ah-title">
+                    <h1>Painel Executivo</h1>
+                    <div class="ah-sub">CINE BOSS &middot; Visao geral do negocio em tempo real</div>
+                </div>
             </div>
-            <div class="stat-card">
-                <div class="icon gold"><i class="fas fa-crown"></i></div>
-                <div class="label">Assinaturas Ativas</div>
-                <div class="value" id="activeSubs">--</div>
-            </div>
-            <div class="stat-card">
-                <div class="icon green"><i class="fas fa-dollar-sign"></i></div>
-                <div class="label">Receita Mensal</div>
-                <div class="value" id="monthlyRevenue">--</div>
-            </div>
-            <div class="stat-card">
-                <div class="icon purple"><i class="fas fa-mobile-alt"></i></div>
-                <div class="label">Sessoes Ativas</div>
-                <div class="value" id="activeSessions">--</div>
+            <div class="ah-right">
+                <div class="ah-clock" id="adminClock"><i class="fas fa-clock"></i> --:--</div>
+                <span class="badge-owner">OWNER</span>
+                <button class="ah-btn" id="refreshBtn"><i class="fas fa-rotate"></i> Atualizar</button>
+                <button class="ah-btn danger" id="logoutBtn"><i class="fas fa-right-from-bracket"></i> Sair</button>
             </div>
         </div>
 
-        <div class="section-title"><i class="fas fa-link"></i> Links Rapidos</div>
-        <div class="quick-links">
-            <a href="https://analytics.google.com/analytics/web/#/p0/overview" target="_blank" class="quick-link">
-                <i class="fas fa-chart-line"></i>
-                <div><div class="ql-text">Google Analytics</div><div class="ql-desc">Ver metricas completas</div></div>
-            </a>
-            <a href="https://supabase.com/dashboard/project/dofzztjpqedsaazbvzfg" target="_blank" class="quick-link">
-                <i class="fas fa-database"></i>
-                <div><div class="ql-text">Supabase Dashboard</div><div class="ql-desc">Gerenciar banco de dados</div></div>
-            </a>
-            <a href="https://vercel.com/sbooss/cineboss" target="_blank" class="quick-link">
-                <i class="fas fa-cloud"></i>
-                <div><div class="ql-text">Vercel Dashboard</div><div class="ql-desc">Deploy e funcoes serverless</div></div>
-            </a>
-            <a href="https://github.com/sbooss/CineVerse" target="_blank" class="quick-link">
-                <i class="fab fa-github"></i>
-                <div><div class="ql-text">GitHub Repo</div><div class="ql-desc">Codigo fonte</div></div>
-            </a>
-            <a href="https://www.mercadopago.com.br/subscriptions" target="_blank" class="quick-link">
-                <i class="fas fa-credit-card"></i>
-                <div><div class="ql-text">Mercado Pago</div><div class="ql-desc">Assinaturas e pagamentos</div></div>
-            </a>
-            <a href="/donate.html" target="_blank" class="quick-link">
-                <i class="fas fa-heart"></i>
-                <div><div class="ql-text">Pagina de Doacoes</div><div class="ql-desc">Ver QR code PIX</div></div>
-            </a>
+        <div class="kpi-grid" id="kpiGrid">
+            <div class="kpi-card" style="--kpi-color:#00a8e0">
+                <div class="kpi-top">
+                    <div class="kpi-icon"><i class="fas fa-users"></i></div>
+                    <div class="kpi-delta" id="kpiUsersDelta">&nbsp;</div>
+                </div>
+                <div class="kpi-label">Usuarios Totais</div>
+                <div class="kpi-value" id="kpiTotalUsers">--</div>
+                <div class="kpi-sub" id="kpiTotalUsersSub">&nbsp;</div>
+            </div>
+            <div class="kpi-card" style="--kpi-color:#7b2fff">
+                <div class="kpi-top">
+                    <div class="kpi-icon"><i class="fas fa-user-plus"></i></div>
+                    <div class="kpi-delta" id="kpiNewUsersDelta">&nbsp;</div>
+                </div>
+                <div class="kpi-label">Novos (30 dias)</div>
+                <div class="kpi-value" id="kpiNewUsers">--</div>
+                <div class="kpi-sub">Cadastros no ultimo mes</div>
+            </div>
+            <div class="kpi-card" style="--kpi-color:#c9a54e">
+                <div class="kpi-top">
+                    <div class="kpi-icon"><i class="fas fa-crown"></i></div>
+                    <div class="kpi-delta" id="kpiSubsDelta">&nbsp;</div>
+                </div>
+                <div class="kpi-label">Assinaturas Ativas</div>
+                <div class="kpi-value" id="kpiActiveSubs">--</div>
+                <div class="kpi-sub" id="kpiActiveSubsSub">&nbsp;</div>
+            </div>
+            <div class="kpi-card" style="--kpi-color:#4caf50">
+                <div class="kpi-top">
+                    <div class="kpi-icon"><i class="fas fa-satellite-dish"></i></div>
+                    <div class="kpi-delta" id="kpiSessionsDelta">&nbsp;</div>
+                </div>
+                <div class="kpi-label">Sessoes Ativas</div>
+                <div class="kpi-value" id="kpiActiveSessions">--</div>
+                <div class="kpi-sub" id="kpiActiveSessionsSub">&nbsp;</div>
+            </div>
+            <div class="kpi-card" style="--kpi-color:#ffaa00">
+                <div class="kpi-top">
+                    <div class="kpi-icon"><i class="fas fa-dollar-sign"></i></div>
+                    <div class="kpi-delta" id="kpiRevenueDelta">&nbsp;</div>
+                </div>
+                <div class="kpi-label">Receita Ativa</div>
+                <div class="kpi-value" id="kpiRevenue">--</div>
+                <div class="kpi-sub" id="kpiRevenueSub">&nbsp;</div>
+            </div>
+            <div class="kpi-card" style="--kpi-color:#00d4ff">
+                <div class="kpi-top">
+                    <div class="kpi-icon"><i class="fas fa-percent"></i></div>
+                    <div class="kpi-delta" id="kpiConvDelta">&nbsp;</div>
+                </div>
+                <div class="kpi-label">Conversao</div>
+                <div class="kpi-value" id="kpiConversion">--</div>
+                <div class="kpi-sub">Assinantes / usuarios</div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-title"><i class="fas fa-chart-column"></i> Crescimento - Ultimos 30 dias</div>
+                <div class="chart-legend">
+                    <div class="legend-item"><span class="legend-swatch" style="background:#00a8e0"></span> Cadastros</div>
+                    <div class="legend-item"><span class="legend-swatch" style="background:#c9a54e"></span> Assinaturas</div>
+                </div>
+            </div>
+            <div class="chart-box" id="chartBox"><svg id="growthChart" viewBox="0 0 960 220" preserveAspectRatio="none"></svg></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-title"><i class="fas fa-users-gear"></i> Usuarios <span class="muted" id="usersCount"></span></div>
+                <div class="panel-tools">
+                    <div class="search-wrap">
+                        <i class="fas fa-search"></i>
+                        <input type="text" class="search-input" id="userSearch" placeholder="Buscar nome ou email..." autocomplete="off">
+                    </div>
+                    <div class="filter-chips" id="userFilters">
+                        <button class="chip active" data-filter="all">Todos</button>
+                        <button class="chip" data-filter="active">Com assinatura</button>
+                        <button class="chip" data-filter="none">Sem assinatura</button>
+                        <button class="chip" data-filter="expired">Expirados</button>
+                        <button class="chip" data-filter="new30">Novos 30d</button>
+                    </div>
+                </div>
+            </div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Status</th>
+                            <th>Plano</th>
+                            <th>Sessoes</th>
+                            <th>Cadastrado</th>
+                            <th>Ultimo acesso</th>
+                        </tr>
+                    </thead>
+                    <tbody id="usersTbody">
+                        <tr class="empty-row"><td colspan="6">Carregando usuarios...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-foot" id="usersFoot"></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-title"><i class="fas fa-tower-broadcast"></i> Sessoes Ativas <span class="muted" id="sessionsCount"></span></div>
+                <div class="panel-tools muted" style="font-size:11.5px"><i class="fas fa-circle" style="color:#4caf50;font-size:8px"></i> atualizadas agora</div>
+            </div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Usuario</th>
+                            <th>Dispositivo</th>
+                            <th>Navegador</th>
+                            <th>IP</th>
+                            <th>Conectado desde</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody id="sessionsTbody">
+                        <tr class="empty-row"><td colspan="6">Carregando sessoes...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-foot" id="sessionsFoot"></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title" style="margin-bottom:16px"><i class="fas fa-link"></i> Links Rapidos</div>
+            <div class="quick-links">
+                <a href="https://analytics.google.com/analytics/web/#/p0/overview" target="_blank" class="quick-link">
+                    <i class="fas fa-chart-line"></i>
+                    <div><div class="ql-text">Google Analytics</div><div class="ql-desc">Ver metricas completas</div></div>
+                </a>
+                <a href="https://supabase.com/dashboard/project/dofzztjpqedsaazbvzfg" target="_blank" class="quick-link">
+                    <i class="fas fa-database"></i>
+                    <div><div class="ql-text">Supabase Dashboard</div><div class="ql-desc">Gerenciar banco de dados</div></div>
+                </a>
+                <a href="https://vercel.com/sbooss/cineboss" target="_blank" class="quick-link">
+                    <i class="fas fa-cloud"></i>
+                    <div><div class="ql-text">Vercel Dashboard</div><div class="ql-desc">Deploy e funcoes serverless</div></div>
+                </a>
+                <a href="https://github.com/sbooss/CineVerse" target="_blank" class="quick-link">
+                    <i class="fab fa-github"></i>
+                    <div><div class="ql-text">GitHub Repo</div><div class="ql-desc">Codigo fonte</div></div>
+                </a>
+                <a href="https://www.mercadopago.com.br/subscriptions" target="_blank" class="quick-link">
+                    <i class="fas fa-credit-card"></i>
+                    <div><div class="ql-text">Mercado Pago</div><div class="ql-desc">Assinaturas e pagamentos</div></div>
+                </a>
+                <a href="/donate.html" target="_blank" class="quick-link">
+                    <i class="fas fa-heart"></i>
+                    <div><div class="ql-text">Pagina de Doacoes</div><div class="ql-desc">Ver QR code PIX</div></div>
+                </a>
+            </div>
         </div>
     </div>
 
@@ -219,7 +469,67 @@
     (function() {
         var ADMIN_EMAIL = 'williannunes31994@gmail.com';
         var API = window.location.origin + '/api';
+        var state = { users: [], sessions: [], filter: 'all', query: '' };
 
+        function esc(s) {
+            return ('' + s).split('&').join('&amp;').split('<').join('&lt;').split('>').join('&gt;').split('"').join('&quot;');
+        }
+        function initials(name) {
+            if (!name) return 'CB';
+            var parts = name.trim().split(/\s+/);
+            var f = (parts[0] || '').charAt(0) || '';
+            var l = parts.length > 1 ? (parts[parts.length - 1] || '').charAt(0) : '';
+            return (f + l).toUpperCase() || 'CB';
+        }
+        function avatarGradient(name) {
+            var hash = 0; var s = name || 'cb';
+            for (var i = 0; i < s.length; i++) hash = (hash * 31 + s.charCodeAt(i)) % 360;
+            return 'linear-gradient(135deg, hsl(' + hash + ',70%,45%), hsl(' + ((hash + 40) % 360) + ',70%,35%))';
+        }
+        function fmtDate(iso) {
+            if (!iso) return '-';
+            try {
+                var d = new Date(iso);
+                return d.toLocaleDateString('pt-BR') + ' ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            } catch (e) { return '-'; }
+        }
+        function fmtMoney(v) {
+            var parts = Number(v || 0).toFixed(2).split('.');
+            parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            return 'R$ ' + parts.join(',');
+        }
+        function countUp(el, target, prefix, suffix, decimals) {
+            prefix = prefix || ''; suffix = suffix || ''; decimals = decimals || 0;
+            function fmt(v) {
+                var s = Number(v).toFixed(decimals);
+                var parts = s.split('.');
+                parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                return prefix + parts.join(',') + suffix;
+            }
+            var start = null; var dur = 700;
+            function step(ts) {
+                if (!start) start = ts;
+                var p = Math.min(1, (ts - start) / dur);
+                var val = target * (1 - Math.pow(1 - p, 3));
+                el.textContent = fmt(val);
+                if (p < 1) requestAnimationFrame(step);
+                else el.textContent = fmt(target);
+            }
+            requestAnimationFrame(step);
+        }
+
+        /* ===================== CLOCK ===================== */
+        function tickClock() {
+            var el = document.getElementById('adminClock');
+            if (!el) return;
+            var now = new Date();
+            el.innerHTML = '<i class="fas fa-clock"></i> ' +
+                now.toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) +
+                ' &middot; ' + now.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+        setInterval(tickClock, 1000); tickClock();
+
+        /* ===================== AUTH ===================== */
         fetch(API + '/auth/me', { credentials: 'include' })
             .then(function(r) { return r.json(); })
             .then(function(d) {
@@ -229,31 +539,216 @@
                     return;
                 }
                 document.getElementById('adminContent').style.display = 'block';
-                loadStats();
+                loadOverview();
             })
             .catch(function() {
                 document.getElementById('loadingScreen').style.display = 'none';
                 document.getElementById('accessDenied').style.display = 'block';
             });
 
-        function loadStats() {
-            fetch(API + '/auth/me?stats=true', { credentials: 'include' })
-                .then(function(r) { return r.json(); })
-                .then(function(d) {
-                    if (d.totalUsers !== undefined) document.getElementById('totalUsers').textContent = d.totalUsers;
-                    if (d.activeSubs !== undefined) document.getElementById('activeSubs').textContent = d.activeSubs;
-                    if (d.activeSessions !== undefined) document.getElementById('activeSessions').textContent = d.activeSessions;
-                    if (d.monthlyRevenue !== undefined) document.getElementById('monthlyRevenue').textContent = d.monthlyRevenue;
-                })
+        /* ===================== LOAD OVERVIEW ===================== */
+        function loadOverview() {
+            fetch(API + '/admin/overview', { credentials: 'include' })
+                .then(function(r) { if (!r.ok) throw new Error(r.status); return r.json(); })
+                .then(function(d) { render(d); })
                 .catch(function() {
-                    document.getElementById('totalUsers').textContent = '--';
-                    document.getElementById('activeSubs').textContent = '--';
-                    document.getElementById('activeSessions').textContent = '--';
-                    document.getElementById('monthlyRevenue').textContent = '--';
+                    document.getElementById('usersTbody').innerHTML = '<tr class="empty-row"><td colspan="6">Erro ao carregar dados</td></tr>';
+                    document.getElementById('sessionsTbody').innerHTML = '<tr class="empty-row"><td colspan="6">Erro ao carregar dados</td></tr>';
                 });
         }
-    })();
 
+        function render(d) {
+            var k = d.kpis || {};
+
+            countUp(document.getElementById('kpiTotalUsers'), k.totalUsers || 0);
+            countUp(document.getElementById('kpiNewUsers'), k.newUsers30d || 0);
+            countUp(document.getElementById('kpiActiveSubs'), k.activeSubs || 0);
+            countUp(document.getElementById('kpiActiveSessions'), k.activeSessions || 0);
+            countUp(document.getElementById('kpiRevenue'), k.revenueActive || 0, 'R$ ', '', 2);
+            countUp(document.getElementById('kpiConversion'), k.conversion || 0, '', '%', 1);
+
+            document.getElementById('kpiUsersDelta').textContent = '+' + (k.newUsers30d || 0) + ' em 30d';
+            document.getElementById('kpiNewUsersDelta').textContent = k.newUsers30d > 0 ? 'crescendo' : 'estavel';
+            document.getElementById('kpiSubsDelta').textContent = '+' + (k.newSubs30d || 0) + ' em 30d';
+            document.getElementById('kpiSessionsDelta').textContent = k.activeSessions > 0 ? 'online agora' : 'nenhuma';
+            document.getElementById('kpiRevenueDelta').textContent = '+ ' + fmtMoney(k.revenue30d || 0) + ' em 30d';
+            document.getElementById('kpiConvDelta').textContent = (k.conversion || 0) >= 10 ? 'saudavel' : 'oportunidade';
+            document.getElementById('kpiTotalUsersSub').textContent = 'cadastros acumulados';
+            document.getElementById('kpiActiveSubsSub').textContent = 'planos vigentes';
+            document.getElementById('kpiActiveSessionsSub').textContent = 'dispositivos conectados';
+            document.getElementById('kpiRevenueSub').textContent = 'soma dos planos ativos';
+
+            state.users = d.users || [];
+            state.sessions = d.sessions || [];
+            renderUsers();
+            renderSessions(d.sessions || []);
+            renderChart(d.series || {});
+        }
+
+        /* ===================== TABELA DE USUARIOS ===================== */
+        function statusPill(status) {
+            if (status === 'active') return '<span class="status-pill status-active">ATIVO</span>';
+            if (status === 'expired') return '<span class="status-pill status-expired">EXPIRADO</span>';
+            if (status === 'pending') return '<span class="status-pill status-other">PENDENTE</span>';
+            return '<span class="status-pill status-none">SEM PLANO</span>';
+        }
+        function planLabel(plan) {
+            if (plan === 'monthly') return 'Mensal';
+            if (plan === 'quarterly') return 'Trimestral';
+            return plan ? esc(plan) : '-';
+        }
+        function renderUsers() {
+            var q = state.query.toLowerCase();
+            var nowIso = new Date().toISOString();
+            var d30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+            var rows = state.users.filter(function(u) {
+                if (q && (u.name || '').toLowerCase().indexOf(q) === -1 && (u.email || '').toLowerCase().indexOf(q) === -1) return false;
+                if (state.filter === 'active') return u.status === 'active';
+                if (state.filter === 'none') return u.status === 'none';
+                if (state.filter === 'expired') return u.status === 'expired';
+                if (state.filter === 'new30') return u.createdAt && u.createdAt >= d30;
+                return true;
+            });
+            document.getElementById('usersCount').textContent = '(' + rows.length + ' de ' + state.users.length + ')';
+            document.getElementById('usersFoot').textContent = rows.length === 0 ? 'Nenhum usuario encontrado.' : '';
+            var tb = document.getElementById('usersTbody');
+            if (rows.length === 0) {
+                tb.innerHTML = '<tr class="empty-row"><td colspan="6">Nenhum usuario encontrado.</td></tr>';
+                return;
+            }
+            tb.innerHTML = rows.map(function(u) {
+                return '<tr>' +
+                    '<td><div class="user-cell">' +
+                        '<div class="avatar" style="background:' + avatarGradient(u.name || u.email) + '">' + esc(initials(u.name || u.email)) + '</div>' +
+                        '<div><div class="u-name">' + esc(u.name || '-') + '</div><div class="u-email">' + esc(u.email || '') + '</div></div>' +
+                    '</div></td>' +
+                    '<td>' + statusPill(u.status) + '</td>' +
+                    '<td><span class="plan-tag">' + planLabel(u.plan) + '</span></td>' +
+                    '<td>' + (u.sessionCount || 0) + '</td>' +
+                    '<td class="muted">' + fmtDate(u.createdAt) + '</td>' +
+                    '<td class="muted">' + (u.lastAccess ? fmtDate(u.lastAccess) : 'nunca') + '</td>' +
+                '</tr>';
+            }).join('');
+        }
+
+        /* ===================== TABELA DE SESSOES ===================== */
+        function renderSessions(list) {
+            document.getElementById('sessionsCount').textContent = '(' + list.length + ')';
+            var tb = document.getElementById('sessionsTbody');
+            if (list.length === 0) {
+                tb.innerHTML = '<tr class="empty-row"><td colspan="6">Nenhuma sessao ativa no momento.</td></tr>';
+                document.getElementById('sessionsFoot').textContent = '';
+                return;
+            }
+            tb.innerHTML = list.map(function(s) {
+                return '<tr data-session="' + esc(s.id) + '">' +
+                    '<td><div class="user-cell">' +
+                        '<div class="avatar" style="background:' + avatarGradient(s.userName) + '">' + esc(initials(s.userName)) + '</div>' +
+                        '<div><div class="u-name">' + esc(s.userName) + '</div><div class="u-email">' + esc(s.userEmail || '') + '</div></div>' +
+                    '</div></td>' +
+                    '<td><i class="fas ' + (/TV|Smart/i.test(s.device) ? 'fa-tv' : (/Celular|Android|iOS/i.test(s.device) ? 'fa-mobile-screen' : 'fa-desktop')) + '" style="color:#00a8e0;margin-right:7px"></i>' + esc(s.device) + (s.os ? ' <span class="muted">&middot; ' + esc(s.os) + '</span>' : '') + '</td>' +
+                    '<td>' + esc(s.browser || '-') + '</td>' +
+                    '<td class="muted">' + esc(s.ip || '-') + '</td>' +
+                    '<td class="muted">' + fmtDate(s.createdAt) + '</td>' +
+                    '<td><button class="btn-revoke" data-revoke="' + esc(s.id) + '"><i class="fas fa-plug-circle-xmark"></i> Encerrar</button></td>' +
+                '</tr>';
+            }).join('');
+            document.getElementById('sessionsFoot').textContent = '';
+        }
+
+        document.getElementById('sessionsTbody').addEventListener('click', function(e) {
+            var btn = e.target.closest('[data-revoke]');
+            if (!btn) return;
+            var id = btn.getAttribute('data-revoke');
+            if (!confirm('Encerrar esta sessao? O dispositivo tera que entrar novamente.')) return;
+            btn.disabled = true; btn.textContent = 'Encerrando...';
+            fetch(API + '/admin/overview', {
+                method: 'DELETE',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ sessionId: id })
+            }).then(function(r) {
+                if (r.ok) {
+                    var row = btn.closest('tr');
+                    if (row) row.remove();
+                    state.sessions = state.sessions.filter(function(s) { return s.id !== id; });
+                    document.getElementById('sessionsCount').textContent = '(' + state.sessions.length + ')';
+                    var kpi = document.getElementById('kpiActiveSessions');
+                    var cur = parseInt(kpi.textContent, 10) || 0;
+                    kpi.textContent = Math.max(0, cur - 1);
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="fas fa-plug-circle-xmark"></i> Encerrar';
+                }
+            }).catch(function() {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plug-circle-xmark"></i> Encerrar';
+            });
+        });
+
+        /* ===================== FILTROS / BUSCA ===================== */
+        document.getElementById('userSearch').addEventListener('input', function() {
+            state.query = this.value.trim(); renderUsers();
+        });
+        document.getElementById('userFilters').addEventListener('click', function(e) {
+            var chip = e.target.closest('.chip');
+            if (!chip) return;
+            this.querySelectorAll('.chip').forEach(function(c) { c.classList.remove('active'); });
+            chip.classList.add('active');
+            state.filter = chip.getAttribute('data-filter');
+            renderUsers();
+        });
+        document.getElementById('refreshBtn').addEventListener('click', function() {
+            var i = this.querySelector('i');
+            i.classList.add('fa-spin');
+            loadOverview();
+            setTimeout(function() { i.classList.remove('fa-spin'); }, 900);
+        });
+        document.getElementById('logoutBtn').addEventListener('click', function() {
+            fetch(API + '/auth/logout', { method: 'POST', credentials: 'include' })
+                .catch(function() {})
+                .then(function() { window.location.href = '/'; });
+        });
+
+        /* ===================== GRAFICO SVG ===================== */
+        function renderChart(series) {
+            var svg = document.getElementById('growthChart');
+            var labels = series.labels || [];
+            var users = series.users || [];
+            var subs = series.subs || [];
+            if (!labels.length) { svg.innerHTML = ''; return; }
+
+            var W = 960, H = 220, padL = 30, padR = 8, padT = 12, padB = 22;
+            var chartW = W - padL - padR, chartH = H - padT - padB;
+            var max = Math.max(1, Math.max.apply(null, users.concat(subs)));
+            var step = chartW / labels.length;
+            var barW = Math.max(4, step * 0.32);
+
+            var html = '';
+            var gridLines = 4;
+            for (var g = 0; g <= gridLines; g++) {
+                var gy = padT + chartH - (chartH * g / gridLines);
+                var gv = Math.round(max * g / gridLines);
+                html += '<line class="chart-grid" x1="' + padL + '" y1="' + gy + '" x2="' + (W - padR) + '" y2="' + gy + '"></line>';
+                html += '<text class="chart-label" x="4" y="' + (gy + 3) + '">' + gv + '</text>';
+            }
+
+            for (var i = 0; i < labels.length; i++) {
+                var x = padL + i * step + step / 2;
+                var uh = (users[i] / max) * chartH;
+                var sh = (subs[i] / max) * chartH;
+                html += '<g class="bar-group">' +
+                    '<rect class="bar-users" x="' + (x - barW - 1) + '" y="' + (padT + chartH - uh) + '" width="' + barW + '" height="' + Math.max(uh, users[i] > 0 ? 2 : 0) + '" rx="2"><title>' + labels[i] + ': ' + users[i] + ' cadastros</title></rect>' +
+                    '<rect class="bar-subs" x="' + (x + 1) + '" y="' + (padT + chartH - sh) + '" width="' + barW + '" height="' + Math.max(sh, subs[i] > 0 ? 2 : 0) + '" rx="2"><title>' + labels[i] + ': ' + subs[i] + ' assinaturas</title></rect>' +
+                '</g>';
+                if (i % 5 === 0 || i === labels.length - 1) {
+                    var lbl = labels[i].substring(5).split('-').reverse().join('/');
+                    html += '<text class="chart-label" x="' + x + '" y="' + (H - 6) + '" text-anchor="middle">' + lbl + '</text>';
+                }
+            }
+            svg.innerHTML = html;
+        }
+    })();
     </script>
 
     <footer class="footer">

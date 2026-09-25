@@ -1777,6 +1777,82 @@ html.js-reveal .hero:not(.revealed) { opacity: 0; transform: translateY(30px); }
     from { opacity: 0; transform: translateY(36px); }
     to { opacity: 1; transform: translateY(0); }
 }
+
+/* ===================== HERO CARROSSEL (DESTAQUE DA SEMANA) ===================== */
+#heroSlot { width: 100%; }
+#heroSlot:empty { display: none; }
+.hero-bg-a, .hero-bg-b {
+    opacity: 0;
+    transition: opacity 1s var(--ease-smooth);
+}
+.hero-bg-a.visible, .hero-bg-b.visible { opacity: 1; }
+.hero-content.hero-swap { animation: heroSwap 0.45s var(--ease-out); }
+@keyframes heroSwap {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+.hero-badge-count {
+    margin-left: 8px;
+    padding-left: 8px;
+    border-left: 1px solid rgba(201, 165, 78, 0.35);
+    color: rgba(255, 255, 255, 0.75);
+    font-size: 10px;
+    letter-spacing: 1px;
+}
+.hero-badge { box-shadow: 0 0 22px rgba(201, 165, 78, 0.22); }
+.hero-dub { color: var(--accent-blue); }
+.hero-dub i { color: var(--accent-blue) !important; }
+.hero-nav {
+    position: absolute; top: 50%;
+    transform: translateY(-50%);
+    z-index: 3;
+    width: 46px; height: 46px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(5, 5, 8, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #fff; font-size: 16px;
+    cursor: pointer;
+    opacity: 0;
+    transition: opacity 0.3s var(--ease-smooth), background 0.25s var(--ease-smooth), border-color 0.25s var(--ease-smooth);
+}
+.hero:hover .hero-nav, .hero-nav:focus-visible { opacity: 1; }
+.hero-nav:hover {
+    background: rgba(0, 168, 224, 0.85);
+    border-color: transparent;
+}
+.hero-nav-prev { left: 18px; }
+.hero-nav-next { right: 18px; }
+.hero-dots {
+    position: absolute;
+    bottom: 26px; right: 40px;
+    display: flex; align-items: center; gap: 8px;
+    z-index: 3;
+}
+.hero-dot {
+    width: 8px; height: 8px;
+    border-radius: 4px;
+    border: none;
+    background: rgba(255, 255, 255, 0.3);
+    cursor: pointer;
+    padding: 0;
+    transition: all 0.3s var(--ease-smooth);
+}
+.hero-dot:hover { background: rgba(255, 255, 255, 0.6); }
+.hero-dot.active {
+    width: 22px;
+    background: var(--accent-gold);
+}
+@media (max-width: 640px) {
+    .hero-nav { opacity: 0.75; width: 38px; height: 38px; font-size: 14px; }
+    .hero-nav-prev { left: 8px; }
+    .hero-nav-next { right: 8px; }
+    .hero-dots { bottom: 14px; right: 16px; }
+}
+html.tv-device .hero-nav { opacity: 1; }
+html.tv-device .hero-bg-a, html.tv-device .hero-bg-b { transition: none !important; }
+html.tv-device .hero-content.hero-swap { animation: none !important; }
+
 .btn-primary {
     background: linear-gradient(135deg, var(--accent-blue), #0077b3);
     box-shadow: 0 4px 20px rgba(0, 168, 224, 0.25);

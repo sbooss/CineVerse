@@ -189,6 +189,28 @@ class TMDBAPI {
         return heroItem;
     }
 
+    async getHeroCarousel() {
+        var items = null;
+        try { items = await this.getTrending('all', 'week'); } catch (e) {}
+        if (!items || items.length === 0) items = this.fallbackList('movie');
+        if (!items || items.length === 0) items = this.fallbackList('tv');
+        if (!items || items.length === 0) {
+            var fb = this.fallbackData.movies[0];
+            return [this.formatItem(fb, 'movie')];
+        }
+        var withBg = items.filter(function(i) { return i && i.backdrop; });
+        if (withBg.length === 0) withBg = items;
+        var picked = [];
+        var seen = {};
+        for (var i = 0; i < withBg.length && picked.length < 6; i++) {
+            var key = (withBg[i].mediaType || 'movie') + '_' + withBg[i].id;
+            if (seen[key]) continue;
+            seen[key] = true;
+            picked.push(withBg[i]);
+        }
+        return picked;
+    }
+
     fallbackList(type) {
         const key = type === 'movie' ? 'movies' : 'tv';
         const items = [...this.fallbackData[key]];
