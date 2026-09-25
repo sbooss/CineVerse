@@ -92,25 +92,34 @@ class AuthManager {
 
     async requireAuth() {
         if (!this.checked) await this.check();
-        if (!this.loggedIn) { this.showRegister(); return false; }
+        if (!this.loggedIn) { this.showAuthModal('Crie sua conta para continuar.'); return false; }
         return true;
     }
 
     async requireSubscription() {
         if (!this.checked) await this.check();
-        if (!this.loggedIn) { this.showRegister(); return false; }
+        if (!this.loggedIn) { this.showAuthModal('Crie sua conta para continuar assistindo.'); return false; }
         if (this.isAdmin) return true;
         if (!this.hasActiveSubscription()) { this.showPaywall(); return false; }
         return true;
     }
 
-    showAuthModal() { this._showAuth('register'); }
+    showAuthModal(msg) { this._showAuth('register', msg); }
     showLogin() { window.location.href = '/login.html'; }
     showRegister() { window.location.href = '/login.html'; }
 
-    _showAuth(tab) {
+    _showAuth(tab, msg) {
         let m = document.getElementById('authModal');
         if (!m) { m = this._createAuthModal(); document.body.appendChild(m); }
+        const notice = m.querySelector('.cb-modal-notice');
+        if (notice) {
+            if (msg) {
+                notice.innerHTML = '<i class="fas fa-lock"></i><div class="cb-modal-notice-txt"><b>' + msg + '</b><span>Em seguida, escolha seu plano e tenha acesso imediato ao catalogo completo.</span></div>';
+                notice.style.display = 'flex';
+            } else {
+                notice.style.display = 'none';
+            }
+        }
         m.style.display = 'flex';
         setTimeout(() => m.classList.add('active'), 10);
         const target = tab === 'register' ? 0 : 1;
@@ -136,6 +145,7 @@ class AuthManager {
         <div class="cb-modal-bg"></div>
         <div class="cb-modal-card">
             <div class="cb-modal-inner">
+                <div class="cb-modal-notice"></div>
                 <div class="cb-modal-logo"><div class="cb-modal-logo-icon"><i class="fas fa-play"></i></div><span>CINE <b>BOSS</b></span></div>
                 <div class="auth-tabs" style="display:flex;gap:2px;margin-bottom:20px;background:rgba(255,255,255,0.03);border-radius:8px;padding:3px">
                     <button class="auth-tab active" data-f="cbRegF" style="flex:1;padding:10px;background:none;border:none;color:#4a4a60;font-size:13px;font-weight:600;cursor:pointer;border-radius:6px;transition:all .2s;font-family:Inter,sans-serif">Criar conta</button>
@@ -167,6 +177,10 @@ class AuthManager {
         .cb-modal.active .cb-modal-card{transform:translateY(0) scale(1);opacity:1}
         .cb-modal-card::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,168,224,0.4),transparent)}
         .cb-modal-inner{padding:32px 28px}
+        .cb-modal-notice{display:none;align-items:flex-start;gap:10px;background:rgba(0,168,224,0.08);border:1px solid rgba(0,168,224,0.22);border-radius:10px;padding:12px 14px;margin-bottom:16px;text-align:left}
+        .cb-modal-notice i{color:#00a8e0;font-size:14px;margin-top:2px}
+        .cb-modal-notice-txt b{display:block;font-size:12px;font-weight:700;color:#e8e8f0;margin-bottom:2px}
+        .cb-modal-notice-txt span{display:block;font-size:11px;color:#8a8aa0;line-height:1.5}
         .cb-modal-logo{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:20px;font-family:Sora,sans-serif;font-size:16px;font-weight:800;letter-spacing:2px}
         .cb-modal-logo b{color:#00a8e0}
         .cb-modal-logo-icon{width:30px;height:30px;background:#00a8e0;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;color:#fff}
@@ -195,7 +209,7 @@ class AuthManager {
                 m.querySelectorAll('.auth-tab').forEach(t => { t.classList.remove('active'); t.style.background = 'none'; t.style.color = '#4a4a60'; });
                 m.querySelectorAll('.cb-form').forEach(f => { f.classList.remove('active'); f.style.display = 'none'; });
                 tab.classList.add('active'); tab.style.background = 'rgba(0,168,224,0.12)'; tab.style.color = '#00a8e0';
-                const form = document.getElementById(tab.dataset.f);
+                const form = m.querySelector('#' + tab.dataset.f);
                 form.classList.add('active'); form.style.display = 'flex';
             });
         });
@@ -209,28 +223,28 @@ class AuthManager {
 
         m.querySelector('.cb-modal-bg').addEventListener('click', () => this.closeModal('authModal'));
 
-        document.getElementById('cbLogF').addEventListener('submit', async (e) => {
+        m.querySelector('#cbLogF').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const err = document.getElementById('cbLErr');
+            const err = m.querySelector('#cbLErr');
             const btn = e.target.querySelector('.cb-btn');
             err.textContent = ''; btn.disabled = true; btn.textContent = 'ENTRANDO...';
             try {
-                await this.login(document.getElementById('cbLEmail').value, document.getElementById('cbLPass').value, true);
+                await this.login(m.querySelector('#cbLEmail').value, m.querySelector('#cbLPass').value, true);
                 sounds.success(); this.closeModal('authModal');
-                if (window.playAfterAuth) { window.playAfterAuth(); window.playAfterAuth = null; }
+                if (window.playAfterAuth) { var fn = window.playAfterAuth; window.playAfterAuth = null; setTimeout(fn, 350); }
             } catch (e) { err.textContent = e.message; sounds.error(); }
             btn.disabled = false; btn.textContent = 'ENTRAR';
         });
 
-        document.getElementById('cbRegF').addEventListener('submit', async (e) => {
+        m.querySelector('#cbRegF').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const err = document.getElementById('cbRErr');
+            const err = m.querySelector('#cbRErr');
             const btn = e.target.querySelector('.cb-btn');
             err.textContent = ''; btn.disabled = true; btn.textContent = 'CRIANDO...';
             try {
-                await this.register(document.getElementById('cbRName').value, document.getElementById('cbREmail').value, document.getElementById('cbRPass').value);
+                await this.register(m.querySelector('#cbRName').value, m.querySelector('#cbREmail').value, m.querySelector('#cbRPass').value);
                 sounds.success(); this.closeModal('authModal');
-                if (window.playAfterAuth) { window.playAfterAuth(); window.playAfterAuth = null; }
+                if (window.playAfterAuth) { var fn = window.playAfterAuth; window.playAfterAuth = null; setTimeout(fn, 350); }
             } catch (e) { err.textContent = e.message; sounds.error(); }
             btn.disabled = false; btn.textContent = 'CRIAR MINHA CONTA';
         });
@@ -275,7 +289,7 @@ class AuthManager {
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Sem anuncios</li>
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Suporte por email</li>
                         </ul>
-                        <button class="pw-select-btn" onclick="auth._selectPlan('monthly')" style="width:100%;padding:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e8e8f0;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s;font-family:Inter,sans-serif">Assinar</button>
+                        <button class="pw-select-btn" onclick="auth._selectPlan('monthly', this)" style="width:100%;padding:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e8e8f0;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s;font-family:Inter,sans-serif">Assinar</button>
                     </div>
                     <div style="background:rgba(0,168,224,0.04);border:1px solid rgba(0,168,224,0.3);border-radius:12px;padding:22px 18px;position:relative">
                         <div style="position:absolute;top:-9px;right:14px;background:#00a8e0;color:#fff;font-size:9px;font-weight:700;padding:3px 10px;border-radius:8px;letter-spacing:.5px">MAIS POPULAR</div>
@@ -289,7 +303,7 @@ class AuthManager {
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Suporte prioritario</li>
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>R$ 5,02 de economia</li>
                         </ul>
-                        <button class="pw-select-btn gold" onclick="auth._selectPlan('quarterly')" style="width:100%;padding:12px;background:linear-gradient(135deg,#c9a54e,#e0be6a);border:none;border-radius:8px;color:#0a0a12;font-size:13px;font-weight:700;cursor:pointer;transition:all .25s;font-family:Inter,sans-serif">Assinar agora</button>
+                        <button class="pw-select-btn gold" onclick="auth._selectPlan('quarterly', this)" style="width:100%;padding:12px;background:linear-gradient(135deg,#c9a54e,#e0be6a);border:none;border-radius:8px;color:#0a0a12;font-size:13px;font-weight:700;cursor:pointer;transition:all .25s;font-family:Inter,sans-serif">Assinar agora</button>
                     </div>
                 </div>
                 <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:14px 24px;border-top:1px solid rgba(255,255,255,0.04);font-size:11px;color:#4a4a60">
@@ -302,29 +316,23 @@ class AuthManager {
         return m;
     }
 
-    async _selectPlan(plan) {
+    async _selectPlan(plan, btnEl) {
         sounds.click();
-        const btn = document.querySelector('.pw-select-btn, #planMonthBtn, #planQtrBtn');
+        const btn = btnEl || document.querySelector('.pw-select-btn, #planMonthBtn, #planQtrBtn');
         if(btn){btn.disabled=true;btn.textContent='PROCESSANDO...';}
         try {
             const r = await fetch(`${API_BASE}/subscription/checkout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ plan }) });
             const d = await r.json();
             if (!r.ok) throw new Error(d.error);
             if (d.url) {
-                const subId = d.subscriptionId || d.subscription_id;
-                if (subId) {
-                    setTimeout(async function(){
-                        try { await fetch(`${API_BASE}/subscription/simulate`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ subscription_id: subId }) }); } catch {}
-                    }, 1000);
-                }
                 window.location.href = d.url;
             } else {
                 sounds.success();
-                if(btn){btn.textContent='PAGO!';}
+                if(btn){btn.textContent='ACESSO LIBERADO!';}
                 setTimeout(function(){window.location.href='/'},1500);
             }
         } catch (e) {
-            if(btn){btn.disabled=false;btn.textContent='ASSINAR';}
+            if(btn){btn.disabled=false;btn.textContent='TENTAR NOVAMENTE';}
             alert(e.message || 'Erro ao processar pagamento');
         }
     }

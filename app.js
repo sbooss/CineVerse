@@ -1104,6 +1104,47 @@ function applyUserAvatar(name) {
     avatarEl.style.background = savedColor || getAvatarGradient(name);
 }
 
+/* ===================== RETORNO DO PAGAMENTO ===================== */
+function payToast(msg) {
+    try {
+        var t = document.createElement('div');
+        t.className = 'toast';
+        t.textContent = msg;
+        document.body.appendChild(t);
+        setTimeout(function() { t.classList.add('show'); }, 100);
+        setTimeout(function() { t.classList.remove('show'); setTimeout(function() { t.remove(); }, 300); }, 8000);
+    } catch (e) {}
+}
+
+async function handlePaymentReturn() {
+    try {
+        var qs = new URLSearchParams(window.location.search);
+        var p = qs.get('payment');
+        if (p !== 'success' && p !== 'pending' && p !== 'failed') return;
+        history.replaceState({}, '', window.location.pathname);
+        if (p === 'failed') {
+            if (typeof showToast === 'function') showToast('Pagamento nao concluido. Tente novamente quando quiser.');
+            else payToast('Pagamento nao concluido. Tente novamente quando quiser.');
+            return;
+        }
+        if (typeof auth === 'undefined') return;
+        await auth.check();
+        var tries = 0;
+        while (tries < 4 && !auth.hasActiveSubscription()) {
+            await new Promise(function(r) { setTimeout(r, 3000); });
+            await auth.check();
+            tries++;
+        }
+        if (auth.hasActiveSubscription()) {
+            if (typeof showToast === 'function') showToast('Pagamento confirmado! Acesso liberado a todo o catalogo.');
+            else payToast('Pagamento confirmado! Acesso liberado a todo o catalogo.');
+        } else {
+            if (typeof showToast === 'function') showToast('Pagamento em processamento. Seu acesso sera liberado automaticamente assim que confirmar.');
+            else payToast('Pagamento em processamento. Seu acesso sera liberado automaticamente assim que confirmar.');
+        }
+    } catch (e) {}
+}
+
 /* ===================== INIT ===================== */
 document.addEventListener('DOMContentLoaded', function() {
     document.documentElement.classList.add('js-reveal');
@@ -1133,6 +1174,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     initScrollFX();
     initReveal();
+    handlePaymentReturn();
 
     if (typeof auth !== 'undefined') {
         auth.onAuthChange(function(user, subscription, loggedIn) {

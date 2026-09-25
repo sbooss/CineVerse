@@ -545,10 +545,10 @@
     </script>
     <script src="config.js?v=50"></script>
     <script src="tmdb.js?v=44"></script>
-    <script src="auth.js?v=41"></script>
+    <script src="auth.js?v=42"></script>
     <script src="https://cdn.jsdelivr.net/npm/hls.js@1/dist/hls.min.js" defer></script>
-    <script src="player.js?v=52"></script>
-    <script src="app.js?v=51"></script>
+    <script src="player.js?v=53"></script>
+    <script src="app.js?v=52"></script>
     <script>
         // CINEMATIC POSTER BACKGROUND
         (function(){
@@ -646,22 +646,6 @@
 
             // FAILSAFE: if load event never fires or scripts fail, force remove after 4s
             setTimeout(removeBoot, 4000);
-        })();
-
-        // Handle payment success redirect
-        (function() {
-            var q = window.location.search || '';
-            if (q.indexOf('payment=success') !== -1) {
-                if (typeof auth !== 'undefined') {
-                    auth.check().then(function() {
-                        showToast('Pagamento confirmado! Assinatura ativada.');
-                    });
-                }
-            }
-            if (q.indexOf('payment=cancelled') !== -1) showToast('Pagamento cancelado.');
-            if (q.indexOf('payment=failed') !== -1) showToast('Pagamento falhou. Tente novamente.');
-            if (q.indexOf('payment=pending') !== -1) showToast('Pagamento pendente. Aguarde a confirmacao.');
-            if (q.indexOf('payment=') !== -1) window.history.replaceState({}, '', window.location.pathname);
         })();
     </script>
     <style>

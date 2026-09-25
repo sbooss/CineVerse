@@ -267,7 +267,14 @@ class VideoPlayer {
         });
     }
 
-    openLiveTV(channel) {
+    async openLiveTV(channel) {
+        if (typeof auth !== 'undefined') {
+            var canPlay = await auth.requireSubscription();
+            if (!canPlay) {
+                window.playAfterAuth = () => this.openLiveTV(channel);
+                return;
+            }
+        }
         this.titleEl.textContent = channel.title;
         this.overlay.classList.add('active');
         document.body.style.overflow = 'hidden';

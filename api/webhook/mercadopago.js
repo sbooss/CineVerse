@@ -51,7 +51,7 @@ module.exports = async function handler(req, res) {
 
             if (!subscription) return jsonSuccess(res, { received: true, message: 'Subscription not found' });
 
-            if (paymentData.status === 'approved' || paymentData.status === 'pending') {
+            if (paymentData.status === 'approved') {
                 const planDays = ref.planDays ? parseInt(ref.planDays) : 30;
                 const expiresAt = new Date(Date.now() + planDays * 24 * 60 * 60 * 1000);
 
