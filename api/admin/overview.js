@@ -54,12 +54,11 @@ function lastNDays(n) {
 module.exports = async function handler(req, res) {
     setCors(req, res);
     if (req.method === 'OPTIONS') return handleOptions(res);
+    res.setHeader('Cache-Control', 'no-store');
 
     try {
         const auth = await requireAdmin(req, res);
         if (!auth) return;
-
-        res.setHeader('Cache-Control', 'no-store');
 
         /* Rate limit anti-forca-bruta: 60 req/min por admin */
         const rlKey = 'admin_ovw_' + auth.user.id;
