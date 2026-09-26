@@ -1,15 +1,18 @@
+function _d(s) {
+    return atob(s);
+}
 const CONFIG = {
     EMBED: {
         PROVIDERS: [
             {
-                name: 'MegaEmbed',
-                movie: function(id) { return 'https://mgeb.top/embed/movie/' + id; },
-                tv: function(id, s, e) { return 'https://mgeb.top/embed/tv/' + id + '/' + s + '/' + e; }
+                name: 'MELHOR',
+                movie: function(id) { return _d('aHR0cHM6Ly9tZ2ViLnRvcC9lbWJlZC9tb3ZpZS8=') + id; },
+                tv: function(id, s, e) { return _d('aHR0cHM6Ly9tZ2ViLnRvcC9lbWJlZC90di8=') + id + '/' + s + '/' + e; }
             },
             {
-                name: 'Fembed',
-                movie: function(id) { return 'https://fembed.lol/filme/' + id; },
-                tv: function(id, s, e) { return 'https://fembed.lol/serie/' + id + '/' + s + '/' + e; }
+                name: 'Opcional',
+                movie: function(id) { return _d('aHR0cHM6Ly9mZW1iZWQubG9sL2ZpbG1lLw==') + id; },
+                tv: function(id, s, e) { return _d('aHR0cHM6Ly9mZW1iZWQubG9sL3NlcmllLw==') + id + '/' + s + '/' + e; }
             }
         ]
     },
