@@ -5,6 +5,7 @@
 
 var FAV_KEY = 'cineboss_favorites';
 var CW_KEY = 'cineboss_continue';
+var API_BASE_WATCH = window.location.origin + '/api/watch/progress';
 var currentFilter = 'all';
 var heroData = null;
 
@@ -22,26 +23,74 @@ function toggleFavorite(item) {
     return idx < 0;
 }
 
-/* ===================== CONTINUE WATCHING ===================== */
+/* ===================== CONTINUE WATCHING (individual por conta) ===================== */
+function cwStorageKey() {
+    try {
+        if (typeof auth !== 'undefined' && auth.loggedIn && auth.user && auth.user.id) {
+            return 'cineboss_continue_u' + auth.user.id;
+        }
+    } catch (e) {}
+    return CW_KEY;
+}
+function cwSyncEnabled() {
+    try {
+        return typeof auth !== 'undefined' && auth.loggedIn && !!auth.user && !!auth.user.id;
+    } catch (e) { return false; }
+}
+var cwSyncSeq = 0;
 function getContinueWatching() {
-    try { return JSON.parse(localStorage.getItem(CW_KEY)) || []; } catch(e) { return []; }
+    try { return JSON.parse(localStorage.getItem(cwStorageKey())) || []; } catch(e) { return []; }
 }
 function saveContinue(item) {
     if (!item || !item.id) return;
+    cwSyncSeq++;
     var list = getContinueWatching();
     var idx = list.findIndex(function(f) { return f.id === item.id; });
     if (idx >= 0) list.splice(idx, 1);
     item.timestamp = Date.now();
     list.unshift(item);
     if (list.length > 20) list = list.slice(0, 20);
-    localStorage.setItem(CW_KEY, JSON.stringify(list));
+    try { localStorage.setItem(cwStorageKey(), JSON.stringify(list)); } catch (e) {}
+    if (cwSyncEnabled()) {
+        fetch(API_BASE_WATCH, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'same-origin',
+            body: JSON.stringify({
+                tmdbId: item.id, title: item.title, poster: item.poster,
+                backdrop: item.backdrop, mediaType: item.mediaType,
+                season: item.season || 1, episode: item.episode || 1
+            })
+        }).catch(function() {});
+    }
 }
 function removeContinue(id) {
+    cwSyncSeq++;
     var list = getContinueWatching().filter(function(f) { return f.id !== id; });
-    localStorage.setItem(CW_KEY, JSON.stringify(list));
+    try { localStorage.setItem(cwStorageKey(), JSON.stringify(list)); } catch (e) {}
+    if (cwSyncEnabled()) {
+        fetch(API_BASE_WATCH + '?id=' + encodeURIComponent(id), { method: 'DELETE', credentials: 'same-origin' }).catch(function() {});
+    }
 }
 function clearContinueWatching() {
-    localStorage.setItem(CW_KEY, '[]');
+    cwSyncSeq++;
+    try { localStorage.setItem(cwStorageKey(), '[]'); } catch (e) {}
+    if (cwSyncEnabled()) {
+        fetch(API_BASE_WATCH + '?all=1', { method: 'DELETE', credentials: 'same-origin' }).catch(function() {});
+    }
+}
+function syncContinueWatching() {
+    if (!cwSyncEnabled()) return;
+    var seq = ++cwSyncSeq;
+    fetch(API_BASE_WATCH, { credentials: 'same-origin' }).then(function(r) {
+        if (!r.ok) return null;
+        return r.json();
+    }).then(function(d) {
+        if (!d || !d.items) return;
+        if (seq !== cwSyncSeq) return; /* houve save/remocao durante o sync: nao sobrescrever o cache */
+        try { localStorage.setItem(cwStorageKey(), JSON.stringify(d.items)); } catch (e) {}
+        renderContinueWatching();
+    }).catch(function() {});
 }
 
 /* ===================== HELPERS ===================== */
@@ -150,9 +199,39 @@ function createCardCW(item) {
             }
             return;
         }
-        openDetailPage(item);
+        player.open({ id: item.id, title: item.title, mediaType: item.mediaType || 'movie' }, item.season || 1, item.episode || 1);
     });
     return card;
+}
+
+function renderContinueWatching() {
+    var main = document.getElementById('mainContent');
+    if (!main) return;
+    var sec = main.querySelector('.continue-section');
+    if (sec) sec.remove();
+    var cw = getContinueWatching();
+    if (cw.length === 0) return;
+    var cwSection = document.createElement('div');
+    cwSection.className = 'content-section continue-section';
+    cwSection.innerHTML = '<div class="section-header cw-header"><h2 class="section-title">Continuar Assistindo</h2><button class="cw-clear" id="cwClearBtn"><i class="fas fa-trash-alt"></i> Limpar</button></div>';
+    var wrap = document.createElement('div');
+    wrap.className = 'row-wrap';
+    var row = document.createElement('div');
+    row.className = 'movies-row';
+    cw.forEach(function(item) { row.appendChild(createCardCW(item)); });
+    wrap.appendChild(row);
+    cwSection.appendChild(wrap);
+    cwSection.querySelector('#cwClearBtn').addEventListener('click', function() {
+        clearContinueWatching();
+        var s = document.querySelector('.continue-section');
+        if (s) s.remove();
+    });
+    var heroSlot = document.getElementById('heroSlot');
+    if (heroSlot && heroSlot.parentNode === main) {
+        main.insertBefore(cwSection, heroSlot.nextSibling);
+    } else {
+        main.insertBefore(cwSection, main.firstChild);
+    }
 }
 
 function createRow(items, container) {
@@ -548,23 +627,10 @@ function loadHome() {
     main.appendChild(heroSlot);
 
     var cw = getContinueWatching();
-    if (cw.length > 0) {
-        var cwSection = document.createElement('div');
-        cwSection.className = 'content-section continue-section';
-        cwSection.innerHTML = '<div class="section-header cw-header"><h2 class="section-title">Continuar Assistindo</h2><button class="cw-clear" id="cwClearBtn"><i class="fas fa-trash-alt"></i> Limpar</button></div>';
-        var wrap = document.createElement('div');
-        wrap.className = 'row-wrap';
-        var row = document.createElement('div');
-        row.className = 'movies-row';
-        cw.forEach(function(item) { row.appendChild(createCardCW(item)); });
-        wrap.appendChild(row);
-        cwSection.appendChild(wrap);
-        main.appendChild(cwSection);
-        cwSection.querySelector('#cwClearBtn').addEventListener('click', function() {
-            clearContinueWatching();
-            var sec = document.querySelector('.continue-section');
-            if (sec) sec.remove();
-        });
+    if (typeof auth !== 'undefined' && auth.checked === false) {
+        /* auth ainda nao resolveu: CW sera renderizado pelo onAuthChange (evita lista de outra conta em navegador compartilhado) */
+    } else if (cw.length > 0) {
+        renderContinueWatching();
     }
 
     tmdb.getHeroCarousel().then(function(items) {
@@ -1207,10 +1273,26 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                 }
+                if (typeof renderContinueWatching === 'function') {
+                    renderContinueWatching();
+                    syncContinueWatching();
+                }
             } else {
                 if (authBtns) authBtns.classList.remove('hidden');
                 if (userMenu) userMenu.classList.add('hidden');
+                if (typeof renderContinueWatching === 'function') renderContinueWatching();
             }
         });
+        if (auth.checked) {
+            /* auth.check() ja completou (notify disparou antes do listener existir): renderizar/sincronizar agora */
+            if (auth.loggedIn) {
+                if (typeof renderContinueWatching === 'function') {
+                    renderContinueWatching();
+                    syncContinueWatching();
+                }
+            } else if (typeof renderContinueWatching === 'function') {
+                renderContinueWatching();
+            }
+        }
     }
 });
