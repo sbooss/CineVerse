@@ -26,6 +26,7 @@ CREATE INDEX IF NOT EXISTS idx_watch_progress_user
 -- RLS: a API usa a service key (bypass), mas policies garantem defesa extra
 ALTER TABLE watch_progress ENABLE ROW LEVEL SECURITY;
 
+DROP POLICY IF EXISTS "Service role gerencia watch_progress" ON watch_progress;
 CREATE POLICY "Service role gerencia watch_progress"
     ON watch_progress FOR ALL
     TO service_role
