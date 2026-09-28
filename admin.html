@@ -199,6 +199,17 @@
         /* ===================== DISTRIBUICAO (POWER BI) ===================== */
         .distrib-grid { display: grid; grid-template-columns: 1fr 1.25fr; gap: 22px; margin-bottom: 22px; }
         .distrib-grid .panel { margin-bottom: 0; }
+        .funnel-steps { display: flex; flex-direction: column; gap: 14px; }
+        .fun-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
+        .fun-step { flex: 1 1 150px; min-width: 150px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.06); border-radius: 12px; padding: 16px 14px; text-align: center; }
+        .fun-step-num { font-family: 'Sora', sans-serif; font-size: 28px; font-weight: 800; }
+        .fun-step-label { font-size: 12px; color: #e8e8f0; font-weight: 600; margin-top: 4px; }
+        .fun-step-sub { font-size: 10.5px; color: #8a8aa0; margin-top: 2px; }
+        .fun-arrow { color: #4a4a60; font-size: 15px; flex-shrink: 0; }
+        .fun-plans { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 14px; }
+        .fun-plan-chip { display: flex; align-items: center; gap: 6px; font-size: 11px; color: #8a8aa0; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; padding: 6px 10px; }
+        .fun-plan-chip b { color: #e8e8f0; }
+        .fp-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; flex-shrink: 0; }
         .donut-wrap { display: flex; align-items: center; gap: 30px; flex-wrap: wrap; }
         .donut-box { position: relative; width: 170px; height: 170px; flex-shrink: 0; }
         .donut-box svg { width: 100%; height: 100%; transform: rotate(-90deg); }
@@ -292,6 +303,8 @@
         @media (max-width: 900px) {
             .distrib-grid { grid-template-columns: 1fr; }
             .dev-row { grid-template-columns: 120px 1fr 40px; }
+            .fun-arrow { transform: rotate(90deg); }
+            .fun-row { flex-direction: column; }
         }
         @media (max-width: 640px) {
             .admin-container { padding: 18px 12px; }
@@ -445,6 +458,14 @@
                 </div>
                 <div class="dev-rows" id="devRows"><div class="dev-empty">Carregando...</div></div>
             </div>
+        </div>
+
+        <div class="panel" id="funnelPanel">
+            <div class="panel-head">
+                <div class="panel-title"><i class="fas fa-filter"></i> Funil de Vendas - 30 dias</div>
+                <div class="panel-tools muted" style="font-size:11.5px">do paywall ao pagamento</div>
+            </div>
+            <div class="funnel-steps" id="funnelSteps"><div class="dev-empty">Carregando...</div></div>
         </div>
 
         <div class="panel">
@@ -860,6 +881,7 @@
             }
 
             renderDevices(dist.devices || {});
+            renderFunnel(d.funnel || {});
         }
         function renderDevices(devices) {
             var rows = document.getElementById('devRows');
@@ -888,6 +910,28 @@
                     for (var i = 0; i < bars.length; i++) bars[i].style.width = bars[i].getAttribute('data-w') + '%';
                 });
             });
+        }
+
+        /* ===================== FUNIL DE VENDAS ===================== */
+        function renderFunnel(f) {
+            var el = document.getElementById('funnelSteps');
+            if (!el) return;
+            f = f || {};
+            var cb = f.clicksByPlan || {};
+            var steps = [
+                { n: f.paywallOpens || 0, label: 'Paywalls abertos', sub: 'tentaram assistir sem plano', color: '#00a8e0' },
+                { n: f.checkoutClicks || 0, label: 'Cliques em plano', sub: (f.paywallOpens ? Math.round((f.paywallToClick || 0) * 10) / 10 + '% dos paywalls' : 'clicaram em assinar'), color: '#c9a54e' },
+                { n: f.purchases || 0, label: 'Pagamentos', sub: (f.checkoutClicks ? Math.round((f.clickToPurchase || 0) * 10) / 10 + '% dos cliques' : 'aprovados'), color: '#4caf50' }
+            ];
+            var row = '';
+            steps.forEach(function(s, i) {
+                if (i) row += '<div class="fun-arrow"><i class="fas fa-arrow-right"></i></div>';
+                row += '<div class="fun-step"><div class="fun-step-num" style="color:' + s.color + '">' + s.n + '</div><div class="fun-step-label">' + s.label + '</div><div class="fun-step-sub">' + s.sub + '</div></div>';
+            });
+            var plans = '<div class="fun-plan-chip"><span class="fp-dot" style="background:#4caf50"></span>Pass 24h: <b>' + (cb.daily || 0) + '</b></div>' +
+                '<div class="fun-plan-chip"><span class="fp-dot" style="background:#00a8e0"></span>Mensal: <b>' + (cb.monthly || 0) + '</b></div>' +
+                '<div class="fun-plan-chip"><span class="fp-dot" style="background:#c9a54e"></span>Trimestral: <b>' + (cb.quarterly || 0) + '</b></div>';
+            el.innerHTML = '<div class="fun-row">' + row + '</div><div class="fun-plans">' + plans + '</div>';
         }
 
         /* ===================== GRAFICO SVG ===================== */

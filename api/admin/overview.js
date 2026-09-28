@@ -79,7 +79,7 @@ module.exports = async function handler(req, res) {
         const now = new Date().toISOString();
         const d30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
-        const [usersRes, usersTotalRes, users30Res, subsRes, sessionsRes] = await Promise.all([
+        const [usersRes, usersTotalRes, users30Res, subsRes, sessionsRes, funnelRes] = await Promise.all([
             supabase.from('users').select('id, name, email, created_at')
                 .order('created_at', { ascending: false }).limit(500),
             supabase.from('users').select('*', { count: 'exact', head: true }),
@@ -90,12 +90,17 @@ module.exports = async function handler(req, res) {
             supabase.from('sessions')
                 .select('id, user_id, device_name, device_os, device_browser, ip_address, created_at, expires_at')
                 .gt('expires_at', now)
-                .order('created_at', { ascending: false }).limit(500)
+                .order('created_at', { ascending: false }).limit(500),
+            supabase.from('funnel_events')
+                .select('event, plan, created_at')
+                .gte('created_at', d30)
+                .limit(5000)
         ]);
 
         const users = usersRes.data || [];
         const subs = subsRes.data || [];
         const sessions = (sessionsRes && sessionsRes.data) || [];
+        const funnelRows = (funnelRes && funnelRes.data) || [];
         const totalUsers = usersTotalRes.count || 0;
         const newUsers30d = users30Res.count || 0;
 
@@ -165,6 +170,16 @@ module.exports = async function handler(req, res) {
         /* distribuicoes para o dashboard */
         const planCounts = { daily: 0, monthly: 0, quarterly: 0 };
         activeSubs.forEach(s => { if (planCounts[s.plan] !== undefined) planCounts[s.plan]++; });
+
+        /* funil de vendas (30 dias) */
+        const funnel = { paywallOpens: 0, checkoutClicks: 0, purchases: 0, clicksByPlan: { daily: 0, monthly: 0, quarterly: 0 } };
+        funnelRows.forEach(r => {
+            if (r.event === 'paywall_open') funnel.paywallOpens++;
+            else if (r.event === 'checkout_click') { funnel.checkoutClicks++; if (r.plan && funnel.clicksByPlan[r.plan] !== undefined) funnel.clicksByPlan[r.plan]++; }
+            else if (r.event === 'purchase') funnel.purchases++;
+        });
+        funnel.paywallToClick = funnel.paywallOpens > 0 ? Math.round((funnel.checkoutClicks / funnel.paywallOpens) * 1000) / 10 : 0;
+        funnel.clickToPurchase = funnel.checkoutClicks > 0 ? Math.round((funnel.purchases / funnel.checkoutClicks) * 1000) / 10 : 0;
         let noPlanUsers = 0;
         userRows.forEach(u => { if (u.status === 'none') noPlanUsers++; });
         const deviceCounts = {};
@@ -189,6 +204,7 @@ module.exports = async function handler(req, res) {
                 noPlanUsers,
                 devices: deviceCounts
             },
+            funnel,
             series: {
                 labels,
                 users: labels.map(l => usersByDay[l]),

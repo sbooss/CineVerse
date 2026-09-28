@@ -394,6 +394,7 @@
 
         window.selectPlan = function(plan){
             S.click();
+            try { fetch(API+'/track',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',keepalive:true,body:JSON.stringify({event:'checkout_click',plan:plan})}); } catch(e) {}
             var btnId = plan==='monthly' ? 'planMonthBtn' : (plan==='daily' ? 'planDailyBtn' : 'planQtrBtn');
             var btn = document.getElementById(btnId);
             var originalText = btn ? btn.textContent : '';

@@ -347,6 +347,7 @@
             btn.disabled = true;
             btn.textContent = 'REDIRECIONANDO...';
             document.getElementById('errorMsg').textContent = '';
+            try { fetch(API + '/track', { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', keepalive: true, body: JSON.stringify({ event: 'checkout_click', plan: plan }) }); } catch (e) {}
             try {
                 const res = await fetch(`${API}/subscription/checkout`, {
                     method: 'POST',

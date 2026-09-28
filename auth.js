@@ -128,6 +128,7 @@ class AuthManager {
 
     showPaywall() {
         if (!document.getElementById('authModal')) { document.body.appendChild(this._createAuthModal()); }
+        this._track('paywall_open');
         let m = document.getElementById('paywallModal');
         if (!m) { m = this._createPaywallModal(); document.body.appendChild(m); }
         m.style.display = 'flex';
@@ -326,8 +327,21 @@ class AuthManager {
         return m;
     }
 
+    _track(event, plan) {
+        try {
+            fetch(API_BASE + '/track', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                keepalive: true,
+                body: JSON.stringify({ event: event, plan: plan })
+            });
+        } catch (e) {}
+    }
+
     async _selectPlan(plan, btnEl) {
         sounds.click();
+        this._track('checkout_click', plan);
         const btn = btnEl || document.querySelector('.pw-select-btn, #planMonthBtn, #planQtrBtn, #planDailyBtn');
         if(btn){btn.disabled=true;btn.textContent='PROCESSANDO...';}
         try {
