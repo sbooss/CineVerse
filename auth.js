@@ -311,7 +311,7 @@ class AuthManager {
                 <div style="margin:0 24px 20px;background:linear-gradient(135deg,rgba(76,175,80,0.10),rgba(0,168,224,0.05));border:1px solid rgba(76,175,80,0.35);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden">
                     <div style="position:absolute;top:12px;right:14px;background:#4caf50;color:#0a0a12;font-size:9px;font-weight:800;padding:3px 10px;border-radius:8px;letter-spacing:.5px">PASS 24H</div>
                     <div style="font-family:Sora,sans-serif;font-size:14px;font-weight:800;color:#fff;margin-bottom:6px"><i class="fas fa-clock" style="color:#4caf50;margin-right:7px"></i>Sem condicoes hoje?</div>
-                    <div style="font-size:12px;color:#8a8aa0;line-height:1.55;margin-bottom:14px;max-width:360px">Pague apenas <strong style="color:#fff">R$ 5,00 no PIX</strong> e tenha <strong style="color:#fff">24 horas de acesso total</strong>: qualquer filme, serie ou anime, sem limite. Ideal pra aquele filme do fim de semana. A gente entende, e essa porta fica aberta.</div>
+                    <div style="font-size:12px;color:#8a8aa0;line-height:1.55;margin-bottom:14px;max-width:360px">Pague apenas <strong style="color:#fff">R$ 5,00</strong> e tenha <strong style="color:#fff">24 horas de acesso total</strong>: qualquer filme, serie ou anime, sem limite. Ideal pra aquele filme do fim de semana. A gente entende, e essa porta fica aberta.</div>
                     <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
                         <div><span style="font-family:Sora,sans-serif;font-size:26px;font-weight:800;color:#fff">R$ 5,00</span> <span style="font-size:11px;color:#4a4a60">/ 24 horas</span></div>
                         <button class="pw-select-btn" onclick="auth._selectPlan('daily', this)" style="padding:12px 20px;background:#4caf50;border:none;border-radius:8px;color:#0a0a12;font-size:13px;font-weight:700;cursor:pointer;transition:all .25s;font-family:Inter,sans-serif">QUERO ASSISTIR HOJE</button>
@@ -319,7 +319,7 @@ class AuthManager {
                 </div>
                 <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:14px 24px;border-top:1px solid rgba(255,255,255,0.04);font-size:11px;color:#4a4a60">
                     <i class="fas fa-shield-halved" style="color:#00a8e0"></i>
-                    Pague com PIX via Mercado Pago. Sem renovacao automatica.
+                    Pagamento via Mercado Pago: PIX, cartao ou boleto. Sem renovacao automatica.
                 </div>
             </div>
         </div>`;
