@@ -173,9 +173,9 @@ class AuthManager {
 
         const style = document.createElement('style');
         style.textContent = `
-        .cb-modal{display:none;position:fixed;inset:0;z-index:99999;align-items:center;justify-content:center;padding:16px}
-        .cb-modal-bg{position:absolute;inset:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(20px)}
-        .cb-modal-card{position:relative;z-index:1;width:100%;max-width:420px;background:rgba(10,10,20,0.9);backdrop-filter:blur(40px);border:1px solid rgba(255,255,255,0.06);border-radius:16px;overflow:hidden;transform:translateY(20px) scale(0.97);opacity:0;transition:all .35s cubic-bezier(.4,0,.2,1)}
+        .cb-modal{display:none;position:fixed;inset:0;z-index:99999;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+        .cb-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,0.92);backdrop-filter:blur(20px)}
+        .cb-modal-card{position:relative;z-index:1;margin:auto;width:100%;max-width:420px;background:rgba(10,10,20,0.9);backdrop-filter:blur(40px);border:1px solid rgba(255,255,255,0.06);border-radius:16px;overflow:hidden;transform:translateY(20px) scale(0.97);opacity:0;transition:all .35s cubic-bezier(.4,0,.2,1)}
         .cb-modal.active .cb-modal-card{transform:translateY(0) scale(1);opacity:1}
         .cb-modal-card::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,rgba(0,168,224,0.4),transparent)}
         .cb-modal-inner{padding:32px 28px}
@@ -258,66 +258,119 @@ class AuthManager {
         const m = document.createElement('div');
         m.id = 'paywallModal'; m.className = 'cb-modal';
         m.innerHTML = `
+        <style>
+        #paywallModal{align-items:flex-start;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+        #paywallModal .cb-modal-card{margin:auto;max-width:640px;width:95%}
+        #paywallModal .cb-modal-bg{position:fixed}
+        #paywallModal .cb-modal-inner{padding:0}
+        .pw2-head{padding:36px 28px 24px;text-align:center;background:linear-gradient(180deg,rgba(0,168,224,0.06) 0%,transparent 100%);position:relative}
+        .pw2-glow{position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:200px;height:200px;background:radial-gradient(circle,rgba(0,168,224,0.15),transparent 70%);pointer-events:none}
+        .pw2-icon{font-size:30px;color:#00a8e0;margin-bottom:14px;position:relative;z-index:1}
+        .pw2-title{font-family:Sora,sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:6px;position:relative;z-index:1}
+        .pw2-sub{font-size:13px;color:#8a8aa0;position:relative;z-index:1;max-width:420px;margin:0 auto;line-height:1.5}
+        .pw2-inc-wrap{padding:0 24px 16px}
+        .pw2-inc{background:linear-gradient(135deg,rgba(0,168,224,0.06),rgba(201,165,78,0.04));border:1px solid rgba(0,168,224,0.12);border-radius:10px;padding:14px 16px;margin-bottom:16px}
+        .pw2-inc-label{font-size:12px;font-weight:700;color:#00a8e0;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+        .pw2-inc-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px}
+        .pw2-inc-item{font-size:11px;color:#8a8aa0;padding:2px 0;padding-left:14px;position:relative}
+        .pw2-inc-item i{color:#00a8e0;font-size:8px;position:absolute;left:0;top:5px}
+        .pw2-plans{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 24px 24px}
+        .pw2-plan{background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:22px 18px;position:relative;min-width:0}
+        .pw2-plan.gold{background:rgba(0,168,224,0.04);border-color:rgba(0,168,224,0.3)}
+        .pw2-badge{position:absolute;top:-9px;right:14px;background:#00a8e0;color:#fff;font-size:9px;font-weight:700;padding:3px 10px;border-radius:8px;letter-spacing:.5px}
+        .pw2-name{font-family:Sora,sans-serif;font-size:11px;font-weight:700;color:#e8e8f0;letter-spacing:1px;margin-bottom:2px}
+        .pw2-period{font-size:10px;color:#4a4a60;margin-bottom:10px}
+        .pw2-price{font-family:Sora,sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:12px;word-break:break-word}
+        .pw2-plan.gold .pw2-price{margin-bottom:2px}
+        .pw2-save{font-size:11px;color:#c9a54e;font-weight:600;margin-bottom:12px}
+        .pw2-feats{list-style:none;margin:0 0 16px;padding:0}
+        .pw2-feats li{display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0}
+        .pw2-feats li i{color:#00a8e0;font-size:9px;width:12px;flex-shrink:0}
+        .pw2-day{margin:0 24px 20px;background:linear-gradient(135deg,rgba(76,175,80,0.10),rgba(0,168,224,0.05));border:1px solid rgba(76,175,80,0.35);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden}
+        .pw2-day-badge{position:absolute;top:12px;right:14px;background:#4caf50;color:#0a0a12;font-size:9px;font-weight:800;padding:3px 10px;border-radius:8px;letter-spacing:.5px}
+        .pw2-day-title{font-family:Sora,sans-serif;font-size:14px;font-weight:800;color:#fff;margin-bottom:6px;padding-right:80px}
+        .pw2-day-desc{font-size:12px;color:#8a8aa0;line-height:1.55;margin-bottom:14px;max-width:360px}
+        .pw2-day-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+        .pw2-day-amount{font-family:Sora,sans-serif;font-size:26px;font-weight:800;color:#fff}
+        .pw2-day-unit{font-size:11px;color:#4a4a60}
+        .pw2-foot{display:flex;align-items:center;justify-content:center;gap:6px;padding:14px 24px;border-top:1px solid rgba(255,255,255,0.04);font-size:11px;color:#4a4a60;text-align:center}
+        @media(max-width:560px){
+            #paywallModal .cb-modal-card{max-width:100%;width:100%}
+            #paywallModal .cb-modal-inner{padding:0}
+            .pw2-head{padding:26px 18px 18px}
+            .pw2-title{font-size:19px}
+            .pw2-sub{font-size:12px}
+            .pw2-inc-wrap{padding:0 16px 14px}
+            .pw2-plans{grid-template-columns:1fr;padding:0 16px 18px}
+            .pw2-plan{padding:18px 16px}
+            .pw2-price{font-size:26px}
+            .pw2-day{margin:0 16px 18px;padding:14px}
+            .pw2-day-row{flex-direction:column;align-items:stretch}
+            .pw2-day-row .pw-select-btn{width:100%}
+            .pw2-foot{padding:12px 16px;font-size:10px}
+        }
+        @media(max-width:380px){.pw2-inc-grid{grid-template-columns:1fr}}
+        </style>
         <div class="cb-modal-bg"></div>
-        <div class="cb-modal-card" style="max-width:640px;width:95%">
-            <div class="cb-modal-inner" style="padding:0">
-                <div style="padding:36px 28px 24px;text-align:center;background:linear-gradient(180deg,rgba(0,168,224,0.06) 0%,transparent 100%);position:relative">
-                    <div style="position:absolute;top:-40px;left:50%;transform:translateX(-50%);width:200px;height:200px;background:radial-gradient(circle,rgba(0,168,224,0.15),transparent 70%);pointer-events:none"></div>
-                    <i class="fas fa-play" style="font-size:30px;color:#00a8e0;margin-bottom:14px;position:relative;z-index:1"></i>
-                    <h2 style="font-family:Sora,sans-serif;font-size:22px;font-weight:800;color:#fff;margin-bottom:6px;position:relative;z-index:1">Seu proximo filme esta pronto.</h2>
-                    <p style="font-size:13px;color:#8a8aa0;position:relative;z-index:1;max-width:420px;margin:0 auto;line-height:1.5">Ative seu acesso CINE BOSS e tenha acesso completo a todo o catalogo de filmes, series e animes.</p>
+        <div class="cb-modal-card">
+            <div class="cb-modal-inner">
+                <div class="pw2-head">
+                    <div class="pw2-glow"></div>
+                    <i class="fas fa-play pw2-icon"></i>
+                    <h2 class="pw2-title">Seu proximo filme esta pronto.</h2>
+                    <p class="pw2-sub">Ative seu acesso CINE BOSS e tenha acesso completo a todo o catalogo de filmes, series e animes.</p>
                 </div>
-                <div style="padding:0 24px 16px">
-                    <div style="background:linear-gradient(135deg,rgba(0,168,224,0.06),rgba(201,165,78,0.04));border:1px solid rgba(0,168,224,0.12);border-radius:10px;padding:14px 16px;margin-bottom:16px">
-                        <div style="font-size:12px;font-weight:700;color:#00a8e0;margin-bottom:8px;display:flex;align-items:center;gap:6px"><i class="fas fa-film"></i> Seu acesso inclui:</div>
-                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px 16px">
-                            <div style="font-size:11px;color:#8a8aa0;padding:2px 0;padding-left:14px;position:relative"><i class="fas fa-check" style="color:#00a8e0;font-size:8px;position:absolute;left:0;top:5px"></i>Todos os filmes e series</div>
-                            <div style="font-size:11px;color:#8a8aa0;padding:2px 0;padding-left:14px;position:relative"><i class="fas fa-check" style="color:#00a8e0;font-size:8px;position:absolute;left:0;top:5px"></i>Dublado e legendado</div>
-                            <div style="font-size:11px;color:#8a8aa0;padding:2px 0;padding-left:14px;position:relative"><i class="fas fa-check" style="color:#00a8e0;font-size:8px;position:absolute;left:0;top:5px"></i>Qualidade ate 1080p</div>
-                            <div style="font-size:11px;color:#8a8aa0;padding:2px 0;padding-left:14px;position:relative"><i class="fas fa-check" style="color:#00a8e0;font-size:8px;position:absolute;left:0;top:5px"></i>Sem anuncios</div>
-                            <div style="font-size:11px;color:#8a8aa0;padding:2px 0;padding-left:14px;position:relative"><i class="fas fa-check" style="color:#00a8e0;font-size:8px;position:absolute;left:0;top:5px"></i>Celular, PC e TV</div>
-                            <div style="font-size:11px;color:#8a8aa0;padding:2px 0;padding-left:14px;position:relative"><i class="fas fa-check" style="color:#00a8e0;font-size:8px;position:absolute;left:0;top:5px"></i>Suporte prioritario</div>
+                <div class="pw2-inc-wrap">
+                    <div class="pw2-inc">
+                        <div class="pw2-inc-label"><i class="fas fa-film"></i> Seu acesso inclui:</div>
+                        <div class="pw2-inc-grid">
+                            <div class="pw2-inc-item"><i class="fas fa-check"></i>Todos os filmes e series</div>
+                            <div class="pw2-inc-item"><i class="fas fa-check"></i>Dublado e legendado</div>
+                            <div class="pw2-inc-item"><i class="fas fa-check"></i>Qualidade ate 1080p</div>
+                            <div class="pw2-inc-item"><i class="fas fa-check"></i>Sem anuncios</div>
+                            <div class="pw2-inc-item"><i class="fas fa-check"></i>Celular, PC e TV</div>
+                            <div class="pw2-inc-item"><i class="fas fa-check"></i>Suporte prioritario</div>
                         </div>
                     </div>
                 </div>
-                <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:0 24px 24px">
-                    <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:22px 18px;position:relative">
-                        <div style="font-family:Sora,sans-serif;font-size:11px;font-weight:700;color:#e8e8f0;letter-spacing:1px;margin-bottom:2px">CINE BOSS</div>
-                        <div style="font-size:10px;color:#4a4a60;margin-bottom:10px">30 dias</div>
-                        <div style="font-family:Sora,sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:12px">R$ 12,99</div>
-                        <ul style="list-style:none;margin:0 0 16px">
-                            <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Todos os filmes e series</li>
-                            <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Qualidade ate 1080p</li>
-                            <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Sem anuncios</li>
-                            <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Suporte por email</li>
+                <div class="pw2-plans">
+                    <div class="pw2-plan">
+                        <div class="pw2-name">CINE BOSS</div>
+                        <div class="pw2-period">30 dias</div>
+                        <div class="pw2-price">R$ 12,99</div>
+                        <ul class="pw2-feats">
+                            <li><i class="fas fa-check"></i>Todos os filmes e series</li>
+                            <li><i class="fas fa-check"></i>Qualidade ate 1080p</li>
+                            <li><i class="fas fa-check"></i>Sem anuncios</li>
+                            <li><i class="fas fa-check"></i>Suporte por email</li>
                         </ul>
                         <button class="pw-select-btn" onclick="auth._selectPlan('monthly', this)" style="width:100%;padding:12px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.08);border-radius:8px;color:#e8e8f0;font-size:13px;font-weight:600;cursor:pointer;transition:all .25s;font-family:Inter,sans-serif">Assinar</button>
                     </div>
-                    <div style="background:rgba(0,168,224,0.04);border:1px solid rgba(0,168,224,0.3);border-radius:12px;padding:22px 18px;position:relative">
-                        <div style="position:absolute;top:-9px;right:14px;background:#00a8e0;color:#fff;font-size:9px;font-weight:700;padding:3px 10px;border-radius:8px;letter-spacing:.5px">MAIS POPULAR</div>
-                        <div style="font-family:Sora,sans-serif;font-size:11px;font-weight:700;color:#e8e8f0;letter-spacing:1px;margin-bottom:2px">CINE BOSS</div>
-                        <div style="font-size:10px;color:#4a4a60;margin-bottom:10px">90 dias</div>
-                        <div style="font-family:Sora,sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:2px">R$ 19,90</div>
-                        <div style="font-size:11px;color:#c9a54e;font-weight:600;margin-bottom:12px">Economize 49%</div>
-                        <ul style="list-style:none;margin:0 0 16px">
-                            <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Tudo do plano mensal</li>
-                            <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>3 meses de acesso</li>
-                            <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Suporte prioritario</li>
-                            <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>R$ 19,07 de economia</li>
+                    <div class="pw2-plan gold">
+                        <div class="pw2-badge">MAIS POPULAR</div>
+                        <div class="pw2-name">CINE BOSS</div>
+                        <div class="pw2-period">90 dias</div>
+                        <div class="pw2-price">R$ 19,90</div>
+                        <div class="pw2-save">Economize 49%</div>
+                        <ul class="pw2-feats">
+                            <li><i class="fas fa-check"></i>Tudo do plano mensal</li>
+                            <li><i class="fas fa-check"></i>3 meses de acesso</li>
+                            <li><i class="fas fa-check"></i>Suporte prioritario</li>
+                            <li><i class="fas fa-check"></i>R$ 19,07 de economia</li>
                         </ul>
                         <button class="pw-select-btn gold" onclick="auth._selectPlan('quarterly', this)" style="width:100%;padding:12px;background:linear-gradient(135deg,#c9a54e,#e0be6a);border:none;border-radius:8px;color:#0a0a12;font-size:13px;font-weight:700;cursor:pointer;transition:all .25s;font-family:Inter,sans-serif">Assinar agora</button>
                     </div>
                 </div>
-                <div style="margin:0 24px 20px;background:linear-gradient(135deg,rgba(76,175,80,0.10),rgba(0,168,224,0.05));border:1px solid rgba(76,175,80,0.35);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden">
-                    <div style="position:absolute;top:12px;right:14px;background:#4caf50;color:#0a0a12;font-size:9px;font-weight:800;padding:3px 10px;border-radius:8px;letter-spacing:.5px">PASS 24H</div>
-                    <div style="font-family:Sora,sans-serif;font-size:14px;font-weight:800;color:#fff;margin-bottom:6px"><i class="fas fa-clock" style="color:#4caf50;margin-right:7px"></i>Sem condicoes hoje?</div>
-                    <div style="font-size:12px;color:#8a8aa0;line-height:1.55;margin-bottom:14px;max-width:360px">Pague apenas <strong style="color:#fff">R$ 5,00</strong> e tenha <strong style="color:#fff">24 horas de acesso total</strong>: qualquer filme, serie ou anime, sem limite. Ideal pra aquele filme do fim de semana. A gente entende, e essa porta fica aberta.</div>
-                    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
-                        <div><span style="font-family:Sora,sans-serif;font-size:26px;font-weight:800;color:#fff">R$ 5,00</span> <span style="font-size:11px;color:#4a4a60">/ 24 horas</span></div>
+                <div class="pw2-day">
+                    <div class="pw2-day-badge">PASS 24H</div>
+                    <div class="pw2-day-title"><i class="fas fa-clock" style="color:#4caf50;margin-right:7px"></i>Sem condicoes hoje?</div>
+                    <div class="pw2-day-desc">Pague apenas <strong style="color:#fff">R$ 5,00</strong> e tenha <strong style="color:#fff">24 horas de acesso total</strong>: qualquer filme, serie ou anime, sem limite. Ideal pra aquele filme do fim de semana. A gente entende, e essa porta fica aberta.</div>
+                    <div class="pw2-day-row">
+                        <div><span class="pw2-day-amount">R$ 5,00</span> <span class="pw2-day-unit">/ 24 horas</span></div>
                         <button class="pw-select-btn" onclick="auth._selectPlan('daily', this)" style="padding:12px 20px;background:#4caf50;border:none;border-radius:8px;color:#0a0a12;font-size:13px;font-weight:700;cursor:pointer;transition:all .25s;font-family:Inter,sans-serif">QUERO ASSISTIR HOJE</button>
                     </div>
                 </div>
-                <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:14px 24px;border-top:1px solid rgba(255,255,255,0.04);font-size:11px;color:#4a4a60">
+                <div class="pw2-foot">
                     <i class="fas fa-shield-halved" style="color:#00a8e0"></i>
                     Pagamento via Mercado Pago: PIX, cartao ou boleto. Sem renovacao automatica.
                 </div>
