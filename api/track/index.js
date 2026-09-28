@@ -1,6 +1,6 @@
 const {
     supabase, setCors, handleOptions,
-    getToken, verifyToken,
+    checkRateLimit, recordRateLimitAttempt,
     jsonError, jsonSuccess
 } = require('../_lib/security');
 
@@ -18,19 +18,14 @@ module.exports = async function handler(req, res) {
         if (!event || ALLOWED_EVENTS.indexOf(event) === -1) return jsonError(res, 400, 'Evento invalido');
         const plan = ALLOWED_PLANS.indexOf(body.plan) !== -1 ? body.plan : null;
 
-        let userId = null;
-        const token = getToken(req);
-        if (token) {
-            try {
-                const decoded = verifyToken(token);
-                userId = decoded.userId || null;
-            } catch {}
-        }
+        const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'desconhecido';
+        const rl = await checkRateLimit('track:' + ip, 60, 60);
+        if (rl.blocked) return jsonError(res, 429, 'Muitas requisicoes');
+        recordRateLimitAttempt('track:' + ip);
 
-        const { error } = await supabase.from('funnel_events').insert({
-            event,
-            plan,
-            user_id: userId,
+        const key = plan ? 'funnel:' + event + ':' + plan : 'funnel:' + event;
+        const { error } = await supabase.from('rate_limits').insert({
+            key,
             created_at: new Date().toISOString()
         });
         if (error) console.error('Funnel insert error:', error);

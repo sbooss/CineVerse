@@ -64,10 +64,8 @@ module.exports = async function handler(req, res) {
                     mp_payment_id: paymentData.id
                 }).eq('id', subscription.id);
 
-                const { error: feErr } = await supabase.from('funnel_events').insert({
-                    event: 'purchase',
-                    plan: subscription.plan || ref.plan || null,
-                    user_id: ref.userId || null,
+                const { error: feErr } = await supabase.from('rate_limits').insert({
+                    key: 'funnel:purchase:' + (subscription.plan || ref.plan || ''),
                     created_at: new Date().toISOString()
                 });
                 if (feErr) console.error('Funnel purchase insert error:', feErr);

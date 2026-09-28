@@ -91,8 +91,9 @@ module.exports = async function handler(req, res) {
                 .select('id, user_id, device_name, device_os, device_browser, ip_address, created_at, expires_at')
                 .gt('expires_at', now)
                 .order('created_at', { ascending: false }).limit(500),
-            supabase.from('funnel_events')
-                .select('event, plan, created_at')
+            supabase.from('rate_limits')
+                .select('key, created_at')
+                .like('key', 'funnel:%')
                 .gte('created_at', d30)
                 .limit(5000)
         ]);
@@ -171,12 +172,17 @@ module.exports = async function handler(req, res) {
         const planCounts = { daily: 0, monthly: 0, quarterly: 0 };
         activeSubs.forEach(s => { if (planCounts[s.plan] !== undefined) planCounts[s.plan]++; });
 
-        /* funil de vendas (30 dias) */
+        /* funil de vendas (30 dias) — eventos na tabela rate_limits, chave funnel:evento[:plano] */
         const funnel = { paywallOpens: 0, checkoutClicks: 0, purchases: 0, clicksByPlan: { daily: 0, monthly: 0, quarterly: 0 } };
         funnelRows.forEach(r => {
-            if (r.event === 'paywall_open') funnel.paywallOpens++;
-            else if (r.event === 'checkout_click') { funnel.checkoutClicks++; if (r.plan && funnel.clicksByPlan[r.plan] !== undefined) funnel.clicksByPlan[r.plan]++; }
-            else if (r.event === 'purchase') funnel.purchases++;
+            const parts = (r.key || '').split(':');
+            if (parts[0] !== 'funnel') return;
+            if (parts[1] === 'paywall_open') funnel.paywallOpens++;
+            else if (parts[1] === 'checkout_click') {
+                funnel.checkoutClicks++;
+                if (parts[2] && funnel.clicksByPlan[parts[2]] !== undefined) funnel.clicksByPlan[parts[2]]++;
+            }
+            else if (parts[1] === 'purchase') funnel.purchases++;
         });
         funnel.paywallToClick = funnel.paywallOpens > 0 ? Math.round((funnel.checkoutClicks / funnel.paywallOpens) * 1000) / 10 : 0;
         funnel.clickToPurchase = funnel.checkoutClicks > 0 ? Math.round((funnel.purchases / funnel.checkoutClicks) * 1000) / 10 : 0;
