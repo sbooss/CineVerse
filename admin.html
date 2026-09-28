@@ -918,11 +918,12 @@
             if (!el) return;
             f = f || {};
             var cb = f.clicksByPlan || {};
-            var steps = [
-                { n: f.paywallOpens || 0, label: 'Paywalls abertos', sub: 'tentaram assistir sem plano', color: '#00a8e0' },
-                { n: f.checkoutClicks || 0, label: 'Cliques em plano', sub: (f.paywallOpens ? Math.round((f.paywallToClick || 0) * 10) / 10 + '% dos paywalls' : 'clicaram em assinar'), color: '#c9a54e' },
-                { n: f.purchases || 0, label: 'Pagamentos', sub: (f.checkoutClicks ? Math.round((f.clickToPurchase || 0) * 10) / 10 + '% dos cliques' : 'aprovados'), color: '#4caf50' }
-            ];
+            var steps = [];
+            if (f.paywallOpens > 0) {
+                steps.push({ n: f.paywallOpens, label: 'Paywalls abertos', sub: 'tentaram assistir sem plano', color: '#00a8e0' });
+            }
+            steps.push({ n: f.checkoutClicks || 0, label: 'Checkouts iniciados', sub: (f.paywallOpens > 0 && f.paywallToClick ? Math.round((f.paywallToClick || 0) * 10) / 10 + '% dos paywalls' : 'escolheram um plano'), color: '#c9a54e' });
+            steps.push({ n: f.purchases || 0, label: 'Pagamentos aprovados', sub: (f.checkoutClicks ? Math.round((f.clickToPurchase || 0) * 10) / 10 + '% dos checkouts' : 'aguardando o primeiro'), color: '#4caf50' });
             var row = '';
             steps.forEach(function(s, i) {
                 if (i) row += '<div class="fun-arrow"><i class="fas fa-arrow-right"></i></div>';

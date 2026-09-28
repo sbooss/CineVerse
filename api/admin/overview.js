@@ -85,7 +85,7 @@ module.exports = async function handler(req, res) {
             supabase.from('users').select('*', { count: 'exact', head: true }),
             supabase.from('users').select('*', { count: 'exact', head: true }).gte('created_at', d30),
             supabase.from('subscriptions')
-                .select('id, user_id, plan, status, amount, expires_at, created_at')
+                .select('id, user_id, plan, status, amount, expires_at, created_at, activated_at')
                 .order('created_at', { ascending: false }).limit(1000),
             supabase.from('sessions')
                 .select('id, user_id, device_name, device_os, device_browser, ip_address, created_at, expires_at')
@@ -172,18 +172,16 @@ module.exports = async function handler(req, res) {
         const planCounts = { daily: 0, monthly: 0, quarterly: 0 };
         activeSubs.forEach(s => { if (planCounts[s.plan] !== undefined) planCounts[s.plan]++; });
 
-        /* funil de vendas (30 dias) — eventos na tabela rate_limits, chave funnel:evento[:plano] */
+        /* funil de vendas (30 dias) — paywall de rate_limits (se a tabela existir), cliques e pagamentos do banco (fonte verdade) */
         const funnel = { paywallOpens: 0, checkoutClicks: 0, purchases: 0, clicksByPlan: { daily: 0, monthly: 0, quarterly: 0 } };
         funnelRows.forEach(r => {
             const parts = (r.key || '').split(':');
-            if (parts[0] !== 'funnel') return;
-            if (parts[1] === 'paywall_open') funnel.paywallOpens++;
-            else if (parts[1] === 'checkout_click') {
-                funnel.checkoutClicks++;
-                if (parts[2] && funnel.clicksByPlan[parts[2]] !== undefined) funnel.clicksByPlan[parts[2]]++;
-            }
-            else if (parts[1] === 'purchase') funnel.purchases++;
+            if (parts[0] === 'funnel' && parts[1] === 'paywall_open') funnel.paywallOpens++;
         });
+        const clicksRows = subs.filter(s => s.created_at && s.created_at >= d30);
+        funnel.checkoutClicks = clicksRows.length;
+        clicksRows.forEach(s => { if (s.plan && funnel.clicksByPlan[s.plan] !== undefined) funnel.clicksByPlan[s.plan]++; });
+        funnel.purchases = subs.filter(s => s.status === 'active' && s.activated_at && s.activated_at >= d30).length;
         funnel.paywallToClick = funnel.paywallOpens > 0 ? Math.round((funnel.checkoutClicks / funnel.paywallOpens) * 1000) / 10 : 0;
         funnel.clickToPurchase = funnel.checkoutClicks > 0 ? Math.round((funnel.purchases / funnel.checkoutClicks) * 1000) / 10 : 0;
         let noPlanUsers = 0;
