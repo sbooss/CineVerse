@@ -163,7 +163,7 @@ module.exports = async function handler(req, res) {
         subs.forEach(s => { const k = dayKey(s.created_at); if (subsByDay[k] !== undefined) subsByDay[k]++; });
 
         /* distribuicoes para o dashboard */
-        const planCounts = { monthly: 0, quarterly: 0 };
+        const planCounts = { daily: 0, monthly: 0, quarterly: 0 };
         activeSubs.forEach(s => { if (planCounts[s.plan] !== undefined) planCounts[s.plan]++; });
         let noPlanUsers = 0;
         userRows.forEach(u => { if (u.status === 'none') noPlanUsers++; });

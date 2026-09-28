@@ -428,6 +428,7 @@
                             <circle class="donut-ring" cx="85" cy="85" r="60"></circle>
                             <circle class="donut-seg" id="segMonthly" cx="85" cy="85" r="60" stroke="#00a8e0" stroke-dasharray="0 376.99" stroke-dashoffset="0"></circle>
                             <circle class="donut-seg" id="segQuarterly" cx="85" cy="85" r="60" stroke="#c9a54e" stroke-dasharray="0 376.99" stroke-dashoffset="0"></circle>
+                            <circle class="donut-seg" id="segDaily" cx="85" cy="85" r="60" stroke="#4caf50" stroke-dasharray="0 376.99" stroke-dashoffset="0"></circle>
                         </svg>
                         <div class="donut-center">
                             <div class="dc-value" id="donutTotal">--</div>
@@ -828,16 +829,23 @@
             var dist = d.distrib || {};
             var m = dist.plans ? (dist.plans.monthly || 0) : 0;
             var q = dist.plans ? (dist.plans.quarterly || 0) : 0;
-            var totalPlan = m + q;
+            var dy = dist.plans ? (dist.plans.daily || 0) : 0;
+            var totalPlan = m + q + dy;
             var C = 2 * Math.PI * 60;
             var mLen = totalPlan ? (m / totalPlan) * C : 0;
             var qLen = totalPlan ? (q / totalPlan) * C : 0;
+            var dLen = totalPlan ? (dy / totalPlan) * C : 0;
             var segM = document.getElementById('segMonthly');
             var segQ = document.getElementById('segQuarterly');
+            var segD = document.getElementById('segDaily');
             if (segM) segM.setAttribute('stroke-dasharray', mLen.toFixed(1) + ' ' + (C - mLen).toFixed(1));
             if (segQ) {
                 segQ.setAttribute('stroke-dasharray', qLen.toFixed(1) + ' ' + (C - qLen).toFixed(1));
                 segQ.setAttribute('stroke-dashoffset', (-mLen).toFixed(1));
+            }
+            if (segD) {
+                segD.setAttribute('stroke-dasharray', dLen.toFixed(1) + ' ' + (C - dLen).toFixed(1));
+                segD.setAttribute('stroke-dashoffset', (-(mLen + qLen)).toFixed(1));
             }
             var donutTotal = document.getElementById('donutTotal');
             if (donutTotal) donutTotal.textContent = totalPlan;
@@ -847,6 +855,7 @@
                 legend.innerHTML =
                     '<div class="dl-item"><span class="dl-swatch" style="background:#00a8e0"></span><span class="dl-name">Mensal</span><span class="dl-val">' + m + '</span><span class="dl-pct">' + (totalPlan ? Math.round(m / totalPlan * 100) : 0) + '%</span></div>' +
                     '<div class="dl-item"><span class="dl-swatch" style="background:#c9a54e"></span><span class="dl-name">Trimestral</span><span class="dl-val">' + q + '</span><span class="dl-pct">' + (totalPlan ? Math.round(q / totalPlan * 100) : 0) + '%</span></div>' +
+                    '<div class="dl-item"><span class="dl-swatch" style="background:#4caf50"></span><span class="dl-name">Pass 24h</span><span class="dl-val">' + dy + '</span><span class="dl-pct">' + (totalPlan ? Math.round(dy / totalPlan * 100) : 0) + '%</span></div>' +
                     '<div class="dl-item"><span class="dl-swatch" style="background:rgba(255,255,255,0.16)"></span><span class="dl-name">Sem plano</span><span class="dl-val">' + (dist.noPlanUsers || 0) + '</span><span class="dl-pct">usuarios</span></div>';
             }
 

@@ -42,13 +42,18 @@ module.exports = async function handler(req, res) {
         // Admin stats endpoint
         if (isStatsRequest && user.email === ADMIN_EMAIL) {
             const { count: totalUsers } = await supabase.from('users').select('*', { count: 'exact', head: true });
-            const { count: activeSubs } = await supabase.from('subscriptions').select('*', { count: 'exact', head: true }).eq('status', 'active').gt('expires_at', new Date().toISOString());
+            const { data: activeRows } = await supabase.from('subscriptions')
+                .select('amount')
+                .eq('status', 'active')
+                .gt('expires_at', new Date().toISOString());
+            const activeSubs = activeRows ? activeRows.length : 0;
+            const activeRevenue = activeRows ? activeRows.reduce((sum, s) => sum + (Number(s.amount) || 0), 0) : 0;
             const allSessions = await getActiveSessions(user.id);
             return res.status(200).json({
                 totalUsers: totalUsers || 0,
-                activeSubs: activeSubs || 0,
+                activeSubs,
                 activeSessions: allSessions.length,
-                monthlyRevenue: 'R$ ' + ((activeSubs || 0) * 6.99).toFixed(2).replace('.', ',')
+                monthlyRevenue: 'R$ ' + activeRevenue.toFixed(2).replace('.', ',')
             });
         }
 

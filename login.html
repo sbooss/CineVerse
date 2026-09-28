@@ -141,6 +141,16 @@
         .plan-btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
         .plan-footer{text-align:center;font-size:10px;color:var(--txt3);margin-top:4px}
         .plan-footer i{color:var(--blue);margin-right:4px}
+        .day-pass-card{display:flex;align-items:center;justify-content:space-between;gap:10px;background:linear-gradient(135deg,rgba(76,175,80,0.10),rgba(0,168,224,0.05));border:1px solid rgba(76,175,80,0.35);border-radius:12px;padding:14px;cursor:pointer;transition:all .25s}
+        .day-pass-card:hover{border-color:rgba(76,175,80,0.6)}
+        .dp-info{min-width:0}
+        .dp-title{font-family:'Sora',sans-serif;font-size:11px;font-weight:700;color:#fff;letter-spacing:.5px;margin-bottom:4px}
+        .dp-title i{color:#4caf50;margin-right:5px}
+        .dp-text{font-size:10px;color:var(--txt2);line-height:1.5}
+        .dp-text strong{color:#fff}
+        .dp-buy{display:flex;flex-direction:column;align-items:flex-end;gap:7px;flex-shrink:0}
+        .plan-btn.green{background:#4caf50;color:#0a0a12}
+        .plan-btn.green:hover{box-shadow:0 4px 16px rgba(76,175,80,0.3)}
 
         .sound-btn{position:fixed;top:14px;right:14px;z-index:20;width:34px;height:34px;background:rgba(255,255,255,0.04);border:1px solid var(--brd);border-radius:50%;color:var(--txt3);font-size:13px;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .2s}
         .sound-btn:hover{color:var(--txt);background:rgba(255,255,255,0.08)}
@@ -170,6 +180,8 @@
         @media(max-width:640px){
             .auth-card-inner{padding:28px 22px}
             .plans-grid{grid-template-columns:1fr}
+            .day-pass-card{flex-direction:column;align-items:stretch}
+            .dp-buy{align-items:stretch}
             .footer{display:none}
             .auth-area{padding-bottom:20px}
         }
@@ -259,12 +271,12 @@
 
                 <div class="payment-panel" id="paymentPanel">
                     <div class="payment-panel-title">Escolha seu plano</div>
-                    <div class="payment-panel-desc">Pagamento unico via Mercado Pago. Sem renovacao automatica.</div>
+                    <div class="payment-panel-desc">Pague com PIX via Mercado Pago. Sem renovacao automatica.</div>
                     <div class="plans-grid">
                         <div class="plan-card" id="planMonthly" onclick="selectPlan('monthly')">
                             <div class="plan-name">CINE BOSS MENSAL</div>
                             <div class="plan-period">30 dias de acesso</div>
-                            <div class="plan-price">R$ 6,99 <span class="period">/mes</span></div>
+                            <div class="plan-price">R$ 12,99 <span class="period">/mes</span></div>
                             <ul class="plan-features">
                                 <li><i class="fas fa-check"></i>Todos os filmes e series</li>
                                 <li><i class="fas fa-check"></i>Qualidade ate 1080p</li>
@@ -275,8 +287,8 @@
                         <div class="plan-card popular" id="planQuarterly" onclick="selectPlan('quarterly')">
                             <div class="plan-name">CINE BOSS TRIMESTRAL</div>
                             <div class="plan-period">90 dias de acesso</div>
-                            <div class="plan-price">R$ 15,99 <span class="period">/3 meses</span></div>
-                            <div class="plan-save">Economize 25%</div>
+                            <div class="plan-price">R$ 19,90 <span class="period">/3 meses</span></div>
+                            <div class="plan-save">Economize 49%</div>
                             <ul class="plan-features">
                                 <li><i class="fas fa-check"></i>Tudo do plano mensal</li>
                                 <li><i class="fas fa-check"></i>3 meses de acesso</li>
@@ -285,7 +297,17 @@
                             <button class="plan-btn gold" id="planQtrBtn">ASSINAR</button>
                         </div>
                     </div>
-                    <div class="plan-footer"><i class="fas fa-shield-halved"></i>Pagamento unico. Sem renovacao automatica.</div>
+                    <div class="day-pass-card" onclick="selectPlan('daily')">
+                        <div class="dp-info">
+                            <div class="dp-title"><i class="fas fa-clock"></i> PASS 24 HORAS</div>
+                            <div class="dp-text">Sem condicoes agora? Pague <strong>R$ 5,00 no PIX</strong> e tenha 24h de acesso total, qualquer filme ou serie.</div>
+                        </div>
+                        <div class="dp-buy">
+                            <div class="plan-price">R$ 5,00 <span class="period">/24h</span></div>
+                            <button class="plan-btn green" id="planDailyBtn">ASSISTIR</button>
+                        </div>
+                    </div>
+                    <div class="plan-footer"><i class="fas fa-shield-halved"></i>Pagamento via PIX. Sem renovacao automatica.</div>
                 </div>
             </div>
         </div>
@@ -372,7 +394,9 @@
 
         window.selectPlan = function(plan){
             S.click();
-            var btn = document.getElementById(plan==='monthly'?'planMonthBtn':'planQtrBtn');
+            var btnId = plan==='monthly' ? 'planMonthBtn' : (plan==='daily' ? 'planDailyBtn' : 'planQtrBtn');
+            var btn = document.getElementById(btnId);
+            var originalText = btn ? btn.textContent : '';
             if(btn){btn.disabled=true;btn.textContent='PROCESSANDO...';}
             fetch(API+'/subscription/checkout',{method:'POST',headers:{'Content-Type':'application/json'},credentials:'include',body:JSON.stringify({plan:plan})})
             .then(function(r){return r.json().then(function(d){return{ok:r.ok,data:d}})})
@@ -387,7 +411,7 @@
                 }
             })
             .catch(function(e){
-                if(btn){btn.disabled=false;btn.textContent='ASSINAR';}
+                if(btn){btn.disabled=false;btn.textContent=originalText;}
                 alert(e.message||'Erro ao processar pagamento');
             });
         };

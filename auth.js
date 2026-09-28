@@ -127,6 +127,7 @@ class AuthManager {
     }
 
     showPaywall() {
+        if (!document.getElementById('authModal')) { document.body.appendChild(this._createAuthModal()); }
         let m = document.getElementById('paywallModal');
         if (!m) { m = this._createPaywallModal(); document.body.appendChild(m); }
         m.style.display = 'flex';
@@ -282,7 +283,7 @@ class AuthManager {
                     <div style="background:rgba(255,255,255,0.02);border:1px solid rgba(255,255,255,0.05);border-radius:12px;padding:22px 18px;position:relative">
                         <div style="font-family:Sora,sans-serif;font-size:11px;font-weight:700;color:#e8e8f0;letter-spacing:1px;margin-bottom:2px">CINE BOSS</div>
                         <div style="font-size:10px;color:#4a4a60;margin-bottom:10px">30 dias</div>
-                        <div style="font-family:Sora,sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:12px">R$ 6,99</div>
+                        <div style="font-family:Sora,sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:12px">R$ 12,99</div>
                         <ul style="list-style:none;margin:0 0 16px">
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Todos os filmes e series</li>
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Qualidade ate 1080p</li>
@@ -295,20 +296,29 @@ class AuthManager {
                         <div style="position:absolute;top:-9px;right:14px;background:#00a8e0;color:#fff;font-size:9px;font-weight:700;padding:3px 10px;border-radius:8px;letter-spacing:.5px">MAIS POPULAR</div>
                         <div style="font-family:Sora,sans-serif;font-size:11px;font-weight:700;color:#e8e8f0;letter-spacing:1px;margin-bottom:2px">CINE BOSS</div>
                         <div style="font-size:10px;color:#4a4a60;margin-bottom:10px">90 dias</div>
-                        <div style="font-family:Sora,sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:2px">R$ 15,99</div>
-                        <div style="font-size:11px;color:#c9a54e;font-weight:600;margin-bottom:12px">Economize 25%</div>
+                        <div style="font-family:Sora,sans-serif;font-size:28px;font-weight:800;color:#fff;margin-bottom:2px">R$ 19,90</div>
+                        <div style="font-size:11px;color:#c9a54e;font-weight:600;margin-bottom:12px">Economize 49%</div>
                         <ul style="list-style:none;margin:0 0 16px">
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Tudo do plano mensal</li>
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>3 meses de acesso</li>
                             <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>Suporte prioritario</li>
-                            <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>R$ 5,02 de economia</li>
+                            <li style="display:flex;align-items:center;gap:6px;font-size:11px;color:#8a8aa0;padding:4px 0"><i class="fas fa-check" style="color:#00a8e0;font-size:9px;width:12px"></i>R$ 19,07 de economia</li>
                         </ul>
                         <button class="pw-select-btn gold" onclick="auth._selectPlan('quarterly', this)" style="width:100%;padding:12px;background:linear-gradient(135deg,#c9a54e,#e0be6a);border:none;border-radius:8px;color:#0a0a12;font-size:13px;font-weight:700;cursor:pointer;transition:all .25s;font-family:Inter,sans-serif">Assinar agora</button>
                     </div>
                 </div>
+                <div style="margin:0 24px 20px;background:linear-gradient(135deg,rgba(76,175,80,0.10),rgba(0,168,224,0.05));border:1px solid rgba(76,175,80,0.35);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden">
+                    <div style="position:absolute;top:12px;right:14px;background:#4caf50;color:#0a0a12;font-size:9px;font-weight:800;padding:3px 10px;border-radius:8px;letter-spacing:.5px">PASS 24H</div>
+                    <div style="font-family:Sora,sans-serif;font-size:14px;font-weight:800;color:#fff;margin-bottom:6px"><i class="fas fa-clock" style="color:#4caf50;margin-right:7px"></i>Sem condicoes hoje?</div>
+                    <div style="font-size:12px;color:#8a8aa0;line-height:1.55;margin-bottom:14px;max-width:360px">Pague apenas <strong style="color:#fff">R$ 5,00 no PIX</strong> e tenha <strong style="color:#fff">24 horas de acesso total</strong>: qualquer filme, serie ou anime, sem limite. Ideal pra aquele filme do fim de semana. A gente entende, e essa porta fica aberta.</div>
+                    <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+                        <div><span style="font-family:Sora,sans-serif;font-size:26px;font-weight:800;color:#fff">R$ 5,00</span> <span style="font-size:11px;color:#4a4a60">/ 24 horas</span></div>
+                        <button class="pw-select-btn" onclick="auth._selectPlan('daily', this)" style="padding:12px 20px;background:#4caf50;border:none;border-radius:8px;color:#0a0a12;font-size:13px;font-weight:700;cursor:pointer;transition:all .25s;font-family:Inter,sans-serif">QUERO ASSISTIR HOJE</button>
+                    </div>
+                </div>
                 <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:14px 24px;border-top:1px solid rgba(255,255,255,0.04);font-size:11px;color:#4a4a60">
                     <i class="fas fa-shield-halved" style="color:#00a8e0"></i>
-                    Pagamento unico via Mercado Pago. Sem renovacao automatica.
+                    Pague com PIX via Mercado Pago. Sem renovacao automatica.
                 </div>
             </div>
         </div>`;
@@ -318,7 +328,7 @@ class AuthManager {
 
     async _selectPlan(plan, btnEl) {
         sounds.click();
-        const btn = btnEl || document.querySelector('.pw-select-btn, #planMonthBtn, #planQtrBtn');
+        const btn = btnEl || document.querySelector('.pw-select-btn, #planMonthBtn, #planQtrBtn, #planDailyBtn');
         if(btn){btn.disabled=true;btn.textContent='PROCESSANDO...';}
         try {
             const r = await fetch(`${API_BASE}/subscription/checkout`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, credentials: 'include', body: JSON.stringify({ plan }) });

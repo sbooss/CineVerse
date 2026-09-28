@@ -9,8 +9,9 @@ if (!MP_TOKEN) console.error('CRITICAL: MP_ACCESS_TOKEN not set');
 const MP_API = 'https://api.mercadopago.com';
 
 const PLANS = {
-    monthly: { price: 6.99, days: 30, name: 'CINE BOSS - 30 Dias', unit: 6.99 },
-    quarterly: { price: 15.99, days: 90, name: 'CINE BOSS - 90 Dias', unit: 15.99 }
+    daily: { price: 5.00, days: 1, name: 'CINE BOSS - Pass 24 Horas', unit: 5.00 },
+    monthly: { price: 12.99, days: 30, name: 'CINE BOSS - 30 Dias', unit: 12.99 },
+    quarterly: { price: 19.90, days: 90, name: 'CINE BOSS - 90 Dias', unit: 19.90 }
 };
 
 module.exports = async function handler(req, res) {
@@ -56,7 +57,13 @@ module.exports = async function handler(req, res) {
             },
             auto_return: 'approved',
             payment_methods: {
-                excluded_payment_types: [],
+                excluded_payment_types: [
+                    { id: 'credit_card' },
+                    { id: 'debit_card' },
+                    { id: 'prepaid_card' },
+                    { id: 'ticket' },
+                    { id: 'account_money' }
+                ],
                 installments: 1
             },
             notification_url: `${siteUrl}/api/webhook/mercadopago`,
