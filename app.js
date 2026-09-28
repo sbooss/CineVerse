@@ -903,6 +903,8 @@ document.addEventListener('keydown', function(e) {
 /* ===================== SMART TV REMOTE CONTROL ===================== */
 var tvFocusIndex = -1;
 var tvFocusableElements = [];
+var _tvFocusCacheAt = 0;
+var _tvFocusScope = '';
 
 function setupTVRemote() {
     // Detect if device is TV (Smart TV, Android TV, Fire TV, etc.)
@@ -914,13 +916,27 @@ function setupTVRemote() {
 
     document.body.classList.add('tv-mode');
 
-    // Get all focusable elements
-    function updateFocusableElements() {
-        tvFocusableElements = Array.from(document.querySelectorAll(
+    function isPlayerOpen() {
+        return (typeof player !== 'undefined') && player.isOpen && player.isOpen();
+    }
+
+    // Get all focusable elements (com player aberto, apenas dentro do overlay)
+    function updateFocusableElements(force) {
+        var now = (window.Date && Date.now) ? Date.now() : 0;
+        var wantScope = isPlayerOpen() ? 'overlay' : 'page';
+        if (!force && tvFocusableElements.length > 0 && now - _tvFocusCacheAt < 500 && _tvFocusScope === wantScope) return;
+        _tvFocusCacheAt = now;
+        _tvFocusScope = wantScope;
+        var scope = document;
+        if (isPlayerOpen()) {
+            var ov = document.getElementById('playerOverlay');
+            if (ov) scope = ov;
+        }
+        tvFocusableElements = Array.from(scope.querySelectorAll(
             '.nav-link, .mobile-link, .movie-card, .channel-card, .filter-btn, ' +
             '.btn-primary, .btn-secondary, .detail-btn-play, .detail-btn-secondary, ' +
             '.server-chip, #heroPlayBtn, #heroFavBtn, ' +
-            '.season-tab, .detail-episode-card, .card-fav'
+            '.season-tab, .detail-episode-card, .card-fav, .player-back'
         )).filter(function(el) {
             return el.offsetParent !== null && el.offsetWidth > 0;
         });
@@ -931,7 +947,7 @@ function setupTVRemote() {
         if (!el) return;
         el.focus();
         el.classList.add('tv-focused');
-        el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        el.scrollIntoView({ behavior: 'auto', block: 'center' });
     }
 
     // Remove focus from all
@@ -974,7 +990,23 @@ function setupTVRemote() {
 
     // Handle TV remote keys
     document.addEventListener('keydown', function(e) {
-        updateFocusableElements();
+        if (isPlayerOpen()) {
+            // Sai do player: Back/Stop sempre fecham (mesmo com foco no video)
+            if (e.key === 'Backspace' || e.key === 'Back' || e.key === 'MediaStop') {
+                e.preventDefault();
+                player.close();
+                return;
+            }
+            // Foco no video (iframe do embed ou <video>): deixa a tecla ir pro player
+            var ae = document.activeElement;
+            if (ae && (ae.tagName === 'IFRAME' || ae.tagName === 'VIDEO')) return;
+            // Foco tras da overlay (card/pagina): nao mexe na pagina durante a reproducao
+            if (!ae || !ae.closest || !ae.closest('#playerOverlay')) return;
+            // Dentro do overlay (chips de servidor, voltar, erro): navega so nele
+            updateFocusableElements(true);
+        } else {
+            updateFocusableElements();
+        }
         if (tvFocusableElements.length === 0) return;
 
         var current = document.activeElement;
@@ -1069,7 +1101,8 @@ function setupTVRemote() {
 
     // Initial focus on first card after load
     setTimeout(function() {
-        updateFocusableElements();
+        if (isPlayerOpen()) return;
+        updateFocusableElements(true);
         if (tvFocusableElements.length > 0) {
             focusElement(tvFocusableElements[0]);
         }

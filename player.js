@@ -116,6 +116,16 @@ class VideoPlayer {
         return this.overlay.classList.contains('active');
     }
 
+    _pauseBackground() {
+        try { this._heroWasRunning = (typeof heroTimer !== 'undefined' && !!heroTimer); } catch (e) { this._heroWasRunning = false; }
+        if (typeof stopHeroCarousel === 'function') stopHeroCarousel();
+    }
+
+    _resumeBackground() {
+        if (this._heroWasRunning && typeof startHeroCarousel === 'function') startHeroCarousel();
+        this._heroWasRunning = false;
+    }
+
     async open(item, season, episode) {
         season = season || 1;
         episode = episode || 1;
@@ -130,6 +140,7 @@ class VideoPlayer {
         this.overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
         this._startAntiAds();
+        this._pauseBackground();
         this._loadEmbed(item, season, episode);
     }
 
@@ -139,6 +150,7 @@ class VideoPlayer {
         if (!detailOpen) document.body.style.overflow = '';
         if (this._serverLoadTimeout) { clearTimeout(this._serverLoadTimeout); this._serverLoadTimeout = null; }
         this._stopAntiAds();
+        this._resumeBackground();
         var iframes = this.wrapper.querySelectorAll('iframe');
         iframes.forEach(function(f) { try { f.src = 'about:blank'; f.remove(); } catch(ex) {} });
         this.wrapper.innerHTML = '';
@@ -172,9 +184,13 @@ class VideoPlayer {
                 '<button class="btn-secondary" id="playerErrorBack" style="margin-top:15px">' +
                 '<i class="fas fa-arrow-left"></i> Voltar</button></div>';
             document.getElementById('playerErrorBack').addEventListener('click', function() { self.close(); });
+            if (document.documentElement.classList.contains('tv-device')) {
+                var fbtn = serverBar.querySelector('.server-chip') || document.getElementById('playerErrorBack');
+                if (fbtn) { try { fbtn.focus(); } catch (e) {} }
+            }
         };
 
-        var tryProvider = function(index) {
+        var tryProvider = function(index, isRetry) {
             if (index >= providers.length) {
                 serverBar.innerHTML = '';
                 showError('Todos os servidores estao fora. Tente novamente mais tarde.');
@@ -215,17 +231,20 @@ class VideoPlayer {
                 this.style.opacity = '1';
                 var loader = document.getElementById('playerLoadingOverlay');
                 if (loader) loader.remove();
+                if (isTv) { try { this.focus(); } catch (e) {} }
             };
 
             loadTimeout = setTimeout(function() {
                 if (settled || !self.isOpen()) return;
                 settled = true;
                 self._serverLoadTimeout = null;
+                if (isTv && !isRetry) { tryProvider(index, true); return; }
                 tryProvider(index + 1);
-            }, isTv ? 14000 : 10000);
+            }, isTv ? (isRetry ? 15000 : 22000) : 10000);
             self._serverLoadTimeout = loadTimeout;
 
             self.wrapper.appendChild(iframe);
+            if (isTv) { try { iframe.focus(); } catch (e) {} }
 
             serverBar.querySelectorAll('.server-chip').forEach(function(btn) {
                 btn.addEventListener('click', function(e) {
@@ -245,7 +264,7 @@ class VideoPlayer {
             self._currentEpisode = episode;
         };
 
-        tryProvider(0);
+        tryProvider(0, false);
     }
 
     _switchServer(index) {
@@ -279,6 +298,7 @@ class VideoPlayer {
         this.overlay.classList.add('active');
         document.body.style.overflow = 'hidden';
         this._startAntiAds();
+        this._pauseBackground();
         var serverBar = document.getElementById('serverBar');
         serverBar.innerHTML = '<span class="server-label">TV Ao Vivo</span>';
         var self = this;
