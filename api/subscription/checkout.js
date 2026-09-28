@@ -57,13 +57,7 @@ module.exports = async function handler(req, res) {
             },
             auto_return: 'approved',
             payment_methods: {
-                excluded_payment_types: [
-                    { id: 'credit_card' },
-                    { id: 'debit_card' },
-                    { id: 'prepaid_card' },
-                    { id: 'ticket' },
-                    { id: 'account_money' }
-                ],
+                excluded_payment_types: [],
                 installments: 1
             },
             notification_url: `${siteUrl}/api/webhook/mercadopago`,

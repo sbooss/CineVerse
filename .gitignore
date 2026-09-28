@@ -28,3 +28,4 @@ start-server.bat
 Thumbs.db
 
 .vercel
+.env*
