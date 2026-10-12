@@ -16,7 +16,7 @@ const CONFIG = {
             }
         ]
     },
-    IPTV: {
+    LIVETV: {
         BRAZIL: [
             { name: 'Amazon Sat', stream: 'https://amazonsat.brasilstream.com.br/hls/amazonsat/index.m3u8', quality: '1080p' },
             { name: 'Angel TV', stream: 'https://canaleducacao-stream.ebc.com.br/index.m3u8', quality: '720p' },

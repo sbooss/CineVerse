@@ -617,6 +617,7 @@ function loadEpisodes(item, seasonNum) {
 /* ===================== LOAD HOME ===================== */
 function loadHome() {
     var main = document.getElementById('mainContent');
+    if (!main) return;
     main.innerHTML = '';
     stopHeroCarousel();
     heroSlides = [];
@@ -724,6 +725,7 @@ function showNewEpisodes(news) {
 /* ===================== LOAD CATEGORY ===================== */
 function loadCategory(category, containerOverride) {
     var main = containerOverride || document.getElementById('mainContent');
+    if (!main) return;
     main.innerHTML = '';
 
     if (category === 'favorites') {
@@ -745,20 +747,112 @@ function loadCategory(category, containerOverride) {
         return;
     }
 
-    var promise;
-    var titles = { movie: 'Filmes Populares', tv: 'Series Populares', anime: 'Animes Populares', novelas: 'Novelas e Telenovelas' };
-    switch (category) {
-        case 'movie': promise = tmdb.getPopular('movie'); break;
-        case 'tv': promise = tmdb.getPopular('tv'); break;
-        case 'anime': promise = tmdb.getAnime(); break;
-        case 'novelas': promise = tmdb.getByGenre('tv', 10766); break;
-        default: promise = tmdb.getTrending();
+    var catalogFetchers = {
+        movie: { title: 'Filmes Populares', fetch: function(p) { return tmdb.getPopular('movie', p); }, fallback: 'movie' },
+        tv: { title: 'Series Populares', fetch: function(p) { return tmdb.getPopular('tv', p); }, fallback: 'tv' },
+        anime: { title: 'Animes Populares', fetch: function(p) { return tmdb.getAnime(p); }, fallback: 'tv' },
+        novelas: { title: 'Novelas e Telenovelas', fetch: function(p) { return tmdb.getByGenre('tv', 10766, p); }, fallback: 'tv' },
+        doramas: { title: 'Doramas', fetch: function(p) { return tmdb.getDoramas(p); }, fallback: 'tv' }
+    };
+    var cat = catalogFetchers[category];
+    if (cat) {
+        buildGridSection(cat.title, cat.fetch, main, { fallback: cat.fallback });
+        return;
     }
-    promise.then(function(items) {
-        if (items && items.length > 0) createSection(titles[category] || 'Conteudo', items, main);
+    tmdb.getTrending().then(function(items) {
+        if (items && items.length > 0) createSection('Em Alta', items, main);
     }).catch(function() {
         main.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Erro ao carregar</p></div>';
     });
+}
+
+function buildGridSection(title, fetchFn, container, opts) {
+    opts = opts || {};
+    var section = document.createElement('div');
+    section.className = 'content-section catalog-section';
+    section.innerHTML = '<div class="section-header"><h2 class="section-title">' + title + '</h2></div>';
+    var grid = document.createElement('div');
+    grid.className = 'catalog-grid';
+    var moreWrap = document.createElement('div');
+    moreWrap.className = 'catalog-more-wrap';
+    var moreBtn = document.createElement('button');
+    moreBtn.className = 'catalog-more';
+    moreBtn.innerHTML = '<i class="fas fa-plus"></i> Carregar Mais';
+    var countEl = document.createElement('div');
+    countEl.className = 'catalog-count';
+    moreWrap.appendChild(moreBtn);
+    moreWrap.appendChild(countEl);
+    section.appendChild(grid);
+    section.appendChild(moreWrap);
+    container.appendChild(section);
+
+    var state = { page: 1, loading: false, done: false, seen: {}, total: 0 };
+    function addItems(items) {
+        var fresh = 0;
+        (items || []).forEach(function(it) {
+            if (!it || !it.id) return;
+            var key = (it.mediaType || 'm') + '_' + it.id;
+            if (state.seen[key]) return;
+            state.seen[key] = true;
+            grid.appendChild(createCard(it));
+            state.total++;
+            fresh++;
+        });
+        countEl.textContent = state.total > 0 ? 'Mostrando ' + state.total + ' titulos' : '';
+        return fresh;
+    }
+    function finish(msg) {
+        state.done = true;
+        moreBtn.disabled = true;
+        moreBtn.innerHTML = msg || 'Fim do catalogo';
+    }
+    function fail() {
+        if (state.page === 1 && opts.fallback) {
+            var fb = tmdb.fallbackList(opts.fallback);
+            addItems(fb);
+        }
+        if (state.total === 0) {
+            grid.style.display = 'none';
+            moreWrap.style.display = 'none';
+            section.insertAdjacentHTML('beforeend', '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><p>Erro ao carregar</p></div>');
+        }
+        finish();
+    }
+    function loadChunk() {
+        if (state.loading || state.done) return;
+        state.loading = true;
+        moreBtn.disabled = true;
+        moreBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Carregando...';
+        fetchFn(state.page).then(function(items) {
+            state.loading = false;
+            if (!items) { fail(); return; }
+            if (state.page === 1 && items.length === 0) {
+                grid.style.display = 'none';
+                moreWrap.style.display = 'none';
+                section.insertAdjacentHTML('beforeend', '<div class="empty-state"><i class="fas fa-search"></i><p>Nenhum titulo encontrado</p></div>');
+                state.done = true;
+                return;
+            }
+            var fresh = addItems(items);
+            state.page++;
+            if (items.length < 5 || fresh === 0) finish();
+            else {
+                moreBtn.disabled = false;
+                moreBtn.innerHTML = '<i class="fas fa-plus"></i> Carregar Mais';
+            }
+        }).catch(function() {
+            state.loading = false;
+            fail();
+        });
+    }
+    moreBtn.addEventListener('click', loadChunk);
+    loadChunk();
+    if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function(entries) {
+            if (entries[0].isIntersecting) loadChunk();
+        }, { rootMargin: '0px', threshold: 0.6 });
+        io.observe(moreBtn);
+    }
 }
 
 function loadLiveTV(container) {
@@ -767,7 +861,7 @@ function loadLiveTV(container) {
     section.innerHTML = '<div class="section-header"><h2 class="section-title"><i class="fas fa-broadcast-tower"></i> TV Ao Vivo</h2></div>';
     var grid = document.createElement('div');
     grid.className = 'live-channels';
-    CONFIG.IPTV.BRAZIL.forEach(function(ch) {
+    CONFIG.LIVETV.BRAZIL.forEach(function(ch) {
         var card = document.createElement('div');
         card.className = 'channel-card';
         card.innerHTML = '<div class="channel-icon"><i class="fas fa-tv"></i></div><div><div class="channel-name">' + escapeHtml(ch.name) + '</div><div class="channel-live">AO VIVO</div></div>';
@@ -781,7 +875,7 @@ function loadLiveTV(container) {
     intlSection.innerHTML = '<div class="section-header"><h2 class="section-title"><i class="fas fa-globe"></i> Internacional</h2></div>';
     var intlGrid = document.createElement('div');
     intlGrid.className = 'live-channels';
-    CONFIG.IPTV.INTERNATIONAL.forEach(function(ch) {
+    CONFIG.LIVETV.INTERNATIONAL.forEach(function(ch) {
         var card = document.createElement('div');
         card.className = 'channel-card';
         card.innerHTML = '<div class="channel-icon" style="background:linear-gradient(135deg,#7b2fff,#ff2d78)"><i class="fas fa-globe"></i></div><div><div class="channel-name">' + escapeHtml(ch.name) + '</div><div class="channel-live">AO VIVO</div></div>';
@@ -800,6 +894,7 @@ function setupSearch() {
     var mobileInput = document.getElementById('mobileSearchInput');
     function doSearch(query) {
         var main = window.__catMain || document.getElementById('mainContent');
+        if (!main) return;
         if (!query || query.length < 2) {
             if (window.__catMain && window.CINEBOSS_CATEGORY) {
                 loadCategory(window.CINEBOSS_CATEGORY, window.__catMain);
@@ -809,10 +904,10 @@ function setupSearch() {
             return;
         }
         main.innerHTML = '<div class="loading"><div class="loading-spinner"></div></div>';
-        tmdb.search(query).then(function(items) {
+        tmdb.search(query, 1).then(function(items) {
             main.innerHTML = '';
             if (items && items.length > 0) {
-                createSection('Resultados para "' + query + '"', items, main);
+                buildGridSection('Resultados para "' + escapeHtml(query) + '"', function(p) { return tmdb.search(query, p); }, main, {});
             } else {
                 main.innerHTML = '<div class="empty-state"><i class="fas fa-search"></i><p>Nenhum resultado</p></div>';
             }
@@ -844,13 +939,16 @@ function setupNavigation() {
         document.querySelectorAll('.mobile-link').forEach(function(l) { l.classList.remove('active'); });
         document.querySelectorAll('[data-category="' + category + '"]').forEach(function(l) { l.classList.add('active'); });
         closeDetailPage();
-        document.getElementById('mobileMenu').classList.remove('open');
+        var mm = document.getElementById('mobileMenu');
+        if (mm) mm.classList.remove('open');
         if (category === 'home') loadHome(); else loadCategory(category);
     }
     document.querySelectorAll('.nav-link').forEach(function(link) {
+        if (!link.dataset || !link.dataset.category) return;
         link.addEventListener('click', function(e) { e.preventDefault(); navigate(link.dataset.category); });
     });
     document.querySelectorAll('.mobile-link').forEach(function(link) {
+        if (!link.dataset || !link.dataset.category) return;
         link.addEventListener('click', function(e) { e.preventDefault(); navigate(link.dataset.category); });
     });
     var logoLink = document.getElementById('logoLink');
@@ -865,13 +963,17 @@ function setupNavigation() {
 
 /* ===================== MOBILE MENU ===================== */
 function setupMobileMenu() {
-    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
-        document.getElementById('mobileMenu').classList.add('open');
+    var mmBtn = document.getElementById('mobileMenuBtn');
+    var mmEl = document.getElementById('mobileMenu');
+    if (!mmBtn || !mmEl) return;
+    mmBtn.addEventListener('click', function() {
+        mmEl.classList.add('open');
     });
-    document.getElementById('mobileMenuClose').addEventListener('click', function() {
-        document.getElementById('mobileMenu').classList.remove('open');
+    var mmClose = document.getElementById('mobileMenuClose');
+    if (mmClose) mmClose.addEventListener('click', function() {
+        mmEl.classList.remove('open');
     });
-    document.getElementById('mobileMenu').addEventListener('click', function(e) {
+    mmEl.addEventListener('click', function(e) {
         if (e.target === this) this.classList.remove('open');
     });
     var bell = document.getElementById('navBell');

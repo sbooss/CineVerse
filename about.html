@@ -4,40 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sobre o CINE BOSS | A Plataforma de Streaming Premium do Brasil</title>
-    <meta name="description" content="Conheca o CINE BOSS: a plataforma brasileira de streaming com filmes, series, IPTV ao vivo e experiencia cinematografica premium. Qualidade HD, interface moderna, planos a partir de R$ 5,00.">
-    <meta name="keywords" content="sobre cine boss, plataforma streaming, streaming brasileiro, filmes series, iptv ao vivo, streaming HD, cineboss, plataforma video premium">
+    <meta name="description" content="Conheca o CINE BOSS: a plataforma brasileira de streaming com filmes, series, animes, doramas, novelas e TV ao vivo do mundo inteiro. Qualidade HD, interface moderna, planos a partir de R$ 5,00.">
+    <meta name="keywords" content="sobre cine boss, plataforma streaming, streaming brasileiro, filmes series, doramas, animes, novelas, tv ao vivo, streaming HD, cineboss, plataforma video premium">
     <meta name="author" content="CINE BOSS">
     <meta name="robots" content="index, follow">
     <link rel="canonical" href="https://cineboss.online/about.html">
 
     <meta property="og:title" content="Sobre o CINE BOSS - Plataforma de Streaming Premium">
-    <meta property="og:description" content="A plataforma brasileira de streaming com experiencia cinematografica premium. Filmes, series e IPTV ao vivo.">
+    <meta property="og:description" content="A plataforma brasileira de streaming com experiencia cinematografica premium. Filmes, series, animes, doramas e TV ao vivo do mundo.">
     <meta property="og:image" content="https://cineboss.online/og-image.png">
     <meta property="og:url" content="https://cineboss.online/about.html">
     <meta property="og:type" content="website">
     <meta property="og:locale" content="pt_BR">
 
     <link rel="icon" href="favicon.ico" type="image/x-icon">
+    <script>
+    (function(){
+        var ua = navigator.userAgent || '';
+        var isTV = /SmartTV|Smart-TV|WebTV|Tizen|webOS|HbbTV|NetCast|BRAVIA|FireTV|Android TV|GoogleTV|CrKey/i.test(ua);
+        if (isTV || (window.location.search || '').indexOf('tv=1') !== -1) {
+            document.documentElement.classList.add('tv-device');
+        }
+    })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <link rel="stylesheet" href="style.css?v=56">
 
     <script type="application/ld+json">
     {
         "@context": "https://schema.org",
         "@type": "AboutPage",
         "name": "Sobre o CINE BOSS",
-        "description": "Conheca a plataforma CINE BOSS de streaming com filmes, series e IPTV.",
+        "description": "Conheca a plataforma CINE BOSS de streaming com filmes, series, animes, doramas e TV ao vivo.",
         "url": "https://cineboss.online/about.html",
         "mainEntity": {
             "@type": "Organization",
             "name": "CINE BOSS",
             "url": "https://cineboss.online",
             "logo": "https://imgur.com/6opzHhy.png",
-            "description": "Plataforma brasileira de streaming premium com filmes, series e IPTV ao vivo",
+            "description": "Plataforma brasileira de streaming premium com filmes, series, animes, doramas, novelas e TV ao vivo",
             "contactPoint": {
                 "@type": "ContactPoint",
                 "contactType": "customer support",
@@ -56,7 +64,7 @@
     <style>
         .about-hero-section {
             position: relative;
-            padding: 80px 24px 60px;
+            padding: 80px 24px 50px;
             text-align: center;
             overflow: hidden;
         }
@@ -100,7 +108,7 @@
         .about-hero-desc {
             font-size: 17px;
             color: var(--text-secondary);
-            max-width: 640px;
+            max-width: 680px;
             margin: 0 auto;
             line-height: 1.7;
             animation: fadeInUp 0.6s ease-out 0.2s both;
@@ -170,6 +178,7 @@
             line-height: 1.8;
             margin-bottom: 20px;
         }
+        .about-section-text a { color: var(--accent-blue); font-weight: 600; }
         .about-grid-3 {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -221,6 +230,16 @@
             color: var(--text-muted);
             line-height: 1.6;
         }
+        .about-cat-card { text-decoration: none; display: block; cursor: pointer; }
+        .about-cat-card .about-cat-go {
+            display: inline-block;
+            margin-top: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent-blue);
+        }
+        .about-cat-card:hover .about-cat-go i { transform: translateX(3px); }
+        .about-cat-card .about-cat-go i { transition: transform 0.2s ease; }
         .about-how-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -260,35 +279,6 @@
             font-size: 13px;
             color: var(--text-muted);
             line-height: 1.6;
-        }
-        .about-tech-list {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-        }
-        .about-tech-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 14px 18px;
-            background: var(--bg-card);
-            border: 1px solid var(--border-subtle);
-            border-radius: var(--radius-sm);
-            transition: all 0.2s ease;
-        }
-        .about-tech-item:hover {
-            border-color: var(--border-accent);
-        }
-        .about-tech-item i {
-            font-size: 18px;
-            color: var(--accent-blue);
-            width: 20px;
-            text-align: center;
-        }
-        .about-tech-item span {
-            font-size: 14px;
-            color: var(--text-secondary);
-            font-weight: 500;
         }
         .about-cta {
             text-align: center;
@@ -343,6 +333,168 @@
             border-color: var(--accent-blue);
             background: var(--accent-blue-glow);
         }
+
+        /* ===================== BILLBOARD 3D ===================== */
+        .about-billboard {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 34px 24px 6px;
+            text-align: center;
+        }
+        .bb-title {
+            font-family: 'Sora', sans-serif;
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+        .bb-sub {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 6px;
+        }
+        .bb-stage {
+            position: relative;
+            height: 380px;
+            margin: 30px auto 0;
+            width: min(880px, 92vw);
+            perspective: 1300px;
+            touch-action: pan-y;
+        }
+        .bb-ring {
+            position: absolute;
+            inset: 0;
+            transform-style: preserve-3d;
+            will-change: transform;
+        }
+        .bb-card {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 132px;
+            margin: -122px 0 0 -66px;
+            text-decoration: none;
+        }
+        .bb-card img {
+            width: 132px;
+            height: 198px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 18px 44px rgba(0,0,0,0.6);
+            display: block;
+        }
+        .bb-card img:hover { border-color: var(--accent-blue); }
+        .bb-label {
+            display: block;
+            margin-top: 9px;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .bb-hint {
+            font-size: 12px;
+            color: var(--text-muted);
+            margin-top: 12px;
+        }
+        .bb-strip {
+            display: flex;
+            gap: 14px;
+            overflow-x: auto;
+            padding: 10px 2px 16px;
+            height: auto;
+            perspective: none;
+        }
+        .bb-card-flat {
+            flex: 0 0 132px;
+            text-decoration: none;
+            display: block;
+        }
+        .bb-card-flat img {
+            width: 132px;
+            height: 198px;
+            object-fit: cover;
+            border-radius: 10px;
+            display: block;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .bb-card-flat span {
+            display: block;
+            margin-top: 9px;
+            font-size: 12px;
+            color: var(--text-secondary);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* ===================== ABERTURA CINEMATOGRAFICA ===================== */
+        #cineIntro {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            overflow: hidden;
+            cursor: pointer;
+        }
+        .intro-frame {
+            position: absolute;
+            inset: 0;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            animation: introFrame 2.61s ease-in-out forwards;
+        }
+        .intro-frame:nth-child(2) { animation-delay: 0.87s; }
+        .intro-frame:nth-child(3) { animation-delay: 1.74s; }
+        .intro-core {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            animation: introLogo 2.61s ease-out forwards;
+        }
+        .intro-core img {
+            height: 92px;
+            filter: drop-shadow(0 10px 40px rgba(0,168,224,0.45));
+        }
+        .intro-tag {
+            margin-top: 14px;
+            font-family: 'Sora', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.85);
+        }
+        .intro-skip {
+            position: absolute;
+            bottom: 22px;
+            right: 26px;
+            font-size: 11px;
+            color: rgba(255,255,255,0.45);
+            z-index: 3;
+        }
+        #cineIntro.closing { animation: introOut 0.45s ease forwards; }
+        @keyframes introFrame {
+            0% { opacity: 0; transform: scale(1.05); }
+            18% { opacity: 0.55; }
+            82% { opacity: 0.55; }
+            100% { opacity: 0; transform: scale(1.18); }
+        }
+        @keyframes introLogo {
+            0% { opacity: 0; transform: scale(0.86); }
+            22% { opacity: 1; transform: scale(1); }
+            84% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+        @keyframes introOut { to { opacity: 0; visibility: hidden; } }
+
         @keyframes fadeInUp {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -351,12 +503,24 @@
             .about-stats-row { gap: 24px; flex-wrap: wrap; }
             .about-stat-number { font-size: 28px; }
             .about-grid-3, .about-how-grid { grid-template-columns: 1fr; }
-            .about-tech-list { grid-template-columns: 1fr; }
             .about-cta-buttons { flex-direction: column; align-items: center; }
+            .bb-stage { height: 330px; }
+            .intro-core img { height: 64px; }
         }
     </style>
 </head>
 <body>
+    <div id="cineIntro" aria-hidden="true">
+        <div class="intro-frame"></div>
+        <div class="intro-frame"></div>
+        <div class="intro-frame"></div>
+        <div class="intro-core">
+            <img src="https://imgur.com/6opzHhy.png" alt="CINE BOSS">
+            <div class="intro-tag">O streaming que o Brasil merecia</div>
+        </div>
+        <div class="intro-skip">Toque para entrar</div>
+    </div>
+
     <div class="donate-banner">
         <a href="donate.html"><i class="fas fa-heart"></i> Doe para ajudar o CINE BOSS a crescer! <i class="fas fa-arrow-right"></i></a>
     </div>
@@ -369,6 +533,7 @@
             <a href="/" class="nav-link"><i class="fas fa-home"></i> Inicio</a>
             <a href="/#filmes" class="nav-link"><i class="fas fa-film"></i> Filmes</a>
             <a href="/#series" class="nav-link"><i class="fas fa-tv"></i> Series</a>
+            <a href="/doramas.html" class="nav-link"><i class="fas fa-masks-theater"></i> Doramas</a>
             <a href="/#ao-vivo" class="nav-link"><i class="fas fa-satellite-dish"></i> Ao Vivo</a>
             <a href="about.html" class="nav-link"><i class="fas fa-info-circle"></i> Sobre</a>
         </div>
@@ -394,7 +559,7 @@
                 O Streaming que o Brasil<br><span class="blue">Merecia</span> e Agora <span class="gold">Tem</span>
             </h1>
             <p class="about-hero-desc">
-                O CINE BOSS nasceu pra acabar com a bagunca. Uma plataforma de verdade: rapida, bonita, com catalogo completo e sem enrolacao. Filmes, series, IPTV ao vivo — tudo num so lugar, com a qualidade que voce merece.
+                O CINE BOSS nasceu pra acabar com a bagunca: todos os filmes do mundo, series completas, animes, novelas, doramas e TV ao vivo do planeta — tudo num so lugar. Rapido, bonito e sem enrolacao, no celular, no computador ou na TV da sala.
             </p>
             <div class="about-stats-row">
                 <div class="about-stat">
@@ -407,13 +572,20 @@
                 </div>
                 <div class="about-stat">
                     <div class="about-stat-number">24/7</div>
-                    <div class="about-stat-label">IPTV Ao Vivo</div>
+                    <div class="about-stat-label">TV ao Vivo do Mundo</div>
                 </div>
                 <div class="about-stat">
                     <div class="about-stat-number">R$5,00</div>
                     <div class="about-stat-label">A partir de</div>
                 </div>
             </div>
+        </section>
+
+        <section class="about-billboard" id="aboutBillboard" style="display:none">
+            <h2 class="bb-title">Em Alta Agora</h2>
+            <p class="bb-sub">Os titulos que todo mundo esta assistindo essa semana — atualizado em tempo real</p>
+            <div class="bb-stage" id="bbStage"></div>
+            <p class="bb-hint">Arraste pra girar e clique numa capa pra assistir</p>
         </section>
 
         <div class="about-content-wrapper">
@@ -429,7 +601,7 @@
                     O CINE BOSS e uma plataforma de streaming brasileira criada com um unico objetivo: oferecer a melhor experiencia de conteudo audiovisual do pais. Nao somos mais um site generico de filmes. Somos uma plataforma completa, com interface premium, catalogo organizado e funcionamento impecavel em qualquer dispositivo.
                 </p>
                 <p class="about-section-text">
-                    Com dados em tempo real do TMDB (The Movie Database), sempre tera as informacoes mais atualizadas sobre filmes e series. Nosso player embutido roda direto no navegador, sem necessidade de baixar nada. E pra complementar, temos IPTV ao vivo com canais nacionais e internacionais.
+                    Catalogo sempre atualizado com os lancamentos e os titulos mais procurados da internet. Player que roda direto no navegador, sem instalar nada. E TV ao vivo com canais nacionais e internacionais pra completar. Tudo em um so lugar, do jeito certo.
                 </p>
             </section>
 
@@ -450,7 +622,7 @@
                     <div class="about-feature-card">
                         <i class="fas fa-palette"></i>
                         <h3>Design Premium</h3>
-                        <p>Visual cinematografico com tema escuro, tipografia Sora e efeitos que parecem Netflix. Feito pra impressionar.</p>
+                        <p>Visual cinematografico com tema escuro e efeitos de cinema. Feito pra impressionar desde o primeiro clique.</p>
                     </div>
                     <div class="about-feature-card">
                         <i class="fas fa-mobile-alt"></i>
@@ -459,13 +631,13 @@
                     </div>
                     <div class="about-feature-card">
                         <i class="fas fa-satellite-dish"></i>
-                        <h3>IPTV Ao Vivo</h3>
-                        <p>Canais de TV ao vivo, esportes, noticias e conteudo em tempo real. Tudo integrado na mesma plataforma.</p>
+                        <h3>TV Ao Vivo do Mundo</h3>
+                        <p>Canais de TV ao vivo, esportes, noticias e conteudo em tempo real do Brasil e do mundo, integrado na mesma plataforma.</p>
                     </div>
                     <div class="about-feature-card">
-                        <i class="fas fa-shield-alt"></i>
-                        <h3>Seguranca Total</h3>
-                        <p>Autenticacao com JWT, senhas criptografadas com bcrypt, limite de dispositivos por conta. Seus dados protegidos.</p>
+                        <i class="fas fa-history"></i>
+                        <h3>Continue de Onde Parou</h3>
+                        <p>O CINE BOSS lembra em que episodio voce parou. Volte exatamente pro mesmo momento, em qualquer tela.</p>
                     </div>
                     <div class="about-feature-card">
                         <i class="fas fa-credit-card"></i>
@@ -504,46 +676,53 @@
 
             <section class="about-section">
                 <div class="about-section-header">
-                    <div class="about-section-icon"><i class="fas fa-layer-group"></i></div>
+                    <div class="about-section-icon"><i class="fas fa-globe"></i></div>
                     <div>
-                        <h2>Tecnologia por Tras</h2>
-                        <p>Stack moderna e segura</p>
+                        <h2>Um Catalogo do Tamanho do Mundo</h2>
+                        <p>Tudo que existe pra assistir, num so lugar</p>
                     </div>
                 </div>
-                <div class="about-tech-list">
-                    <div class="about-tech-item">
-                        <i class="fas fa-server"></i>
-                        <span>Vercel (Hospedagem Global)</span>
-                    </div>
-                    <div class="about-tech-item">
-                        <i class="fas fa-database"></i>
-                        <span>Supabase (Banco + Auth)</span>
-                    </div>
-                    <div class="about-tech-item">
+                <div class="about-grid-3">
+                    <a class="about-feature-card about-cat-card" href="/filmes.html">
                         <i class="fas fa-film"></i>
-                        <span>TMDB API (Catalogo)</span>
-                    </div>
-                    <div class="about-tech-item">
-                        <i class="fas fa-play-circle"></i>
-                        <span>Player Integrado</span>
-                    </div>
-                    <div class="about-tech-item">
-                        <i class="fas fa-lock"></i>
-                        <span>JWT + bcrypt (Seguranca)</span>
-                    </div>
-                    <div class="about-tech-item">
-                        <i class="fas fa-wallet"></i>
-                        <span>Mercado Pago (Pagamentos)</span>
-                    </div>
-                    <div class="about-tech-item">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Google Analytics (Metricas)</span>
-                    </div>
-                    <div class="about-tech-item">
-                        <i class="fas fa-mobile-alt"></i>
-                        <span>PWA (Instalavel)</span>
-                    </div>
+                        <h3>Filmes</h3>
+                        <p>Do lancamento que lota o cinema ao classico que voce nunca esqueceu. Todos os generos, todos os moods.</p>
+                        <span class="about-cat-go">Explorar Filmes <i class="fas fa-arrow-right"></i></span>
+                    </a>
+                    <a class="about-feature-card about-cat-card" href="/series.html">
+                        <i class="fas fa-tv"></i>
+                        <h3>Series</h3>
+                        <p>Maratonas completas: da serie do momento aquela premiada que todo mundo vive recomendando.</p>
+                        <span class="about-cat-go">Explorar Series <i class="fas fa-arrow-right"></i></span>
+                    </a>
+                    <a class="about-feature-card about-cat-card" href="/doramas.html">
+                        <i class="fas fa-masks-theater"></i>
+                        <h3>Doramas</h3>
+                        <p>Os K-dramas e J-dramas que o Brasil inteiro comenta, com episodios completos, dublados ou legendados.</p>
+                        <span class="about-cat-go">Explorar Doramas <i class="fas fa-arrow-right"></i></span>
+                    </a>
+                    <a class="about-feature-card about-cat-card" href="/animes.html">
+                        <i class="fas fa-dragon"></i>
+                        <h3>Animes</h3>
+                        <p>Do shonen classico ao lancamento da temporada, direto do Japao. Temporadas completas pra maratonar.</p>
+                        <span class="about-cat-go">Explorar Animes <i class="fas fa-arrow-right"></i></span>
+                    </a>
+                    <a class="about-feature-card about-cat-card" href="/novelas.html">
+                        <i class="fas fa-clapperboard"></i>
+                        <h3>Novelas</h3>
+                        <p>Do Brasil e do mundo: capitulos completos das historias que prendem o pais inteiro.</p>
+                        <span class="about-cat-go">Explorar Novelas <i class="fas fa-arrow-right"></i></span>
+                    </a>
+                    <a class="about-feature-card about-cat-card" href="/tv-ao-vivo.html">
+                        <i class="fas fa-broadcast-tower"></i>
+                        <h3>TV Ao Vivo</h3>
+                        <p>Canais nacionais e internacionais ao vivo, 24 horas por dia, direto do navegador. O mundo passando na sua tela.</p>
+                        <span class="about-cat-go">Assistir TV Ao Vivo <i class="fas fa-arrow-right"></i></span>
+                    </a>
                 </div>
+                <p class="about-section-text" style="text-align:center; margin-top:28px;">
+                    Tudo isso por menos de 50 centavos por dia no plano mensal. <a href="/payment.html">Escolha seu plano</a> ou <a href="/login.html?register=true">crie sua conta gratis</a> e comece a assistir em minutos.
+                </p>
             </section>
         </div>
 
@@ -581,10 +760,109 @@
         </div>
     </footer>
 
-    <script src="config.js"></script>
-    <script src="tmdb.js"></script>
-    <script src="auth.js"></script>
-    <script src="app.js"></script>
+    <script src="config.js?v=52"></script>
+    <script src="tmdb.js?v=45"></script>
+    <script src="auth.js?v=46"></script>
+    <script src="app.js?v=55"></script>
+    <script>
+    (function(){
+        try {
+            var isTV = document.documentElement.classList.contains('tv-device');
+            var reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+            var seen = false;
+            try { seen = sessionStorage.getItem('cineboss_intro') === '1'; } catch (e) {}
+            var intro = document.getElementById('cineIntro');
+            if (!intro || isTV || reduced || seen) { if (intro) intro.remove(); return; }
+            var closed = false;
+            function closeIntro() {
+                if (closed) return;
+                closed = true;
+                try { sessionStorage.setItem('cineboss_intro', '1'); } catch (e) {}
+                intro.classList.add('closing');
+                setTimeout(function () { if (intro && intro.parentNode) intro.parentNode.removeChild(intro); }, 500);
+            }
+            intro.addEventListener('click', closeIntro);
+            document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closeIntro(); });
+            setTimeout(closeIntro, 2950);
+            if (typeof tmdb !== 'undefined') {
+                tmdb.getTrending('all', 'week').then(function (items) {
+                    if (!items || !items.length) return;
+                    var bgs = [];
+                    for (var i = 0; i < items.length && bgs.length < 3; i++) { if (items[i] && items[i].backdrop) bgs.push(items[i].backdrop); }
+                    var frames = intro.querySelectorAll('.intro-frame');
+                    for (var f = 0; f < frames.length && f < bgs.length; f++) frames[f].style.backgroundImage = 'url(' + bgs[f] + ')';
+                }).catch(function () {});
+            }
+        } catch (e) {}
+    })();
+    </script>
+    <script>
+    (function(){
+        try {
+            var section = document.getElementById('aboutBillboard');
+            var stage = document.getElementById('bbStage');
+            if (!section || !stage || typeof tmdb === 'undefined') return;
+            var isTV = document.documentElement.classList.contains('tv-device');
+            var reduced = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+            function esc(s) {
+                var A = String.fromCharCode(38);
+                return String(s || '').replace(/&/g, A + 'amp;').replace(/</g, A + 'lt;').replace(/>/g, A + 'gt;').replace(/"/g, A + 'quot;');
+            }
+            tmdb.getTrending('all', 'week').then(function (items) {
+                if (!items || !items.length) return;
+                var withPoster = items.filter(function (i) { return i && i.poster; }).slice(0, 10);
+                if (withPoster.length < 4) return;
+                section.style.display = 'block';
+                if (isTV) {
+                    stage.className = 'bb-stage bb-strip';
+                    withPoster.forEach(function (it) {
+                        var a = document.createElement('a');
+                        a.className = 'bb-card-flat';
+                        a.href = '/';
+                        a.innerHTML = '<img src="' + it.poster + '" alt="' + esc(it.title) + '" loading="lazy"><span>' + esc(it.title) + '</span>';
+                        stage.appendChild(a);
+                    });
+                    return;
+                }
+                var ring = document.createElement('div');
+                ring.className = 'bb-ring';
+                stage.appendChild(ring);
+                var N = withPoster.length;
+                var step = 360 / N;
+                var R = Math.round((132 / 2) / Math.tan(Math.PI / N)) + 46;
+                withPoster.forEach(function (it, i) {
+                    var a = document.createElement('a');
+                    a.className = 'bb-card';
+                    a.href = '/';
+                    a.innerHTML = '<img src="' + it.poster + '" alt="' + esc(it.title) + '" loading="lazy"><span class="bb-label">' + esc(it.title) + '</span>';
+                    a.style.transform = 'rotateY(' + Math.round(i * step) + 'deg) translateZ(' + R + 'px)';
+                    ring.appendChild(a);
+                });
+                var angle = 0, paused = false, dragging = false, lastX = 0, vel = 0;
+                stage.addEventListener('pointerenter', function () { paused = true; });
+                stage.addEventListener('pointerleave', function () { paused = false; });
+                stage.addEventListener('pointerdown', function (e) { dragging = true; lastX = e.clientX; vel = 0; });
+                window.addEventListener('pointermove', function (e) {
+                    if (!dragging) return;
+                    var d = e.clientX - lastX;
+                    lastX = e.clientX;
+                    angle += d * 0.25;
+                    vel = d * 0.25;
+                });
+                window.addEventListener('pointerup', function () { dragging = false; });
+                function frame() {
+                    if (!dragging) {
+                        if (!paused && !reduced) angle += 0.12;
+                        if (Math.abs(vel) > 0.01) { angle += vel; vel *= 0.94; }
+                    }
+                    ring.style.transform = 'rotateY(' + angle + 'deg)';
+                    requestAnimationFrame(frame);
+                }
+                requestAnimationFrame(frame);
+            }).catch(function () {});
+        } catch (e) {}
+    })();
+    </script>
     <script src="https://www.googletagmanager.com/gtag/js?id=G-3RT0TLN4F4"></script>
     <script>
         window.dataLayer = window.dataLayer || [];

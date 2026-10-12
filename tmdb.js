@@ -150,6 +150,11 @@ class TMDBAPI {
         return r && r.results ? r.results.map(i => this.formatItem(i, 'anime')) : null;
     }
 
+    async getDoramas(page = 1) {
+        const r = await this.fetchAPI('/discover/tv', { with_origin_country: 'KR|JP', with_genres: 18, sort_by: 'popularity.desc', page, 'vote_count.gte': 10 });
+        return r && r.results ? r.results.filter(i => !i.adult).map(i => this.formatItem(i, 'tv')) : null;
+    }
+
     async getDetails(type, id) {
         return this.fetchAPI(`/${type}/${id}`, { append_to_response: 'videos,credits,similar,external_ids' });
     }

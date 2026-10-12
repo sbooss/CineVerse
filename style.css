@@ -2131,6 +2131,44 @@ html.js-reveal .content-section.revealed .movie-card {
     text-transform: uppercase;
 }
 
+/* ===================== CATALOGO EM GRADE ===================== */
+.catalog-section { margin: 10px 0 48px; }
+.catalog-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 20px 16px;
+}
+.catalog-grid .movie-card { width: 100%; min-width: 0; }
+.catalog-grid .card-poster { width: 100%; }
+.catalog-grid .card-poster img,
+.catalog-grid .card-poster .poster-placeholder { width: 100%; height: 100%; object-fit: cover; }
+.catalog-more-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 30px 0 8px;
+}
+.catalog-more {
+    padding: 13px 44px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-medium);
+    color: var(--text-primary);
+    border-radius: var(--radius-sm);
+    font-family: 'Sora', 'Inter', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+.catalog-more:hover { border-color: var(--accent-blue); background: var(--accent-blue-glow); transform: translateY(-2px); }
+.catalog-more[disabled] { opacity: 0.55; cursor: default; transform: none; }
+.catalog-count { font-size: 12px; color: var(--text-muted); }
+@media (max-width: 640px) {
+    .catalog-grid { grid-template-columns: repeat(auto-fill, minmax(122px, 1fr)); gap: 14px 10px; }
+    .catalog-more { padding: 12px 34px; font-size: 13px; }
+}
+
 /* ===================== TV PERFORMANCE MODE ===================== */
 html.tv-device .cinema-bg .poster-row,
 html.tv-device .cinema-bg .orb { display: none !important; }
