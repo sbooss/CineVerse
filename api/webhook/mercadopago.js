@@ -76,6 +76,13 @@ module.exports = async function handler(req, res) {
                     created_at: new Date().toISOString()
                 });
                 if (payErr) console.error('Payments insert error:', payErr);
+
+                try {
+                    const { notifyPaymentActivated } = require('../_lib/notify');
+                    await notifyPaymentActivated(supabase, ref.userId || subscription.user_id, subscription.plan || ref.plan, expiresAt.toISOString());
+                } catch (e) {
+                    console.error('[notify] erro (ignorado): ' + e.message);
+                }
             }
         }
 

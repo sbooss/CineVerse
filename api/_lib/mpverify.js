@@ -115,7 +115,13 @@ async function verifyAndActivateUser(supabase, userId, userEmail) {
             const approved = await findApprovedForUser(userId, extRef);
             if (approved) {
                 const r = await activateSubscription(supabase, userId, sub, approved);
-                if (r.ok) return { status: 'activated', plan: r.plan, expiresAt: r.expiresAt, recovered: false, mpPaymentId: r.mpPaymentId };
+                if (r.ok) {
+                    try {
+                        const { notifyPaymentActivated } = require('./notify');
+                        await notifyPaymentActivated(supabase, userId, r.plan, r.expiresAt);
+                    } catch (e) { console.error('[notify] erro (ignorado): ' + e.message); }
+                    return { status: 'activated', plan: r.plan, expiresAt: r.expiresAt, recovered: false, mpPaymentId: r.mpPaymentId };
+                }
                 return { status: 'error', detail: r.detail || r.error };
             }
         }
@@ -125,7 +131,13 @@ async function verifyAndActivateUser(supabase, userId, userEmail) {
     const approvedForUser = await findApprovedForUser(userId, null);
     if (approvedForUser) {
         const r = await activateSubscription(supabase, userId, null, approvedForUser);
-        if (r.ok) return { status: 'activated', plan: r.plan, expiresAt: r.expiresAt, recovered: true, mpPaymentId: r.mpPaymentId };
+        if (r.ok) {
+            try {
+                const { notifyPaymentActivated } = require('./notify');
+                await notifyPaymentActivated(supabase, userId, r.plan, r.expiresAt);
+            } catch (e) { console.error('[notify] erro (ignorado): ' + e.message); }
+            return { status: 'activated', plan: r.plan, expiresAt: r.expiresAt, recovered: true, mpPaymentId: r.mpPaymentId };
+        }
         return { status: 'error', detail: r.detail || r.error };
     }
 
