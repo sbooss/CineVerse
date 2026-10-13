@@ -648,7 +648,7 @@
             window.addEventListener('pointerdown', unmuteOnGesture, { once: true });
             window.addEventListener('keydown', unmuteOnGesture, { once: true });
 
-            setTimeout(function() { if (!closed && vid.paused) closeIntro(); }, 4500);
+            setTimeout(function() { if (!closed && vid.paused && vid.readyState === 0) closeIntro(); }, 4500);
             setTimeout(closeIntro, 12000);
         })();
     </script>
