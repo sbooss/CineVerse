@@ -5,6 +5,7 @@ const {
     checkRateLimit, recordRateLimitAttempt,
     jsonError
 } = require('../_lib/security');
+const { verifyAndActivateUser } = require('../_lib/mpverify');
 
 const ADMIN_EMAIL = 'williannunes31994@gmail.com';
 
@@ -74,12 +75,34 @@ module.exports = async function handler(req, res) {
             return res.status(200).json({ success: true });
         }
 
-        if (req.method !== 'GET') return jsonError(res, 405, 'Method not allowed');
+        if (req.method !== 'GET') {
+            if (req.method !== 'POST') return jsonError(res, 405, 'Method not allowed');
+            const { action } = req.body || {};
+            if (action !== 'verify_pending') return jsonError(res, 400, 'Acao invalida');
+            const d30v = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+            const { data: pend } = await supabase.from('subscriptions')
+                .select('id, user_id, plan, amount, created_at')
+                .eq('status', 'pending').gte('created_at', d30v)
+                .order('created_at', { ascending: false }).limit(10);
+            const results = [];
+            const seenUsers = {};
+            for (const s of (pend || [])) {
+                if (!s.user_id || seenUsers[s.user_id]) continue;
+                seenUsers[s.user_id] = true;
+                const { data: uRows } = await supabase.from('users')
+                    .select('id, email, name').eq('id', s.user_id).limit(1);
+                const u = uRows && uRows[0];
+                if (!u) continue;
+                const r = await verifyAndActivateUser(supabase, u.id, u.email);
+                results.push({ email: u.email, name: u.name, result: r.status || 'error', plan: r.plan || s.plan, expiresAt: r.expiresAt || null });
+            }
+            return res.status(200).json({ success: true, checked: results.length, results });
+        }
 
         const now = new Date().toISOString();
         const d30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
-        const [usersRes, usersTotalRes, users30Res, subsRes, sessionsRes, funnelRes] = await Promise.all([
+        const [usersRes, usersTotalRes, users30Res, subsRes, sessionsRes, funnelRes, paymentsRes] = await Promise.all([
             supabase.from('users').select('id, name, email, created_at')
                 .order('created_at', { ascending: false }).limit(500),
             supabase.from('users').select('*', { count: 'exact', head: true }),
@@ -87,21 +110,34 @@ module.exports = async function handler(req, res) {
             supabase.from('subscriptions')
                 .select('id, user_id, plan, status, amount, expires_at, created_at, activated_at')
                 .order('created_at', { ascending: false }).limit(1000),
-            supabase.from('sessions')
-                .select('id, user_id, device_name, device_os, device_browser, ip_address, created_at, expires_at')
-                .gt('expires_at', now)
-                .order('created_at', { ascending: false }).limit(500),
+            (async () => {
+                let r = await supabase.from('sessions')
+                    .select('id, user_id, device_name, device_os, device_browser, ip_address, created_at, expires_at')
+                    .gt('expires_at', now)
+                    .order('created_at', { ascending: false }).limit(500);
+                if (r.error) {
+                    r = await supabase.from('sessions')
+                        .select('id, user_id, created_at, expires_at')
+                        .gt('expires_at', now)
+                        .order('created_at', { ascending: false }).limit(500);
+                }
+                return r;
+            })(),
             supabase.from('rate_limits')
                 .select('key, created_at')
                 .like('key', 'funnel:%')
                 .gte('created_at', d30)
-                .limit(5000)
+                .limit(5000),
+            supabase.from('payments')
+                .select('id, subscription_id, user_id, amount, status, method, external_id, paid_at, created_at')
+                .order('created_at', { ascending: false }).limit(200)
         ]);
 
         const users = usersRes.data || [];
         const subs = subsRes.data || [];
         const sessions = (sessionsRes && sessionsRes.data) || [];
         const funnelRows = (funnelRes && funnelRes.data) || [];
+        const paymentRowsRaw = (paymentsRes && paymentsRes.data) || [];
         const totalUsers = usersTotalRes.count || 0;
         const newUsers30d = users30Res.count || 0;
 
@@ -161,6 +197,37 @@ module.exports = async function handler(req, res) {
             };
         });
 
+        const paymentRows = paymentRowsRaw.map(p => {
+            const u = userMap[p.user_id] || null;
+            const sub = subs.find(s => s.id === p.subscription_id) || null;
+            return {
+                id: p.id,
+                userName: u ? (u.name || u.email) : 'Desconhecido',
+                userEmail: u ? u.email : '',
+                plan: sub ? sub.plan : null,
+                amount: Number(p.amount) || 0,
+                status: p.status,
+                method: p.method || 'mercadopago',
+                externalId: p.external_id || '',
+                paidAt: p.paid_at || p.created_at,
+                createdAt: p.created_at
+            };
+        });
+
+        const pendingRows = subs
+            .filter(s => s.status === 'pending' && s.created_at && s.created_at >= d30)
+            .map(s => {
+                const u = userMap[s.user_id] || null;
+                return {
+                    id: s.id,
+                    userName: u ? (u.name || u.email) : 'Desconhecido',
+                    userEmail: u ? u.email : '',
+                    plan: s.plan,
+                    amount: Number(s.amount) || 0,
+                    createdAt: s.created_at
+                };
+            });
+
         /* series dos ultimos 30 dias */
         const labels = lastNDays(30);
         const usersByDay = {}; const subsByDay = {};
@@ -215,7 +282,9 @@ module.exports = async function handler(req, res) {
                 subs: labels.map(l => subsByDay[l])
             },
             users: userRows,
-            sessions: sessionRows
+            sessions: sessionRows,
+            payments: paymentRows,
+            pendingCheckouts: pendingRows
         });
     } catch (error) {
         console.error('admin overview error:', error);

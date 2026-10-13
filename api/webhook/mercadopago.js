@@ -36,13 +36,7 @@ module.exports = async function handler(req, res) {
 
             let subscription = subs && subs.length > 0 ? subs[0] : null;
 
-            if (!subscription) {
-                const { data: allSubs } = await supabase.from('subscriptions')
-                    .select('*').eq('mp_preference_id', String(paymentData.preference_id)).limit(1);
-                subscription = allSubs && allSubs.length > 0 ? allSubs[0] : null;
-            }
-
-            if (!subscription) {
+            if (!subscription && ref.userId) {
                 const { data: byUser } = await supabase.from('subscriptions')
                     .select('*').eq('user_id', ref.userId).eq('status', 'pending')
                     .order('created_at', { ascending: false }).limit(1);
@@ -55,14 +49,14 @@ module.exports = async function handler(req, res) {
                 const planDays = ref.planDays ? parseInt(ref.planDays) : 30;
                 const expiresAt = new Date(Date.now() + planDays * 24 * 60 * 60 * 1000);
 
-                await supabase.from('subscriptions').update({
+                const { error: updErr } = await supabase.from('subscriptions').update({
                     status: 'active',
                     activated_at: new Date().toISOString(),
                     expires_at: expiresAt.toISOString(),
                     updated_at: new Date().toISOString(),
-                    payment_id: paymentData.id || String(paymentId),
-                    mp_payment_id: paymentData.id
+                    payment_id: String(paymentData.id || paymentId)
                 }).eq('id', subscription.id);
+                if (updErr) console.error('Sub activate error:', updErr);
 
                 const { error: feErr } = await supabase.from('rate_limits').insert({
                     key: 'funnel:purchase:' + (subscription.plan || ref.plan || ''),
@@ -70,19 +64,18 @@ module.exports = async function handler(req, res) {
                 });
                 if (feErr) console.error('Funnel purchase insert error:', feErr);
 
-                if (paymentData.status === 'approved') {
-                    await supabase.from('payments').upsert({
-                        id: crypto.randomUUID(),
-                        subscription_id: subscription.id,
-                        user_id: ref.userId,
-                        amount: subscription.amount,
-                        status: 'completed',
-                        provider: 'mercadopago',
-                        payment_id: paymentData.id,
-                        paid_at: new Date().toISOString(),
-                        created_at: new Date().toISOString()
-                    });
-                }
+                const { error: payErr } = await supabase.from('payments').insert({
+                    id: crypto.randomUUID(),
+                    subscription_id: subscription.id,
+                    user_id: ref.userId || subscription.user_id,
+                    amount: Number(paymentData.transaction_amount) || Number(subscription.amount) || 0,
+                    status: 'completed',
+                    method: 'mercadopago',
+                    external_id: String(paymentData.id || paymentId),
+                    paid_at: new Date().toISOString(),
+                    created_at: new Date().toISOString()
+                });
+                if (payErr) console.error('Payments insert error:', payErr);
             }
         }
 

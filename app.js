@@ -1330,9 +1330,25 @@ async function handlePaymentReturn() {
         }
         if (typeof auth === 'undefined') return;
         await auth.check();
+        if (auth.hasActiveSubscription()) {
+            if (typeof showToast === 'function') showToast('Pagamento confirmado! Acesso liberado a todo o catalogo.');
+            else payToast('Pagamento confirmado! Acesso liberado a todo o catalogo.');
+            return;
+        }
+        for (var i = 0; i < 4; i++) {
+            try {
+                var vr = await fetch('/api/subscription/verify', { method: 'POST', credentials: 'include' });
+                if (vr.ok) {
+                    var vj = await vr.json();
+                    if (vj && vj.activated) break;
+                }
+            } catch (e2) {}
+            await new Promise(function(r2) { setTimeout(r2, 4000); });
+        }
+        await auth.check();
         var tries = 0;
-        while (tries < 4 && !auth.hasActiveSubscription()) {
-            await new Promise(function(r) { setTimeout(r, 3000); });
+        while (tries < 2 && !auth.hasActiveSubscription()) {
+            await new Promise(function(r2) { setTimeout(r2, 3000); });
             await auth.check();
             tries++;
         }
@@ -1340,9 +1356,28 @@ async function handlePaymentReturn() {
             if (typeof showToast === 'function') showToast('Pagamento confirmado! Acesso liberado a todo o catalogo.');
             else payToast('Pagamento confirmado! Acesso liberado a todo o catalogo.');
         } else {
-            if (typeof showToast === 'function') showToast('Pagamento em processamento. Seu acesso sera liberado automaticamente assim que confirmar.');
-            else payToast('Pagamento em processamento. Seu acesso sera liberado automaticamente assim que confirmar.');
+            if (typeof showToast === 'function') showToast('Pagamento em processamento. Se o acesso nao liberar em alguns minutos, fale com contato@cineboss.online que resolvemos na hora.');
+            else payToast('Pagamento em processamento. Se o acesso nao liberar em alguns minutos, fale com contato@cineboss.online que resolvemos na hora.');
         }
+    } catch (e) {}
+}
+
+function tryBackgroundVerify() {
+    var flag = 'cineboss_verify_done';
+    try {
+        if (sessionStorage.getItem(flag) === '1') return;
+        sessionStorage.setItem(flag, '1');
+    } catch (e) {}
+    try {
+        fetch('/api/subscription/verify', { method: 'POST', credentials: 'include' })
+            .then(function(r) { return r.ok ? r.json() : null; })
+            .then(function(j) {
+                if (j && j.activated) {
+                    if (typeof auth !== 'undefined') auth.check();
+                    if (typeof showToast === 'function') showToast('Pagamento confirmado! Acesso liberado.');
+                }
+            })
+            .catch(function() {});
     } catch (e) {}
 }
 
@@ -1411,6 +1446,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (typeof renderContinueWatching === 'function') {
                     renderContinueWatching();
                     syncContinueWatching();
+                }
+                if (!subscription || subscription.status !== 'active') {
+                    tryBackgroundVerify();
                 }
             } else {
                 if (authBtns) authBtns.classList.remove('hidden');

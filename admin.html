@@ -470,6 +470,57 @@
 
         <div class="panel">
             <div class="panel-head">
+                <div class="panel-title"><i class="fas fa-money-check-dollar"></i> Pagamentos Recebidos <span class="muted" id="paymentsCount"></span></div>
+                <div class="panel-tools muted" style="font-size:11.5px">todo dinheiro que entrou</div>
+            </div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Plano</th>
+                            <th>Valor</th>
+                            <th>Status</th>
+                            <th>Metodo</th>
+                            <th>Pago em</th>
+                        </tr>
+                    </thead>
+                    <tbody id="paymentsTbody">
+                        <tr class="empty-row"><td colspan="6">Carregando pagamentos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-foot" id="paymentsFoot"></div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
+                <div class="panel-title"><i class="fas fa-hourglass-half"></i> Pendencias de Pagamento <span class="muted" id="pendingCount"></span></div>
+                <div class="panel-tools">
+                    <button class="ah-btn" id="verifyPendingBtn"><i class="fas fa-rotate"></i> Verificar agora</button>
+                </div>
+            </div>
+            <div class="table-scroll">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Cliente</th>
+                            <th>Plano</th>
+                            <th>Valor</th>
+                            <th>Checkout em</th>
+                            <th>Situacao</th>
+                        </tr>
+                    </thead>
+                    <tbody id="pendingTbody">
+                        <tr class="empty-row"><td colspan="5">Carregando pendencias...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="table-foot" id="pendingFoot" style="font-size:11.5px;color:#888">Checkouts abertos que ainda nao viraram pagamento. Clique em Verificar agora pra checar no Mercado Pago e liberar o acesso de quem ja pagou.</div>
+        </div>
+
+        <div class="panel">
+            <div class="panel-head">
                 <div class="panel-title"><i class="fas fa-users-gear"></i> Usuarios <span class="muted" id="usersCount"></span></div>
                 <div class="panel-tools">
                     <div class="search-wrap">
@@ -678,6 +729,8 @@
             state.sessions = d.sessions || [];
             renderUsers();
             renderSessions(d.sessions || []);
+            renderPayments(d.payments || []);
+            renderPending(d.pendingCheckouts || []);
             renderChart(d.series || {});
             renderVisuals(d);
         }
@@ -752,6 +805,80 @@
             }).join('');
             document.getElementById('sessionsFoot').textContent = '';
         }
+
+        /* ===================== TABELA DE PAGAMENTOS ===================== */
+        function renderPayments(list) {
+            var el = document.getElementById('paymentsCount');
+            if (el) el.textContent = '(' + list.length + ')';
+            var tb = document.getElementById('paymentsTbody');
+            if (list.length === 0) {
+                tb.innerHTML = '<tr class="empty-row"><td colspan="6">Nenhum pagamento registrado ainda.</td></tr>';
+                document.getElementById('paymentsFoot').textContent = '';
+                return;
+            }
+            tb.innerHTML = list.map(function(p) {
+                return '<tr>' +
+                    '<td><div class="user-cell">' +
+                        '<div class="avatar" style="background:' + avatarGradient(p.userName) + '">' + esc(initials(p.userName)) + '</div>' +
+                        '<div><div class="u-name">' + esc(p.userName) + '</div><div class="u-email">' + esc(p.userEmail || '') + '</div></div>' +
+                    '</div></td>' +
+                    '<td><span class="plan-tag">' + planLabel(p.plan) + '</span></td>' +
+                    '<td>' + fmtMoney(p.amount) + '</td>' +
+                    '<td>' + (p.status === 'completed' ? '<span class="status-pill status-active">CONFIRMADO</span>' : '<span class="status-pill status-other">' + esc(p.status || '-') + '</span>') + '</td>' +
+                    '<td class="muted">' + esc(p.method || '-') + '</td>' +
+                    '<td class="muted">' + fmtDate(p.paidAt) + '</td>' +
+                '</tr>';
+            }).join('');
+            document.getElementById('paymentsFoot').textContent = '';
+        }
+
+        /* ===================== TABELA DE PENDENCIAS ===================== */
+        function renderPending(list) {
+            var el = document.getElementById('pendingCount');
+            if (el) el.textContent = '(' + list.length + ')';
+            var tb = document.getElementById('pendingTbody');
+            if (list.length === 0) {
+                tb.innerHTML = '<tr class="empty-row"><td colspan="5">Nenhuma pendencia. Todo checkout foi concluido.</td></tr>';
+                return;
+            }
+            tb.innerHTML = list.map(function(p) {
+                return '<tr>' +
+                    '<td><div class="user-cell">' +
+                        '<div class="avatar" style="background:' + avatarGradient(p.userName) + '">' + esc(initials(p.userName)) + '</div>' +
+                        '<div><div class="u-name">' + esc(p.userName) + '</div><div class="u-email">' + esc(p.userEmail || '') + '</div></div>' +
+                    '</div></td>' +
+                    '<td><span class="plan-tag">' + planLabel(p.plan) + '</span></td>' +
+                    '<td>' + fmtMoney(p.amount) + '</td>' +
+                    '<td class="muted">' + fmtDate(p.createdAt) + '</td>' +
+                    '<td><span class="status-pill status-other">AGUARDANDO</span></td>' +
+                '</tr>';
+            }).join('');
+        }
+
+        document.getElementById('verifyPendingBtn').addEventListener('click', function() {
+            var btn = document.getElementById('verifyPendingBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Verificando...';
+            fetch(API + '/admin/overview', {
+                method: 'POST',
+                credentials: 'include',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'verify_pending' })
+            }).then(function(r) { return r.ok ? r.json() : null; })
+            .then(function(j) {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-rotate"></i> Verificar agora';
+                if (!j) { alert('Erro ao verificar. Tente novamente.'); return; }
+                var act = (j.results || []).filter(function(x) { return x.result === 'activated'; }).length;
+                alert('Verificacao concluida: ' + (j.checked || 0) + ' pendencia(s) checada(s) no Mercado Pago. ' + act + ' pagamento(s) liberado(s) agora.');
+                loadOverview();
+            })
+            .catch(function() {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-rotate"></i> Verificar agora';
+                alert('Erro ao verificar.');
+            });
+        });
 
         document.getElementById('sessionsTbody').addEventListener('click', function(e) {
             var btn = e.target.closest('[data-revoke]');

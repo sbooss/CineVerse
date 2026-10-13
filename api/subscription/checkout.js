@@ -95,12 +95,14 @@ module.exports = async function handler(req, res) {
             payment_id: String(preferenceId),
             amount: planInfo.price,
             expires_at: new Date(Date.now() + planInfo.days * 24 * 60 * 60 * 1000).toISOString(),
-            mp_preference_id: String(preferenceId),
             created_at: new Date().toISOString(),
             updated_at: new Date().toISOString()
         });
 
-        if (subErr) console.error('Sub insert error:', subErr);
+        if (subErr) {
+            console.error('Sub insert error:', subErr);
+            return jsonError(res, 500, 'Erro ao registrar checkout. Tente novamente.');
+        }
 
         return jsonSuccess(res, { url: initPoint, preferenceId, subscriptionId: subId });
     } catch (error) {
