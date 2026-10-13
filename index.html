@@ -619,6 +619,7 @@
         }
 
         // Boot screen removal - FAILSAFE: always removes boot screen
+        // INTRO EM VIDEO: substitui o boot na primeira visita da sessao (som automatico; navegador pode exigir 1 clique)
         (function() {
             var bootScreen = document.getElementById('boot-screen');
             var mainNav = document.getElementById('mainNav');
@@ -633,20 +634,150 @@
                 }, 600);
             }
 
-            // Primary: wait for load (TV: mais rapido)
             var bootDelay = document.documentElement.classList.contains('tv-device') ? 900 : 2200;
-            if (document.readyState === 'complete') {
-                setTimeout(removeBoot, bootDelay);
-            } else {
-                window.addEventListener('load', function() {
+            function scheduleBoot() {
+                if (document.readyState === 'complete') {
                     setTimeout(removeBoot, bootDelay);
+                } else {
+                    window.addEventListener('load', function() {
+                        setTimeout(removeBoot, bootDelay);
+                    });
+                }
+                setTimeout(removeBoot, 4000);
+            }
+
+            var isTV = document.documentElement.classList.contains('tv-device');
+            var reduced = false;
+            try { reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches; } catch (e) {}
+            var isBot = navigator.webdriver === true;
+            var qs = window.location.search || '';
+            var seen = false;
+            try { seen = sessionStorage.getItem('cineboss_video_intro') === '1'; } catch (e) {}
+            var playIntro = !isTV && !reduced && !isBot && !seen && qs.indexOf('nointro=1') === -1;
+
+            if (!playIntro) { scheduleBoot(); return; }
+
+            try { sessionStorage.setItem('cineboss_video_intro', '1'); } catch (e) {}
+
+            var ov = document.createElement('div');
+            ov.id = 'cineVideoIntro';
+            ov.innerHTML = '<video playsinline webkit-playsinline preload="auto" src="/intro-cineboss.mp4"></video>' +
+                '<button type="button" id="cviSkip" aria-label="Pular intro"><i class="fas fa-times"></i> PULAR</button>' +
+                '<button type="button" id="cviSound" aria-label="Ativar som" style="display:none"><i class="fas fa-volume-up"></i> TOCAR SOM</button>';
+            document.body.appendChild(ov);
+
+            var vid = ov.querySelector('video');
+            var sndBtn = ov.querySelector('#cviSound');
+            var closed = false;
+
+            function closeIntro() {
+                if (closed) return;
+                closed = true;
+                try { vid.pause(); } catch (e) {}
+                ov.classList.add('cvi-out');
+                setTimeout(function() { if (ov && ov.parentNode) ov.parentNode.removeChild(ov); }, 420);
+                removeBoot();
+            }
+
+            function markAndClose() {
+                try { sessionStorage.setItem('cineboss_video_intro', '1'); } catch (e) {}
+                closeIntro();
+            }
+
+            ov.addEventListener('click', function(e) {
+                if (e.target.closest('#cviSound')) return;
+                markAndClose();
+            });
+            document.addEventListener('keydown', function(e) { if (e.key === 'Escape') markAndClose(); });
+            ov.querySelector('#cviSkip').addEventListener('click', function(e) { e.stopPropagation(); markAndClose(); });
+            sndBtn.addEventListener('click', function(e) {
+                e.stopPropagation();
+                vid.muted = false;
+                vid.volume = 0.9;
+                try { var p = vid.play(); if (p) p.catch(function() {}); } catch (e2) {}
+                sndBtn.style.display = 'none';
+            });
+
+            vid.addEventListener('ended', markAndClose);
+            vid.addEventListener('error', function() { markAndClose(); });
+
+            vid.muted = false;
+            vid.volume = 0.9;
+            var startPlay = vid.play();
+            if (startPlay && startPlay.then) {
+                startPlay.then(function() {
+                    sndBtn.style.display = 'none';
+                }).catch(function() {
+                    vid.muted = true;
+                    sndBtn.style.display = 'inline-flex';
+                    var p2 = vid.play();
+                    if (p2) p2.catch(function() {});
                 });
             }
 
-            // FAILSAFE: if load event never fires or scripts fail, force remove after 4s
-            setTimeout(removeBoot, 4000);
+            function unmuteOnGesture() {
+                if (closed || vid.muted === false) return;
+                vid.muted = false;
+                vid.volume = 0.9;
+                sndBtn.style.display = 'none';
+            }
+            window.addEventListener('pointerdown', unmuteOnGesture, { once: true });
+            window.addEventListener('keydown', unmuteOnGesture, { once: true });
+
+            setTimeout(markAndClose, 12000);
         })();
     </script>
+    <style>
+        #cineVideoIntro {
+            position: fixed;
+            inset: 0;
+            z-index: 99999;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 1;
+            transition: opacity 0.4s ease;
+        }
+        #cineVideoIntro.cvi-out { opacity: 0; pointer-events: none; }
+        #cineVideoIntro video {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+        #cineVideoIntro #cviSkip,
+        #cineVideoIntro #cviSound {
+            position: absolute;
+            right: 22px;
+            font-family: 'Sora', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: rgba(255,255,255,0.9);
+            background: rgba(20,20,28,0.6);
+            border: 1px solid rgba(255,255,255,0.22);
+            border-radius: 8px;
+            padding: 10px 18px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+        }
+        #cineVideoIntro #cviSkip { top: 22px; }
+        #cineVideoIntro #cviSound { bottom: 26px; }
+        #cineVideoIntro #cviSkip:hover,
+        #cineVideoIntro #cviSound:hover {
+            background: rgba(0,168,224,0.35);
+            border-color: var(--accent-blue);
+        }
+        @media (max-width: 640px) {
+            #cineVideoIntro #cviSkip { top: 14px; right: 14px; padding: 9px 14px; }
+            #cineVideoIntro #cviSound { bottom: 18px; right: 14px; padding: 9px 14px; }
+        }
+    </style>
     <style>
         iframe[src*="doubleclick"],iframe[src*="googlesyndication"],iframe[src*="adnxs"],
         iframe[src*="adsrvr"],iframe[src*="popads"],iframe[src*="propellerads"],
