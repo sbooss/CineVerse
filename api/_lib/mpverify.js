@@ -83,6 +83,18 @@ async function activateSubscription(supabase, userId, sub, payment) {
     return { ok: true, plan: plan, expiresAt: expiresAt, amount: amount, mpPaymentId: String(payment.id) };
 }
 
+async function findApprovedForUser(userId, preferRef) {
+    if (preferRef) {
+        const byRef = await mpSearch({ external_reference: preferRef });
+        const hit = byRef.find(p => p.status === 'approved');
+        if (hit) return hit;
+    }
+    const recent = await mpSearch({ limit: 100 });
+    return recent.find(p => p.status === 'approved'
+        && String(p.external_reference || '').indexOf(userId) !== -1
+        && p.date_approved && (Date.now() - new Date(p.date_approved).getTime()) < 30 * 24 * 60 * 60 * 1000) || null;
+}
+
 async function verifyAndActivateUser(supabase, userId, userEmail) {
     const now = new Date().toISOString();
 
@@ -100,9 +112,7 @@ async function verifyAndActivateUser(supabase, userId, userEmail) {
     if (pendingSubs && pendingSubs.length > 0) {
         for (const sub of pendingSubs) {
             const extRef = JSON.stringify({ userId: userId, plan: sub.plan, planDays: String(PLAN_DAYS[sub.plan] || 30) });
-            let results = await mpSearch({ external_reference: extRef });
-            if (!results.length) results = (await mpSearch({ 'payer.email': userEmail })).filter(p => p.status === 'approved');
-            const approved = results.find(p => p.status === 'approved' && String(p.external_reference || '').indexOf(userId) !== -1);
+            const approved = await findApprovedForUser(userId, extRef);
             if (approved) {
                 const r = await activateSubscription(supabase, userId, sub, approved);
                 if (r.ok) return { status: 'activated', plan: r.plan, expiresAt: r.expiresAt, recovered: false, mpPaymentId: r.mpPaymentId };
@@ -112,10 +122,7 @@ async function verifyAndActivateUser(supabase, userId, userEmail) {
         return { status: 'payment_not_found' };
     }
 
-    const byEmail = await mpSearch({ 'payer.email': userEmail });
-    const approvedForUser = byEmail.find(p => p.status === 'approved'
-        && String(p.external_reference || '').indexOf(userId) !== -1
-        && p.date_approved && (Date.now() - new Date(p.date_approved).getTime()) < 30 * 24 * 60 * 60 * 1000);
+    const approvedForUser = await findApprovedForUser(userId, null);
     if (approvedForUser) {
         const r = await activateSubscription(supabase, userId, null, approvedForUser);
         if (r.ok) return { status: 'activated', plan: r.plan, expiresAt: r.expiresAt, recovered: true, mpPaymentId: r.mpPaymentId };
