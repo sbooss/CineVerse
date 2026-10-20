@@ -2131,6 +2131,26 @@ html.js-reveal .content-section.revealed .movie-card {
     text-transform: uppercase;
 }
 
+/* ===================== BOTAO INSTAGRAM ===================== */
+.ig-follow-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    margin-top: 14px;
+    padding: 10px 20px;
+    border-radius: 30px;
+    background: linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%);
+    color: #fff;
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.4px;
+    text-decoration: none;
+    box-shadow: 0 4px 18px rgba(220, 39, 67, 0.35);
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.ig-follow-btn i { font-size: 16px; }
+.ig-follow-btn:hover { transform: translateY(-3px); box-shadow: 0 8px 30px rgba(220, 39, 67, 0.55); }
+
 /* ===================== CATALOGO EM GRADE ===================== */
 a.movie-card { text-decoration: none; color: inherit; }
 .catalog-section { margin: 10px 0 48px; }
