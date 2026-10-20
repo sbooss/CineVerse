@@ -2132,6 +2132,7 @@ html.js-reveal .content-section.revealed .movie-card {
 }
 
 /* ===================== CATALOGO EM GRADE ===================== */
+a.movie-card { text-decoration: none; color: inherit; }
 .catalog-section { margin: 10px 0 48px; }
 .catalog-grid {
     display: grid;

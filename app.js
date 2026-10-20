@@ -117,10 +117,19 @@ function shuffleArray(arr) {
 }
 
 /* ===================== CREATE CARD ===================== */
+function titleSlug(s) {
+    return String(s || '').toLowerCase()
+        .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-+|-+$/g, '')
+        .substring(0, 60);
+}
+
 function createCard(item) {
     var fav = isFavorite(item.id);
-    var card = document.createElement('div');
+    var card = document.createElement('a');
     card.className = 'movie-card';
+    card.href = '/assistir/' + (item.mediaType || 'movie') + '/' + item.id + '-' + (titleSlug(item.title) || 'titulo');
     var posterHTML = item.poster
         ? '<img src="' + item.poster + '" alt="' + escapeHtml(item.title) + '" loading="lazy" onerror="this.outerHTML=\'<div class=poster-placeholder><i class=fas fa-film></i></div>\'">'
         : '<div class="poster-placeholder"><i class="fas fa-film"></i></div>';
@@ -145,6 +154,7 @@ function createCard(item) {
             '<div class="card-year">' + year + '</div>' +
         '</div>';
     card.addEventListener('click', function(e) {
+        e.preventDefault();
         if (e.target.closest('.card-fav')) {
             e.stopPropagation();
             var added = toggleFavorite(item);
@@ -159,8 +169,9 @@ function createCard(item) {
 /* ===================== CONTINUE WATCHING CARD ===================== */
 function createCardCW(item) {
     var fav = isFavorite(item.id);
-    var card = document.createElement('div');
+    var card = document.createElement('a');
     card.className = 'movie-card cw-card';
+    card.href = '/assistir/' + (item.mediaType === 'movie' ? 'movie' : 'tv') + '/' + item.id + '-' + (titleSlug(item.title) || 'titulo');
     var posterHTML = item.poster
         ? '<img src="' + item.poster + '" alt="' + escapeHtml(item.title) + '" loading="lazy" onerror="this.outerHTML=\'<div class=poster-placeholder><i class=fas fa-film></i></div>\'">'
         : '<div class="poster-placeholder"><i class="fas fa-film"></i></div>';
@@ -182,6 +193,7 @@ function createCardCW(item) {
             '<div class="card-year">Continuar de onde parou</div>' +
         '</div>';
     card.addEventListener('click', function(e) {
+        e.preventDefault();
         if (e.target.closest('.card-fav')) {
             e.stopPropagation();
             var added = toggleFavorite(item);
@@ -1405,6 +1417,17 @@ document.addEventListener('DOMContentLoaded', function() {
         window.__catMain = document.getElementById('catResults');
         if (!window.__catMain) window.__catMain = document.getElementById('mainContent');
         loadCategory(window.CINEBOSS_CATEGORY, window.__catMain);
+        try {
+            var openQs = new URLSearchParams(window.location.search).get('open');
+            if (openQs && /^\w+:\d+$/.test(openQs)) {
+                var opParts = openQs.split(':');
+                var oType = opParts[0] === 'tv' ? 'tv' : 'movie';
+                var oId = opParts[1];
+                tmdb.getDetails(oType, oId).then(function (d) {
+                    if (d) openDetailPage(tmdb.formatItem(d, oType));
+                }).catch(function () {});
+            }
+        } catch (e) {}
     } else {
         loadHome();
     }

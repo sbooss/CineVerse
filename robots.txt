@@ -4,6 +4,8 @@ Disallow: /api/
 Disallow: /account.html
 Disallow: /expired.html
 Disallow: /admin.html
+Disallow: /email-welcome.html
+Disallow: /404.html
 
 Sitemap: https://cineboss.online/sitemap.xml
 
