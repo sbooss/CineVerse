@@ -119,11 +119,22 @@ class VideoPlayer {
     _pauseBackground() {
         try { this._heroWasRunning = (typeof heroTimer !== 'undefined' && !!heroTimer); } catch (e) { this._heroWasRunning = false; }
         if (typeof stopHeroCarousel === 'function') stopHeroCarousel();
+        try {
+            var bg = document.getElementById('cinemaBg');
+            if (bg) { this._bgWasHidden = true; bg.style.display = 'none'; }
+        } catch (e) {}
     }
 
     _resumeBackground() {
         if (this._heroWasRunning && typeof startHeroCarousel === 'function') startHeroCarousel();
         this._heroWasRunning = false;
+        try {
+            if (this._bgWasHidden) {
+                var bg = document.getElementById('cinemaBg');
+                if (bg) bg.style.display = '';
+                this._bgWasHidden = false;
+            }
+        } catch (e) {}
     }
 
     async open(item, season, episode) {
@@ -149,6 +160,8 @@ class VideoPlayer {
         var detailOpen = document.getElementById('detailPage') && document.getElementById('detailPage').classList.contains('active');
         if (!detailOpen) document.body.style.overflow = '';
         if (this._serverLoadTimeout) { clearTimeout(this._serverLoadTimeout); this._serverLoadTimeout = null; }
+        if (this._directFallbackTimer) { clearTimeout(this._directFallbackTimer); this._directFallbackTimer = null; }
+        if (this._directHls) { try { this._directHls.destroy(); } catch (e) {} this._directHls = null; }
         this._stopAntiAds();
         this._resumeBackground();
         var iframes = this.wrapper.querySelectorAll('iframe');
@@ -180,12 +193,17 @@ class VideoPlayer {
             self.wrapper.innerHTML =
                 '<div class="player-error">' +
                 '<i class="fas fa-exclamation-triangle"></i>' +
-                '<p>' + (msg || 'Servidor indisponivel. Tente outro servidor.') + '</p>' +
-                '<button class="btn-secondary" id="playerErrorBack" style="margin-top:15px">' +
-                '<i class="fas fa-arrow-left"></i> Voltar</button></div>';
+                '<p>' + (msg || 'Servidor indisponivel no momento.') + '</p>' +
+                '<div style="display:flex;gap:10px;justify-content:center;margin-top:15px;flex-wrap:wrap">' +
+                '<button class="btn-secondary" id="playerErrorRetry">' +
+                '<i class="fas fa-rotate"></i> Tentar de novo</button>' +
+                '<button class="btn-secondary" id="playerErrorBack">' +
+                '<i class="fas fa-arrow-left"></i> Voltar</button></div></div>';
             document.getElementById('playerErrorBack').addEventListener('click', function() { self.close(); });
+            var retryBtn = document.getElementById('playerErrorRetry');
+            if (retryBtn) retryBtn.addEventListener('click', function() { tryProvider(0, false); });
             if (document.documentElement.classList.contains('tv-device')) {
-                var fbtn = serverBar.querySelector('.server-chip') || document.getElementById('playerErrorBack');
+                var fbtn = serverBar.querySelector('.server-chip') || retryBtn || document.getElementById('playerErrorBack');
                 if (fbtn) { try { fbtn.focus(); } catch (e) {} }
             }
         };
@@ -193,7 +211,14 @@ class VideoPlayer {
         var tryProvider = function(index, isRetry) {
             if (index >= providers.length) {
                 serverBar.innerHTML = '';
-                showError('Todos os servidores estao fora. Tente novamente mais tarde.');
+                try {
+                    fetch('/api/track', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ event: 'player_fail' })
+                    }).catch(function() {});
+                } catch (e) {}
+                showError('Os servidores nao responderam. Verifique sua internet e tente novamente.');
                 return;
             }
 
@@ -240,7 +265,7 @@ class VideoPlayer {
                 self._serverLoadTimeout = null;
                 if (isTv && !isRetry) { tryProvider(index, true); return; }
                 tryProvider(index + 1);
-            }, isTv ? (isRetry ? 15000 : 22000) : 10000);
+            }, isTv ? (isRetry ? 18000 : 25000) : (index === 0 ? 14000 : 10000));
             self._serverLoadTimeout = loadTimeout;
 
             self.wrapper.appendChild(iframe);
