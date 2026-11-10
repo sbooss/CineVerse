@@ -12,8 +12,7 @@
             "maxDuration": 30
         },
         "api/assistir.js": {
-            "maxDuration": 10,
-            "includeFiles": "assistir.html"
+            "maxDuration": 10
         }
     },
     "headers": [

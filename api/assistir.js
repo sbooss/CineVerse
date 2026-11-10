@@ -1,5 +1,4 @@
-import fs from 'fs';
-import path from 'path';
+import { ASSISTIR_TEMPLATE } from './_lib/assistirTemplate.js';
 
 /* =====================================================
    CINE BOSS - Renderizacao server-side das paginas de assistir
@@ -73,11 +72,7 @@ async function fetchTmdb(type, id) {
 }
 
 function loadTemplate() {
-    try {
-        return fs.readFileSync(path.join(process.cwd(), 'assistir.html'), 'utf8');
-    } catch (e) {
-        return null;
-    }
+    return ASSISTIR_TEMPLATE || null;
 }
 
 function replaceFirst(html, needle, replacement) {
@@ -163,7 +158,7 @@ export default async function handler(req, res) {
     if (result.miss && (result.status === 404 || result.status === 400)) {
         if (!cached) memo.set(cacheKey, { expires: now + 24 * 60 * 60 * 1000, data: result });
         res.setHeader('Cache-Control', 'public, max-age=300, s-maxage=86400');
-        var notFound = loadTemplate() || '<html><body><h1>Conteudo nao encontrado</h1></body></html>';
+        var notFound = template;
         notFound = notFound.replace('<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">', '<meta name="robots" content="noindex, follow">');
         notFound = replaceFirst(notFound, '<div class="loader" id="loader">CARREGANDO...</div>', '<div class="loader" id="loader" style="display:none">CARREGANDO...</div>');
         res.status(404).send(notFound);
