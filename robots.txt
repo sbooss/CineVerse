@@ -8,6 +8,8 @@ Disallow: /email-welcome.html
 Disallow: /404.html
 
 Sitemap: https://cineboss.online/sitemap.xml
+Sitemap: https://cineboss.online/sitemap-filmes.xml
+Sitemap: https://cineboss.online/sitemap-generos.xml
 
 # CINE BOSS - Streaming Premium
 # Filmes, Series, Novelas, Animes e TV Ao Vivo em Portugues
