@@ -1,4 +1,4 @@
-import { ASSISTIR_TEMPLATE } from './_lib/assistirTemplate.js';
+import { ASSISTIR_TEMPLATE } from '../lib/assistirTemplate.js';
 
 /* =====================================================
    CINE BOSS - Renderizacao server-side das paginas de assistir
