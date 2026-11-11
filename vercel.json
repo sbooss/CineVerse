@@ -2,17 +2,14 @@
     "version": 2,
     "outputDirectory": ".",
     "rewrites": [
-        { "source": "/assistir/:type/:idslug", "destination": "/api/assistir" }
+        { "source": "/assistir/:type/:idslug", "destination": "/api/assistir/:type/:idslug" }
     ],
     "redirects": [
         { "source": "/(.*)", "destination": "https://cineboss.online/$1", "permanent": true, "has": [{"type": "host", "value": "www.cineboss.online"}] }
     ],
     "functions": {
-        "api/webhook/mercadopago.js": {
+        "api/[...path].js": {
             "maxDuration": 30
-        },
-        "api/assistir.js": {
-            "maxDuration": 10
         }
     },
     "headers": [
