@@ -2,14 +2,29 @@
     "version": 2,
     "outputDirectory": ".",
     "rewrites": [
-        { "source": "/assistir/:type/:idslug", "destination": "/api/assistir/:type/:idslug" }
+        { "source": "/assistir/:type/:idslug", "destination": "/api/assistir?media=:type&idslug=:idslug" },
+        { "source": "/api/assistir/:type/:idslug", "destination": "/api/assistir?media=:type&idslug=:idslug" },
+        { "source": "/api/auth/:fn", "destination": "/api/auth?fn=:fn" },
+        { "source": "/api/admin/:fn", "destination": "/api/admin?fn=:fn" },
+        { "source": "/api/watch/:fn", "destination": "/api/watch?fn=:fn" },
+        { "source": "/api/subscription/:fn", "destination": "/api/subscription?fn=:fn" },
+        { "source": "/api/webhook/:fn", "destination": "/api/webhook?fn=:fn" }
     ],
     "redirects": [
         { "source": "/(.*)", "destination": "https://cineboss.online/$1", "permanent": true, "has": [{"type": "host", "value": "www.cineboss.online"}] }
     ],
     "functions": {
-        "api/[...path].js": {
+        "api/webhook.js": {
             "maxDuration": 30
+        },
+        "api/assistir.js": {
+            "maxDuration": 15
+        },
+        "api/live.js": {
+            "maxDuration": 15
+        },
+        "api/admin.js": {
+            "maxDuration": 15
         }
     },
     "headers": [
